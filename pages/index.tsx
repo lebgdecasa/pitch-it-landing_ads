@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import Layout from '@/components/layout/Layout';
 import HeroSection from '@/components/sections/HeroSection';
 import WhyPitchItSection from '@/components/sections/WhyPitchItSection';
 import FeaturesSection from '@/components/sections/FeaturesSection';
@@ -38,13 +37,11 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Layout onOpenDemoModal={openDemoModal}>
-        <HeroSection onOpenWaitlistModal={openWaitlistModal} onOpenDemoModal={openDemoModal} />
-        <WhyPitchItSection />
-        <FeaturesSection onOpenDemoModal={openDemoModal} />
-        <MoreThanToolSection />
-        <FinalCTASection onOpenWaitlistModal={openWaitlistModal} onOpenDemoModal={openDemoModal} />
-      </Layout>
+      <HeroSection onOpenWaitlistModal={openWaitlistModal} onOpenDemoModal={openDemoModal} />
+      <WhyPitchItSection />
+      <FeaturesSection onOpenDemoModal={openDemoModal} />
+      <MoreThanToolSection />
+      <FinalCTASection onOpenWaitlistModal={openWaitlistModal} onOpenDemoModal={openDemoModal} />
 
       <Modal isOpen={isWaitlistModalOpen} onClose={closeWaitlistModal}>
         <WaitlistModal onClose={closeWaitlistModal} />
