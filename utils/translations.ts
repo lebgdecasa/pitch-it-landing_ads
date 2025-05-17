@@ -169,12 +169,12 @@ export const translations: AllTranslations = {
     // Header
     nav_features: "Fonctionnalités",
     nav_why_us: "Pourquoi Nous?",
-    nav_book_demo: "Book a Demo",
+    nav_book_demo: "Demander une Démo",
     // Hero
     hero_title: "Révolutionnez Votre Pitch. Sécurisez Votre Avenir.",
     hero_subtitle: "Pitch-it est la plateforme IA qui transforme vos idées en présentations percutantes, valide vos concepts et vous prépare à convaincre les investisseurs.",
-    hero_cta_free: "Get Started for Free",
-    hero_cta_demo: "Book a Demo Call",
+    hero_cta_free: "Rejoindre la Waitlist",
+    hero_cta_demo: "Demander une Démo",
     // Why Pitch-it
     why_title: "Fatigué de pitcher dans le vide ?",
     why_subtitle: "Transformer une idée brillante en un pitch qui captive et convertit est un défi majeur. Pitch-it vous donne les outils IA pour surmonter chaque obstacle.",
