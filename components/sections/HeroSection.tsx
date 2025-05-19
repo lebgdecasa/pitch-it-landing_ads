@@ -1,5 +1,6 @@
 import React from 'react';
 import useTranslation from '@/hooks/useTranslation';
+import useFadeInOnScroll from '@/hooks/useFadeInOnScroll';
 
 interface HeroSectionProps {
   onOpenWaitlistModal: () => void;

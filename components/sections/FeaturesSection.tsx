@@ -1,48 +1,7 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
 import useTranslation from '@/hooks/useTranslation';
-import SectionTitle from '@/components/ui/SectionTitle';
 import useFadeInOnScroll from '@/hooks/useFadeInOnScroll';
-import ScreenshotPlaceholder from '@/components/ui/Screenshot';
-import { DeckBuilderIcon, MarketPulseIcon, VirtualVCRehearsalIcon, ArrowRightIcon } from '@/components/ui/icons/Icons';
-import { TranslationSet } from '@/utils/translations';
-import Screenshot from '@/components/ui/Screenshot';
-
-interface FeatureCardProps {
-  icon: ReactNode;
-  titleKey: keyof TranslationSet;
-  descKey: keyof TranslationSet;
-  listKeys: (keyof TranslationSet)[];
-  ctaKey: keyof TranslationSet;
-  onOpenDemoModal: () => void;
-}
-
-const FeatureCard = ({ icon, titleKey, descKey, listKeys, ctaKey, onOpenDemoModal }: FeatureCardProps) => {
-  const t = useTranslation();
-  return (
-    <div className="bg-white p-8 rounded-xl shadow-xl feature-card flex flex-col">
-      <div className="mb-6 text-center">{icon}</div>
-      <h3 className="text-2xl font-bold text-gray-800 text-center mb-4">{t(titleKey)}</h3>
-      <p className="text-gray-600 mb-4 flex-grow text-sm" dangerouslySetInnerHTML={{ __html: t(descKey) }}></p>
-      <Screenshot
-  src={`/images/${titleKey}.png`}
-  alt={`${t(titleKey)} Screenshot`}
-/>
-      <ul className="text-gray-600 space-y-2 list-disc list-inside mb-6 flex-grow text-sm">
-        {listKeys.map((key) => <li key={key as string}>{t(key)}</li>)}
-      </ul>
-      <button
-        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-          e.preventDefault();
-          onOpenDemoModal();
-        }}
-        className="group mt-auto text-blue-600 hover:text-blue-800 font-semibold inline-flex items-center self-start transition-colors duration-300"
-      >
-        {t(ctaKey)}
-        <ArrowRightIcon />
-      </button>
-    </div>
-  );
-};
+import FeatureItem from './FeatureItem'; // Import the new component
 
 interface FeaturesSectionProps {
   onOpenDemoModal: () => void;
@@ -52,45 +11,110 @@ const FeaturesSection = ({ onOpenDemoModal }: FeaturesSectionProps) => {
   const t = useTranslation();
   const [ref, isVisible] = useFadeInOnScroll();
 
-  const features: Omit<FeatureCardProps, 'onOpenDemoModal'>[] = [
+  const features = [
     {
-      icon: <DeckBuilderIcon />,
-      titleKey: 'feature1_title',
-      descKey: 'feature1_desc',
-      listKeys: ['feature1_li1', 'feature1_li2', 'feature1_li3'],
-      ctaKey: 'feature1_cta'
+      id: 'feature1',
+      featureNumber: '01',
+      color: 'blue',
+      title: t('feature1_title').split('|')[1].trim(),
+      description: t('feature1_desc'),
+      listItems: [t('feature1_li1'), t('feature1_li2'), t('feature1_li3')],
+      ctaText: t('feature1_cta'),
+      imageUrl: '/images/analysis.png',
     },
     {
-      icon: <MarketPulseIcon />,
-      titleKey: 'feature2_title',
-      descKey: 'feature2_desc',
-      listKeys: ['feature2_li1', 'feature2_li2', 'feature2_li3'],
-      ctaKey: 'feature2_cta'
+      id: 'feature2',
+      featureNumber: '02',
+      color: 'green',
+      title: t('feature2_title').split('|')[1].trim(),
+      description: t('feature2_desc'),
+      listItems: [t('feature2_li1'), t('feature2_li2'), t('feature2_li3')],
+      ctaText: t('feature2_cta'),
+      imageUrl: '/images/pulse_setup.png',
     },
     {
-      icon: <VirtualVCRehearsalIcon />,
-      titleKey: 'feature3_title',
-      descKey: 'feature3_desc',
-      listKeys: ['feature3_li1', 'feature3_li2', 'feature3_li3'],
-      ctaKey: 'feature3_cta'
+      id: 'feature3',
+      featureNumber: '03',
+      color: 'purple',
+      title: t('feature3_title').split('|')[1].trim(),
+      description: t('feature3_desc'),
+      listItems: [t('feature3_li1'), t('feature3_li2'), t('feature3_li3')],
+      ctaText: t('feature3_cta'),
+      imageUrl: '/images/personas.png',
+    },
+    {
+      id: 'feature4',
+      featureNumber: '04',
+      color: 'yellow',
+      title: t('feature4_title').split('|')[1].trim(),
+      description: t('feature4_desc'),
+      listItems: [t('feature4_li1'), t('feature4_li2'), t('feature4_li3')],
+      ctaText: t('feature4_cta'),
+      imageUrl: '/images/deck_editor.png',
+    },
+    {
+      id: 'feature5',
+      featureNumber: '05',
+      color: 'red',
+      title: t('feature5_title').split('|')[1].trim(),
+      description: t('feature5_desc'),
+      listItems: [t('feature5_li1'), t('feature5_li2'), t('feature5_li3')],
+      ctaText: t('feature5_cta'),
+      imageUrl: '/images/VVC_setup.png',
+      onCtaClick: onOpenDemoModal,
     },
   ];
 
   return (
-    <section
-      id="features"
-      ref={ref}
-      className={`py-16 md:py-24 bg-blue-50 transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
-    >
+    <section id="features" ref={ref} className="py-20 bg-gray-50">
       <div className="container mx-auto px-6">
-        <SectionTitle>{t('features_title')}</SectionTitle>
-        <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-10 mt-16">
-          {features.map(feature => (
-            <FeatureCard
-              key={feature.titleKey as string}
-              {...feature}
-              onOpenDemoModal={onOpenDemoModal}
-            />
+        <div className={`text-center mb-16 transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('features_title')}</h2>
+        </div>
+
+        {/* Feature Navigation */}
+        <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-16">
+          {features.map((feature, index) => (
+            <a key={feature.id} href={`#${feature.id}`} className="flex items-center">
+              <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold ${
+                feature.color === 'blue' ? 'bg-blue-400' :
+                feature.color === 'green' ? 'bg-green-400' :
+                feature.color === 'purple' ? 'bg-purple-400' :
+                feature.color === 'yellow' ? 'bg-yellow-400' :
+                'bg-red-400'
+              }`}>
+                {feature.featureNumber}
+              </div>
+              <div className="hidden md:block ml-2 font-medium">
+                {feature.title}
+              </div>
+              {index < features.length - 1 && <div className="mx-2 text-gray-400">→</div>}
+            </a>
+          ))}
+        </div>
+
+        {/* Feature Items */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {features.map((feature, index) => (
+            <div
+              key={feature.id}
+              className={
+                // If there are 5 features, make the 5th item (index 4) span two columns on medium screens and up
+                features.length === 5 && index === 4 ? 'md:col-span-2' : ''
+              }
+            >
+              <FeatureItem
+                id={feature.id}
+                featureNumber={feature.featureNumber}
+                color={feature.color}
+                title={feature.title}
+                description={feature.description}
+                listItems={feature.listItems}
+                ctaText={feature.ctaText}
+                imageUrl={feature.imageUrl}
+                onCtaClick={feature.onCtaClick}
+              />
+            </div>
           ))}
         </div>
       </div>
