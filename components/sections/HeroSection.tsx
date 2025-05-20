@@ -12,17 +12,19 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
   const t = useTranslation();
 
   return (
-    <section className="relative overflow-hidden py-24 md:py-36 bg-white">
+    <section className="relative overflow-hidden py-16 md:py-36 bg-white">
       {/* 3D Fluid Animation Background (positioned to the right) */}
-      <HeroBackground />
+      <div className="hidden md:block">
+        <HeroBackground />
+      </div>
 
       {/* Content Layer */}
-      <div className="container mx-auto px-6 text-left relative z-10">
-        <div className="max-w-2xl">
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight animate-fade-in-down text-blue-700">
+      <div className="container mx-auto px-4 md:px-6 text-center md:text-left relative z-10">
+        <div className="max-w-full md:max-w-2xl">
+          <h1 className="text-3xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight animate-fade-in-down text-blue-700">
             {t('hero_title')}
           </h1>
-          <p className="text-lg md:text-xl mb-10 max-w-3xl text-blue-600 animate-fade-in-up delay-300">
+          <p className="text-lg md:text-xl mb-10 max-w-3xl mx-auto md:mx-0 text-blue-600 animate-fade-in-up delay-300">
             {t('hero_subtitle')}
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-6 animate-fade-in-up delay-600">
@@ -42,7 +44,7 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
         </div>
 
         {/* Overlay for text that would overlap with animation */}
-        <div className="absolute top-0 right-0 w-2/6 h-full flex items-center justify-center">
+        <div className="absolute top-0 right-0 w-2/6 h-full hidden md:flex items-center justify-center">
           <img src="/images/logo.png" alt="Pitch-it Logo" className="h-auto max-h-80 md:max-h-90 opacity-100" />
         </div>
       </div>

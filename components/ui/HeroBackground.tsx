@@ -235,6 +235,7 @@ const HeroBackground = () => {
   return (
     <div
       ref={mountRef}
+      className="hidden md:block"
       style={{
         position: 'absolute',
         top: 0,
