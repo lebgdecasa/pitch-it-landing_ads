@@ -21,6 +21,7 @@ const FeaturesSection = ({ onOpenDemoModal }: FeaturesSectionProps) => {
       listItems: [t('feature1_li1'), t('feature1_li2'), t('feature1_li3')],
       ctaText: t('feature1_cta'),
       imageUrl: '/images/analysis.png',
+      onCtaClick: onOpenDemoModal,
     },
     {
       id: 'feature2',
@@ -31,6 +32,7 @@ const FeaturesSection = ({ onOpenDemoModal }: FeaturesSectionProps) => {
       listItems: [t('feature2_li1'), t('feature2_li2'), t('feature2_li3')],
       ctaText: t('feature2_cta'),
       imageUrl: '/images/pulse_setup.png',
+      onCtaClick: onOpenDemoModal,
     },
     {
       id: 'feature3',
@@ -41,6 +43,7 @@ const FeaturesSection = ({ onOpenDemoModal }: FeaturesSectionProps) => {
       listItems: [t('feature3_li1'), t('feature3_li2'), t('feature3_li3')],
       ctaText: t('feature3_cta'),
       imageUrl: '/images/personas.png',
+      onCtaClick: onOpenDemoModal,
     },
     {
       id: 'feature4',
@@ -51,6 +54,7 @@ const FeaturesSection = ({ onOpenDemoModal }: FeaturesSectionProps) => {
       listItems: [t('feature4_li1'), t('feature4_li2'), t('feature4_li3')],
       ctaText: t('feature4_cta'),
       imageUrl: '/images/deck_editor.png',
+      onCtaClick: onOpenDemoModal,
     },
     {
       id: 'feature5',
@@ -81,7 +85,7 @@ const FeaturesSection = ({ onOpenDemoModal }: FeaturesSectionProps) => {
                 feature.color === 'green' ? 'bg-green-400' :
                 feature.color === 'purple' ? 'bg-purple-400' :
                 feature.color === 'yellow' ? 'bg-yellow-400' :
-                'bg-red-400'
+                feature.color === 'red' ? 'bg-red-400' : ''
               }`}>
                 {feature.featureNumber}
               </div>

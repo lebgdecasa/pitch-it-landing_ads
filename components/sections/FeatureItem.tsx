@@ -27,10 +27,10 @@ const FeatureItem = ({
   const t = useTranslation();
 
   const textColor = `text-${color}-400`;
-  const bgColor = `bg-${color}-100`;
-  const hoverBgColor = `hover:bg-${color}-200`;
+  const bgColor = `bg-${color}-400`; // Changed from bg-${color}-100
+  const hoverBgColor = `hover:bg-${color}-500`; // Changed from hover:bg-${color}-200
   const ringColor = `ring-${color}-400`;
-  const ctaTextColor = `text-${color}-700`;
+  const ctaTextColor = `text-white`; // Changed from text-${color}-700
 
   return (
     <div id={id} className="mb-24 bg-white rounded-xl shadow-lg overflow-hidden">
