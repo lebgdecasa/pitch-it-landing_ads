@@ -141,14 +141,14 @@ const HeroBackground = () => {
           // Create a smooth, flowing displacement based on position and time
           float slowTime = time * 0.05; // Make animation slower
           vec3 pos = position;
-          float noiseScale = .62; // Decreased for broader waves
+          float noiseScale = .762; // Decreased for broader waves
 
           // Use simplex noise for a more organic flow
           float noise = snoise(vec3(pos.x * noiseScale, pos.y * noiseScale, slowTime));
 
           // Add a second layer of noise for more complexity
           // Adjusted slowTime multiplier and noise2 amplitude
-          float noise2 = snoise(vec3(pos.x * noiseScale * 2.0, pos.y * noiseScale * 2.0, slowTime * 1.2)) * 0.4;
+          float noise2 = snoise(vec3(pos.x * noiseScale * 2.0, pos.y * noiseScale * 1.7, slowTime * 1.2)) * 0.4;
 
           // Combine noise layers
           vDisplacement = noise + noise2;

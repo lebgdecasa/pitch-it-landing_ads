@@ -43,9 +43,7 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
 
         {/* Overlay for text that would overlap with animation */}
         <div className="absolute top-0 right-0 w-2/6 h-full flex items-center justify-center">
-          <div className="text-white text-4xl md:text-6xl font-bold opacity-100">
-            Pitch-it
-          </div>
+          <img src="/images/logo.png" alt="Pitch-it Logo" className="h-auto max-h-80 md:max-h-90 opacity-100" />
         </div>
       </div>
     </section>
