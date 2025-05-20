@@ -23,7 +23,7 @@ const HeroBackground = () => {
     }
 
     // Create a geometry for the fluid animation
-    const geometry = new THREE.SphereGeometry(4.13, 2024, 2025);
+    const geometry = new THREE.SphereGeometry(4.13, 524, 524);
 
     // Create a shader material for the fluid effect - using brand blue
     const material = new THREE.ShaderMaterial({
@@ -141,7 +141,7 @@ const HeroBackground = () => {
           // Create a smooth, flowing displacement based on position and time
           float slowTime = time * 0.05; // Make animation slower
           vec3 pos = position;
-          float noiseScale = 1.2; // Decreased for broader waves
+          float noiseScale = .62; // Decreased for broader waves
 
           // Use simplex noise for a more organic flow
           float noise = snoise(vec3(pos.x * noiseScale, pos.y * noiseScale, slowTime));
