@@ -11,29 +11,40 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     // Connect to database
     await dbConnect();
-    
-    const { name, email, company, interest, language } = req.body;
-    
+
+    const {
+      name,
+      email,
+      company,
+      interest,
+      language,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_term,
+      utm_content
+    } = req.body;
+
     // Validate required inputs
     if (!name) {
       return res.status(400).json({ success: false, error: 'Name is required' });
     }
-    
+
     if (!email) {
       return res.status(400).json({ success: false, error: 'Email is required' });
     }
-    
+
     if (!interest) {
       return res.status(400).json({ success: false, error: 'Interest information is required' });
     }
-    
+
     // Validate email format
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ success: false, error: 'Invalid email format' });
     }
-    
-    // Create new demo request
+
+    // Create new demo request with UTM parameters
     const demoRequest = new DemoRequest({
       name,
       email,
@@ -41,21 +52,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       interest,
       language: language || 'en',
       status: 'pending',
-      source: 'website'
+      source: 'website',
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_term,
+      utm_content
     });
-    
+
     await demoRequest.save();
-    
-    return res.status(200).json({ 
-      success: true, 
-      message: 'Demo request successfully submitted!' 
+
+    return res.status(200).json({
+      success: true,
+      message: 'Demo request successfully submitted!'
     });
-    
+
   } catch (error) {
     console.error('Demo request API error:', error);
-    return res.status(500).json({ 
-      success: false, 
-      error: 'Server error. Please try again later.' 
+    return res.status(500).json({
+      success: false,
+      error: 'Server error. Please try again later.'
     });
   }
 }
