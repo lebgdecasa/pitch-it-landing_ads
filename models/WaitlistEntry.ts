@@ -5,29 +5,56 @@ export interface IWaitlistEntry extends Document {
   language: string;
   createdAt: Date;
   source: string;
+  // UTM parameters
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_term?: string;
+  utm_content?: string;
 }
 
 const WaitlistEntrySchema: Schema = new Schema({
-  email: { 
-    type: String, 
-    required: true, 
+  email: {
+    type: String,
+    required: true,
     unique: true,
     trim: true,
     lowercase: true
   },
-  language: { 
-    type: String, 
+  language: {
+    type: String,
     required: true,
     enum: ['en', 'fr'],
     default: 'en'
   },
-  createdAt: { 
-    type: Date, 
-    default: Date.now 
+  createdAt: {
+    type: Date,
+    default: Date.now
   },
-  source: { 
-    type: String, 
-    default: 'website' 
+  source: {
+    type: String,
+    default: 'website'
+  },
+  // UTM tracking fields
+  utm_source: {
+    type: String,
+    trim: true
+  },
+  utm_medium: {
+    type: String,
+    trim: true
+  },
+  utm_campaign: {
+    type: String,
+    trim: true
+  },
+  utm_term: {
+    type: String,
+    trim: true
+  },
+  utm_content: {
+    type: String,
+    trim: true
   }
 });
 

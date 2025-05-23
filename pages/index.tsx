@@ -9,10 +9,15 @@ import FinalCTASection from '@/components/sections/FinalCTASection';
 import Modal from '@/components/ui/Modal';
 import WaitlistModal from '@/components/modals/WaitlistModal';
 import DemoModal from '@/components/modals/DemoModal';
+import useScrollTracking from '@/hooks/useScrollTracking';
+import { trackButtonClick } from '@/utils/analytics';
 
 export default function Home() {
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
+
+  // Initialize scroll tracking
+  useScrollTracking();
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
@@ -25,9 +30,18 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleEsc);
   }, []);
 
-  const openWaitlistModal = () => setIsWaitlistModalOpen(true);
+  const openWaitlistModal = (source: string = 'unknown') => {
+    trackButtonClick('waitlist_modal_open', source);
+    setIsWaitlistModalOpen(true);
+  };
+
   const closeWaitlistModal = () => setIsWaitlistModalOpen(false);
-  const openDemoModal = () => setIsDemoModalOpen(true);
+
+  const openDemoModal = (source: string = 'unknown') => {
+    trackButtonClick('demo_modal_open', source);
+    setIsDemoModalOpen(true);
+  };
+
   const closeDemoModal = () => setIsDemoModalOpen(false);
 
   return (
@@ -38,12 +52,18 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Layout onOpenDemoModal={openDemoModal}>
-        <HeroSection onOpenWaitlistModal={openWaitlistModal} onOpenDemoModal={openDemoModal} />
+      <Layout onOpenDemoModal={() => openDemoModal('header')}>
+        <HeroSection
+          onOpenWaitlistModal={() => openWaitlistModal('hero')}
+          onOpenDemoModal={() => openDemoModal('hero')}
+        />
         <WhyPitchItSection />
-        <FeaturesSection onOpenDemoModal={openDemoModal} />
+        <FeaturesSection onOpenDemoModal={() => openDemoModal('features')} />
         <MoreThanToolSection />
-        <FinalCTASection onOpenWaitlistModal={openWaitlistModal} onOpenDemoModal={openDemoModal} />
+        <FinalCTASection
+          onOpenWaitlistModal={() => openWaitlistModal('final_cta')}
+          onOpenDemoModal={() => openDemoModal('final_cta')}
+        />
       </Layout>
 
       <Modal isOpen={isWaitlistModalOpen} onClose={closeWaitlistModal}>
