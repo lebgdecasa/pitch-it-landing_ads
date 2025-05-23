@@ -1,7 +1,7 @@
 import React from 'react';
 import useTranslation from '@/hooks/useTranslation';
-import HeroBackground from '@/components/ui/HeroBackground'; // Desktop 3D animation
-import MobileHeroBackground from '@/components/ui/MobileHeroBackground'; // Mobile bubbles animation
+import useFadeInOnScroll from '@/hooks/useFadeInOnScroll';
+import HeroBackground from '@/components/ui/HeroBackground';
 
 interface HeroSectionProps {
   onOpenWaitlistModal: () => void;
@@ -13,14 +13,9 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
 
   return (
     <section className="relative overflow-hidden py-16 md:py-36 bg-white">
-      {/* Desktop 3D Fluid Animation Background */}
+      {/* 3D Fluid Animation Background (positioned to the right) */}
       <div className="hidden md:block">
         <HeroBackground />
-      </div>
-
-      {/* Mobile Bubbles Animation Background */}
-      <div className="block md:hidden">
-        <MobileHeroBackground />
       </div>
 
       {/* Content Layer */}
@@ -48,7 +43,7 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
           </div>
         </div>
 
-        {/* Overlay Image (Desktop Only) */}
+        {/* Overlay for text that would overlap with animation */}
         <div className="absolute top-0 right-0 w-2/6 h-full hidden md:flex items-center justify-center">
           <img src="/images/logo.png" alt="Pitch-it Logo" className="h-auto max-h-80 md:max-h-90 opacity-100" />
         </div>
