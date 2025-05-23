@@ -127,7 +127,7 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
 
           {/* Trust Message */}
           <p className="text-center text-sm text-gray-500 mt-6">
-            Join 500+ founders and VCs already on the waitlist. No spam, unsubscribe anytime.
+            Join 275+ founders and VCs already on the waitlist. No spam, unsubscribe anytime.
           </p>
         </>
       ) : (

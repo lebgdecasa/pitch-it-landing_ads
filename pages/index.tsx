@@ -57,9 +57,12 @@ export default function Home() {
           onOpenWaitlistModal={() => openWaitlistModal('hero')}
           onOpenDemoModal={() => openDemoModal('hero')}
         />
+
         <WhyPitchItSection />
+
         <FeaturesSection onOpenDemoModal={() => openDemoModal('features')} />
         <MoreThanToolSection />
+  
         <FinalCTASection
           onOpenWaitlistModal={() => openWaitlistModal('final_cta')}
           onOpenDemoModal={() => openDemoModal('final_cta')}

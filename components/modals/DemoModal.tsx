@@ -11,6 +11,9 @@ type DemoFormData = {
   name: string;
   email: string;
   company: string;
+  role: 'founder' | 'investor' | 'other';
+  fundingStage?: string;
+  teamSize?: string;
   interest: string;
 };
 
@@ -24,8 +27,11 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
     register,
     handleSubmit,
     formState: { errors },
-    getValues
+    getValues,
+    watch
   } = useForm<DemoFormData>();
+
+  const selectedRole = watch('role');
 
   const onSubmit = async (data: DemoFormData) => {
     setIsSubmitting(true);
@@ -43,7 +49,7 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
         body: JSON.stringify({
           ...data,
           language: localStorage.getItem('pitchit-lang') || 'en',
-          ...utmParams // Include UTM parameters
+          ...utmParams
         }),
       });
 
@@ -88,6 +94,7 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
 
       {!submitSuccess ? (
         <form onSubmit={handleSubmit(onSubmit)}>
+          {/* Name & Email Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label htmlFor="demo_name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -129,19 +136,79 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
             </div>
           </div>
 
-          <div className="mb-4">
-            <label htmlFor="demo_company" className="block text-sm font-medium text-gray-700 mb-1">
-              {t('demo_modal_company_label')}
-            </label>
-            <input
-              id="demo_company"
-              type="text"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow focus:shadow-md"
-              placeholder={t('demo_modal_company_placeholder')}
-              {...register('company')}
-            />
+          {/* Company & Role Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label htmlFor="demo_company" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('demo_modal_company_label')}
+              </label>
+              <input
+                id="demo_company"
+                type="text"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow focus:shadow-md"
+                placeholder={t('demo_modal_company_placeholder')}
+                {...register('company')}
+              />
+            </div>
+            <div>
+              <label htmlFor="demo_role" className="block text-sm font-medium text-gray-700 mb-1">
+                I am a...
+              </label>
+              <select
+                id="demo_role"
+                className={`w-full px-4 py-3 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow focus:shadow-md`}
+                {...register('role', { required: 'Please select your role' })}
+              >
+                <option value="">Select your role</option>
+                <option value="founder">Founder/Entrepreneur</option>
+                <option value="investor">VC/Investor</option>
+                <option value="other">Other</option>
+              </select>
+              {errors.role && (
+                <p className="mt-1 text-red-500 text-sm">{errors.role.message}</p>
+              )}
+            </div>
           </div>
 
+          {/* Conditional Fields for Founders */}
+          {selectedRole === 'founder' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label htmlFor="demo_funding_stage" className="block text-sm font-medium text-gray-700 mb-1">
+                  Funding Stage
+                </label>
+                <select
+                  id="demo_funding_stage"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow focus:shadow-md"
+                  {...register('fundingStage')}
+                >
+                  <option value="">Select stage</option>
+                  <option value="pre-seed">Pre-seed</option>
+                  <option value="seed">Seed</option>
+                  <option value="series-a">Series A</option>
+                  <option value="series-b+">Series B+</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="demo_team_size" className="block text-sm font-medium text-gray-700 mb-1">
+                  Team Size
+                </label>
+                <select
+                  id="demo_team_size"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow focus:shadow-md"
+                  {...register('teamSize')}
+                >
+                  <option value="">Select size</option>
+                  <option value="1-5">1-5</option>
+                  <option value="6-20">6-20</option>
+                  <option value="21-50">21-50</option>
+                  <option value="50+">50+</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* Interest Field */}
           <div className="mb-6">
             <label htmlFor="demo_interest" className="block text-sm font-medium text-gray-700 mb-1">
               {t('demo_modal_interest_label')}
