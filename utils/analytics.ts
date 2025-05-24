@@ -43,6 +43,24 @@ export const trackFormSubmission = (formType: 'waitlist' | 'demo', success: bool
   });
 };
 
+// Track modal open events
+export const trackModalOpen = (modalType: 'waitlist' | 'demo') => {
+  event({
+    action: 'modal_open',
+    category: 'engagement',
+    label: modalType,
+  });
+};
+
+// Track modal close events
+export const trackModalClose = (modalType: 'waitlist' | 'demo') => {
+  event({
+    action: 'modal_close',
+    category: 'engagement',
+    label: modalType,
+  });
+};
+
 export const trackButtonClick = (buttonName: string, location: string) => {
   event({
     action: 'button_click',

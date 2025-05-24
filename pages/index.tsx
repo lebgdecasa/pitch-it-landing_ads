@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Head from 'next/head';
+import SEO from '@/components/SEO';
 import Layout from '@/components/layout/Layout';
 import HeroSection from '@/components/sections/HeroSection';
 import WhyPitchItSection from '@/components/sections/WhyPitchItSection';
@@ -46,11 +46,7 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>Pitch-it | AI-Powered Pitch Deck Platform</title>
-        <meta name="description" content="Pitch-it is the AI platform that transforms your ideas into impactful presentations, validates your concepts, and prepares you to convince investors." />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <SEO />
 
       <Layout onOpenDemoModal={() => openDemoModal('header')}>
         <HeroSection

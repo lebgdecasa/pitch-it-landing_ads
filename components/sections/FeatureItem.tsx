@@ -1,5 +1,6 @@
 import React from 'react';
 import useTranslation from '@/hooks/useTranslation';
+import { trackButtonClick, trackModalOpen } from '@/utils/analytics';
 
 interface FeatureItemProps {
   id: string;
@@ -52,12 +53,18 @@ const FeatureItem = ({
 
         {onCtaClick ? (
           <button
-            onClick={onCtaClick}
+            onClick={() => {
+              trackButtonClick(`feature_cta_${id}`, 'features_section');
+              trackModalOpen('demo');
+              onCtaClick();
+            }}
             className={`inline-block ${bgColor} ${hoverBgColor} ${ctaTextColor} font-semibold py-3 px-6 rounded-lg transition-colors`}
           >
             {ctaText}
           </button>
         ) : (
+          // Assuming the anchor tag version doesn't open a modal, so no tracking here.
+          // If it were to open a modal, similar tracking would be added.
           <a href="#" className={`inline-block ${bgColor} ${hoverBgColor} ${ctaTextColor} font-semibold py-3 px-6 rounded-lg transition-colors`}>
             {ctaText}
           </a>

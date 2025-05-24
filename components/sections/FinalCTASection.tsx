@@ -1,6 +1,7 @@
 import React from 'react';
 import useTranslation from '@/hooks/useTranslation';
 import useFadeInOnScroll from '@/hooks/useFadeInOnScroll';
+import { trackButtonClick, trackModalOpen } from '@/utils/analytics';
 
 interface FinalCTASectionProps {
   onOpenWaitlistModal: () => void;
@@ -20,14 +21,22 @@ const FinalCTASection = ({ onOpenWaitlistModal, onOpenDemoModal }: FinalCTASecti
         <h2 className="text-3xl md:text-4xl font-bold mb-6">{t('final_cta_title')}</h2>
         <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-blue-100">{t('final_cta_subtitle')}</p>
         <div className="space-y-4 md:space-y-0 md:space-x-6">
-          <button 
-            onClick={onOpenWaitlistModal} 
+          <button
+            onClick={() => {
+              trackButtonClick('final_cta_waitlist', 'final_cta_section');
+              trackModalOpen('waitlist');
+              onOpenWaitlistModal();
+            }}
             className="bg-white text-blue-700 font-bold py-3 px-8 rounded-lg text-lg cta-button hover:bg-gray-100 shadow-xl"
           >
             {t('final_cta_waitlist')}
           </button>
-          <button 
-            onClick={onOpenDemoModal} 
+          <button
+            onClick={() => {
+              trackButtonClick('final_cta_demo', 'final_cta_section');
+              trackModalOpen('demo');
+              onOpenDemoModal();
+            }}
             className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg cta-button shadow-xl"
           >
             {t('final_cta_demo')}

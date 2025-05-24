@@ -100,7 +100,7 @@ export const translations: AllTranslations = {
     nav_why_us: "Why Us?",
     nav_book_demo: "Book a Demo",
     // Hero
-    hero_title: "Empowering Founders & Informing VCs with AI-Driven Insights",
+    hero_title: "AI Insights for Founders & VCs",
     hero_subtitle: "Pitch-it is the AI platform that helps founders validate concepts and prepare for investment, while giving VCs deeper market intelligence for smarter decision-making.",
     hero_cta_free: "Get Started for Free",
     hero_cta_demo: "Book a Demo Call",
@@ -195,7 +195,7 @@ export const translations: AllTranslations = {
     nav_why_us: "Pourquoi Nous?",
     nav_book_demo: "Demander une Démo",
     // Hero
-    hero_title: "Autonomiser les Fondateurs & Informer les VCs avec l'IA",
+    hero_title: "IA: Insights pour Fondateurs & VCs",
     hero_subtitle: "Pitch-it est la plateforme IA qui aide les fondateurs à valider leurs concepts et à se préparer à l'investissement, tout en offrant aux VCs une intelligence de marché approfondie pour des décisions plus éclairées.",
     hero_cta_free: "Commencer Gratuitement",
     hero_cta_demo: "Réserver un Appel Démo",

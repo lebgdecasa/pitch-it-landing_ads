@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import useTranslation from '@/hooks/useTranslation';
 import SecurityBadges from '@/components/ui/SecurityBadges';
-import { trackFormSubmission, trackConversion, getStoredUTMParams } from '@/utils/analytics';
+import { trackFormSubmission, trackConversion, getStoredUTMParams, trackModalClose } from '@/utils/analytics';
 
 interface WaitlistModalProps {
   onClose: () => void;
@@ -75,7 +75,10 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-2xl font-bold text-gray-800">{t('waitlist_modal_title')}</h3>
         <button
-          onClick={onClose}
+          onClick={() => {
+            trackModalClose('waitlist');
+            onClose();
+          }}
           className="text-gray-400 hover:text-gray-600 text-3xl transition-colors"
           aria-label="Close"
         >
