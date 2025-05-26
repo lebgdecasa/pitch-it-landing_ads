@@ -18,7 +18,7 @@ type DemoFormData = {
   interest: string;
 };
 
-const DemoModal = ({ onClose }: DemoModalProps) => {
+const DemoModal = ({ onClose, triggerCtaId }: DemoModalProps) => {
   const t = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);

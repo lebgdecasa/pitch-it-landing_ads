@@ -13,7 +13,7 @@ type WaitlistFormData = {
   email: string;
 };
 
-const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
+const WaitlistModal = ({ onClose, triggerCtaId }: WaitlistModalProps) => {
   const t = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
