@@ -15,6 +15,7 @@ import { trackButtonClick } from '@/utils/analytics';
 export default function Home() {
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
+  const [currentCtaId, setCurrentCtaId] = useState<string>('unknown_trigger');
 
   // Initialize scroll tracking
   useScrollTracking();
@@ -30,19 +31,27 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleEsc);
   }, []);
 
-  const openWaitlistModal = (source: string = 'unknown') => {
-    trackButtonClick('waitlist_modal_open', source);
+  const openWaitlistModal = (ctaId: string = 'unknown_trigger') => {
+    trackButtonClick('waitlist_modal_open', ctaId); // Existing tracking, ctaId is the source
+    setCurrentCtaId(ctaId);
     setIsWaitlistModalOpen(true);
   };
 
-  const closeWaitlistModal = () => setIsWaitlistModalOpen(false);
+  const closeWaitlistModal = () => {
+    setIsWaitlistModalOpen(false);
+    setCurrentCtaId('unknown_trigger'); // Reset on close
+  };
 
-  const openDemoModal = (source: string = 'unknown') => {
-    trackButtonClick('demo_modal_open', source);
+  const openDemoModal = (ctaId: string = 'unknown_trigger') => {
+    trackButtonClick('demo_modal_open', ctaId); // Existing tracking, ctaId is the source
+    setCurrentCtaId(ctaId);
     setIsDemoModalOpen(true);
   };
 
-  const closeDemoModal = () => setIsDemoModalOpen(false);
+  const closeDemoModal = () => {
+    setIsDemoModalOpen(false);
+    setCurrentCtaId('unknown_trigger'); // Reset on close
+  };
 
   return (
     <>
@@ -52,29 +61,29 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Layout onOpenDemoModal={() => openDemoModal('header')}>
+      <Layout onOpenDemoModal={() => openDemoModal('header_demo_cta')}>
         <HeroSection
-          onOpenWaitlistModal={() => openWaitlistModal('hero')}
-          onOpenDemoModal={() => openDemoModal('hero')}
+          onOpenWaitlistModal={() => openWaitlistModal('hero_join_waitlist')}
+          onOpenDemoModal={() => openDemoModal('hero_request_demo')}
         />
 
         <WhyPitchItSection />
 
-        <FeaturesSection onOpenDemoModal={() => openDemoModal('features')} />
+        <FeaturesSection onOpenDemoModal={() => openDemoModal('features_request_demo')} />
         <MoreThanToolSection />
   
         <FinalCTASection
-          onOpenWaitlistModal={() => openWaitlistModal('final_cta')}
-          onOpenDemoModal={() => openDemoModal('final_cta')}
+          onOpenWaitlistModal={() => openWaitlistModal('final_cta_waitlist')}
+          onOpenDemoModal={() => openDemoModal('final_cta_demo')}
         />
       </Layout>
 
       <Modal isOpen={isWaitlistModalOpen} onClose={closeWaitlistModal}>
-        <WaitlistModal onClose={closeWaitlistModal} />
+        <WaitlistModal onClose={closeWaitlistModal} triggerCtaId={currentCtaId} />
       </Modal>
 
       <Modal isOpen={isDemoModalOpen} onClose={closeDemoModal} maxWidth="max-w-2xl">
-        <DemoModal onClose={closeDemoModal} />
+        <DemoModal onClose={closeDemoModal} triggerCtaId={currentCtaId} />
       </Modal>
     </>
   );

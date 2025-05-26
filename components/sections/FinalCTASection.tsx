@@ -1,6 +1,7 @@
 import React from 'react';
 import useTranslation from '@/hooks/useTranslation';
 import useFadeInOnScroll from '@/hooks/useFadeInOnScroll';
+import { trackGA4Event } from '@/utils/analytics'; // Import the GA4 event tracking function
 
 interface FinalCTASectionProps {
   onOpenWaitlistModal: () => void;
@@ -20,14 +21,26 @@ const FinalCTASection = ({ onOpenWaitlistModal, onOpenDemoModal }: FinalCTASecti
         <h2 className="text-3xl md:text-4xl font-bold mb-6">{t('final_cta_title')}</h2>
         <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-blue-100">{t('final_cta_subtitle')}</p>
         <div className="space-y-4 md:space-y-0 md:space-x-6">
-          <button 
-            onClick={onOpenWaitlistModal} 
+          <button
+            onClick={() => {
+              onOpenWaitlistModal();
+              trackGA4Event('cta_click', {
+                cta_id: 'final_cta_waitlist',
+                cta_text: t('final_cta_waitlist')
+              });
+            }}
             className="bg-white text-blue-700 font-bold py-3 px-8 rounded-lg text-lg cta-button hover:bg-gray-100 shadow-xl"
           >
             {t('final_cta_waitlist')}
           </button>
-          <button 
-            onClick={onOpenDemoModal} 
+          <button
+            onClick={() => {
+              onOpenDemoModal();
+              trackGA4Event('cta_click', {
+                cta_id: 'final_cta_demo',
+                cta_text: t('final_cta_demo')
+              });
+            }}
             className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg cta-button shadow-xl"
           >
             {t('final_cta_demo')}

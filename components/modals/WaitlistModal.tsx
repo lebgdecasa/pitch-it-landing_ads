@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import useTranslation from '@/hooks/useTranslation';
 import SecurityBadges from '@/components/ui/SecurityBadges';
-import { trackFormSubmission, trackConversion, getStoredUTMParams } from '@/utils/analytics';
+import { trackFormSubmission, trackConversion, getStoredUTMParams, trackGA4Event } from '@/utils/analytics';
 
 interface WaitlistModalProps {
   onClose: () => void;
+  triggerCtaId?: string; // Optional prop for the CTA ID
 }
 
 type WaitlistFormData = {
@@ -24,6 +25,14 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
     formState: { errors },
     getValues
   } = useForm<WaitlistFormData>();
+
+  // Track form_start when the modal becomes visible (mounts)
+  useEffect(() => {
+    trackGA4Event('form_start', {
+      form_name: 'waitlist_modal',
+      trigger_cta_id: triggerCtaId || 'unknown_modal_trigger'
+    });
+  }, [triggerCtaId]);
 
   const onSubmit = async (data: WaitlistFormData) => {
     setIsSubmitting(true);
@@ -51,6 +60,10 @@ const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
         // Track successful submission
         trackFormSubmission('waitlist', true);
         trackConversion('waitlist', data.email);
+        trackGA4Event('form_submission_success', {
+          form_name: 'waitlist_modal',
+          trigger_cta_id: triggerCtaId || 'unknown_modal_trigger'
+        });
 
         setSubmitSuccess(true);
         setTimeout(() => {

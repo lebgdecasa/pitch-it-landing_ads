@@ -1,4 +1,6 @@
 // Analytics utility for tracking events across the application
+import ReactGA from 'react-ga4';
+
 declare global {
   interface Window {
     gtag?: (...args: any[]) => void;
@@ -6,15 +8,42 @@ declare global {
   }
 }
 
-// GA4 Measurement ID - Replace with your actual ID
-export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || 'G-XXXXXXXXXX';
+// GA4 Measurement ID
+export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "G-G3E0CBM8VV";
+let isGaInitialized = false;
 
-// Initialize Google Analytics
+export const initializeAnalytics = () => {
+  if (!isGaInitialized && GA_MEASUREMENT_ID && typeof window !== 'undefined') {
+    ReactGA.initialize(GA_MEASUREMENT_ID);
+    isGaInitialized = true;
+    console.log("GA4 Initialized (consent given)");
+    // Send initial pageview now that analytics are initialized
+    // Using window.location.pathname + window.location.search for a complete URL
+    pageview(window.location.pathname + window.location.search);
+  }
+};
+
 export const pageview = (url: string) => {
-  if (typeof window.gtag !== 'undefined') {
-    window.gtag('config', GA_MEASUREMENT_ID, {
-      page_path: url,
-    });
+  if (!isGaInitialized) {
+    console.log("GA4 not initialized (consent not given or pending) - pageview for:", url);
+    return;
+  }
+  ReactGA.send({ hitType: "pageview", page: url });
+  // console.log(`GA4 Pageview: ${url}`); // For debugging
+};
+
+// Generic GA4 Event Tracking Function
+export const trackGA4Event = (eventName: string, eventParams?: { [key: string]: any }) => {
+  if (!isGaInitialized) {
+    console.log(`GA4 not initialized (consent not given or pending) - event: ${eventName}`, eventParams);
+    return;
+  }
+  // Simple check for production, you might have a more robust way to check environment
+  if (process.env.NODE_ENV === 'production' || process.env.NEXT_PUBLIC_VERCEL_ENV === 'production') {
+    ReactGA.event(eventName, eventParams);
+    // console.log(`GA4 Event: ${eventName}`, eventParams); // For debugging, can be removed
+  } else {
+    console.log(`DEV: GA4 Event: ${eventName}`, eventParams); // For dev environment logging
   }
 };
 

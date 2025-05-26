@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import useTranslation from '@/hooks/useTranslation';
 import { LanguageContext } from '@/context/LanguageContext';
-import { trackLanguageChange, trackButtonClick } from '@/utils/analytics';
+import { trackLanguageChange, trackButtonClick, trackGA4Event } from '@/utils/analytics';
 
 interface HeaderProps {
   onOpenDemoModal: () => void;
@@ -46,7 +46,13 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
             {t('nav_why_us')}
           </a>
           <button
-            onClick={onOpenDemoModal}
+            onClick={() => {
+              onOpenDemoModal();
+              trackGA4Event('cta_click', {
+                cta_id: 'header_demo_cta', // Matches the ID used in pages/index.tsx
+                cta_text: t('nav_book_demo')
+              });
+            }}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg cta-button text-sm sm:text-base"
           >
             {t('nav_book_demo')}

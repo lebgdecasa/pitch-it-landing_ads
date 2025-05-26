@@ -1,5 +1,6 @@
 import React from 'react';
 import useTranslation from '@/hooks/useTranslation';
+import { trackGA4Event } from '@/utils/analytics'; // Import the GA4 event tracking function
 import HeroBackground from '@/components/ui/HeroBackground'; // Desktop 3D animation
 import MobileHeroBackground from '@/components/ui/MobileHeroBackground'; // Mobile bubbles animation
 
@@ -34,13 +35,25 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-6 animate-fade-in-up delay-600">
             <button
-              onClick={onOpenWaitlistModal}
+              onClick={() => {
+                onOpenWaitlistModal();
+                trackGA4Event('cta_click', {
+                  cta_id: 'hero_join_waitlist',
+                  cta_text: t('hero_cta_free') // Using the translated text
+                });
+              }}
               className="bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg cta-button hover:bg-blue-800 shadow-xl"
             >
               {t('hero_cta_free')}
             </button>
             <button
-              onClick={onOpenDemoModal}
+              onClick={() => {
+                onOpenDemoModal();
+                trackGA4Event('cta_click', {
+                  cta_id: 'hero_request_demo', // Matches the ID used in pages/index.tsx
+                  cta_text: t('hero_cta_demo')
+                });
+              }}
               className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg cta-button shadow-xl"
             >
               {t('hero_cta_demo')}

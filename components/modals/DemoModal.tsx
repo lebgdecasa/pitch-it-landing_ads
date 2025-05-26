@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import useTranslation from '@/hooks/useTranslation';
-import { trackFormSubmission, trackConversion, getStoredUTMParams } from '@/utils/analytics';
+import { trackFormSubmission, trackConversion, getStoredUTMParams, trackGA4Event } from '@/utils/analytics';
 
 interface DemoModalProps {
   onClose: () => void;
+  triggerCtaId?: string; // Optional prop for the CTA ID
 }
 
 type DemoFormData = {
@@ -33,6 +34,14 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
 
   const selectedRole = watch('role');
 
+  // Track form_start when the modal becomes visible (mounts)
+  useEffect(() => {
+    trackGA4Event('form_start', {
+      form_name: 'demo_modal',
+      trigger_cta_id: triggerCtaId || 'unknown_modal_trigger'
+    });
+  }, [triggerCtaId]);
+
   const onSubmit = async (data: DemoFormData) => {
     setIsSubmitting(true);
     setErrorMessage('');
@@ -59,6 +68,10 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
         // Track successful submission
         trackFormSubmission('demo', true);
         trackConversion('demo', data.email);
+        trackGA4Event('form_submission_success', {
+          form_name: 'demo_modal',
+          trigger_cta_id: triggerCtaId || 'unknown_modal_trigger'
+        });
 
         setSubmitSuccess(true);
         setTimeout(() => {

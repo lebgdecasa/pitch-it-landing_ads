@@ -1,5 +1,6 @@
 import React from 'react';
 import useTranslation from '@/hooks/useTranslation';
+import { trackGA4Event } from '@/utils/analytics'; // Import the GA4 event tracking function
 
 interface FeatureItemProps {
   id: string;
@@ -52,7 +53,15 @@ const FeatureItem = ({
 
         {onCtaClick ? (
           <button
-            onClick={onCtaClick}
+            onClick={() => {
+              trackGA4Event('cta_click', {
+                cta_id: `${id}_request_demo`, // e.g., feature1_request_demo
+                cta_text: ctaText
+              });
+              if (onCtaClick) {
+                onCtaClick();
+              }
+            }}
             className={`inline-block ${bgColor} ${hoverBgColor} ${ctaTextColor} font-semibold py-3 px-6 rounded-lg transition-colors`}
           >
             {ctaText}
