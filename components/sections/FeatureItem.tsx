@@ -39,6 +39,10 @@ const FeatureItem = ({
         <h3 className="text-2xl md:text-3xl font-bold mb-6">{title}</h3>
         <p className="text-gray-700 mb-6" dangerouslySetInnerHTML={{ __html: description }}></p>
 
+        <div className="bg-gray-100 p-8 flex justify-center mb-6">
+          <img src={imageUrl} alt={title} className="rounded-lg w-full h-auto object-contain" />
+        </div>
+
         <ul className="mb-8 space-y-2">
           {listItems.map((item, index) => (
             <li key={index} className="flex items-start">
@@ -62,10 +66,6 @@ const FeatureItem = ({
             {ctaText}
           </a>
         )}
-      </div>
-
-      <div className="bg-gray-100 p-8 flex justify-center">
-        <img src={imageUrl} alt={title} className="rounded-lg w-full h-auto object-contain" />
       </div>
     </div>
   );
