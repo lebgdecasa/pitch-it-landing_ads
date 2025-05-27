@@ -101,10 +101,10 @@ export const translations: AllTranslations = {
     nav_book_demo: "Book a Demo",
     // Hero
     hero_title: "Empowering Founders & Informing VCs with AI-Driven Insights",
-    hero_subtitle: "Pitch-it is the AI platform that helps founders validate concepts and prepare for investment, while giving VCs deeper market intelligence for smarter decision-making.",
+    hero_subtitle: "NexVC is the AI platform that helps founders validate concepts and prepare for investment, while giving VCs deeper market intelligence for smarter decision-making.",
     hero_cta_free: "Get Started for Free",
     hero_cta_demo: "Book a Demo Call",
-    // Why Pitch-it
+    // Why NexVC
     why_title: "The Bridge Between Great Ideas and Smart Capital",
     why_subtitle: "For founders, we validate concepts and prepare you for investment. For VCs, we provide deeper insights and streamline due diligence with AI-powered analysis.",
     why_card1_title: "For Founders",
@@ -147,7 +147,7 @@ export const translations: AllTranslations = {
     feature5_cta: "Practice Your Pitch",
     // More Than Tool
     more_title: "A Complete Ecosystem for Investment Success",
-    more_subtitle: "Pitch-it goes beyond individual features to offer an integrated platform that serves both founders and investors throughout the funding journey.",
+    more_subtitle: "NexVC goes beyond individual features to offer an integrated platform that serves both founders and investors throughout the funding journey.",
     more_item1_title: "Continuous AI Insights",
     more_item1_text: "Real-time market intelligence and competitive analysis to inform decisions.",
     more_item2_title: "Centralized Document Hub",
@@ -158,22 +158,22 @@ export const translations: AllTranslations = {
     more_item4_text: "Seamless sharing between founders, team members, and potential investors.",
     // Final CTA
     final_cta_title: "Ready to Transform the Investment Process?",
-    final_cta_subtitle: "Whether you're a founder seeking funding or an investor looking for quality deals, Pitch-it provides the tools for more successful outcomes.",
+    final_cta_subtitle: "Whether you're a founder seeking funding or an investor looking for quality deals, NexVC provides the tools for more successful outcomes.",
     final_cta_waitlist: "Join the Waitlist (Free)",
     final_cta_demo: "Request a Demo",
     // Footer
-    footer_text: "© {year} Pitch-it. All rights reserved. <br />Connecting visionary founders with strategic investors.",
+    footer_text: "© {year} NexVC. All rights reserved. <br />Connecting visionary founders with strategic investors.",
     footer_privacy: "Privacy Policy",
     footer_terms: "Terms of Service",
     // Modals
     waitlist_modal_title: "Join our Waitlist!",
-    waitlist_modal_text: "Be among the first to access Pitch-it and transform how founders and investors connect. Enter your email below.",
+    waitlist_modal_text: "Be among the first to access NexVC and transform how founders and investors connect. Enter your email below.",
     waitlist_modal_email_label: "Email Address",
     waitlist_modal_email_placeholder: "you@example.com",
     waitlist_modal_submit: "Sign Up for Waitlist",
     waitlist_modal_success: "Thank you! {email} has been added to our waitlist. We'll keep you informed!",
     demo_modal_title: "Request a Personalized Demo",
-    demo_modal_text: "Discover how Pitch-it can improve the investment process for your specific needs. Fill out this form, and we'll contact you.",
+    demo_modal_text: "Discover how NexVC can improve the investment process for your specific needs. Fill out this form, and we'll contact you.",
     demo_modal_name_label: "Full Name",
     demo_modal_name_placeholder: "Your Name",
     demo_modal_email_label: "Email Address",
@@ -185,7 +185,7 @@ export const translations: AllTranslations = {
     demo_modal_submit: "Send Demo Request",
     demo_modal_success: "Thank you, {name}! Your demo request has been received. We will contact you soon.",
     // General
-    pitchit_brand: "Pitch-it",
+    pitchit_brand: "NexVC",
     close_button: "×",
     screenshot_placeholder_text: "Feature Screenshot",
   },
@@ -196,10 +196,10 @@ export const translations: AllTranslations = {
     nav_book_demo: "Demander une Démo",
     // Hero
     hero_title: "Autonomiser les Fondateurs & Informer les VCs avec l'IA",
-    hero_subtitle: "Pitch-it est la plateforme IA qui aide les fondateurs à valider leurs concepts et à se préparer à l'investissement, tout en offrant aux VCs une intelligence de marché approfondie pour des décisions plus éclairées.",
+    hero_subtitle: "NexVC est la plateforme IA qui aide les fondateurs à valider leurs concepts et à se préparer à l'investissement, tout en offrant aux VCs une intelligence de marché approfondie pour des décisions plus éclairées.",
     hero_cta_free: "Commencer Gratuitement",
     hero_cta_demo: "Réserver un Appel Démo",
-    // Why Pitch-it
+    // Why NexVC
     why_title: "Le Pont Entre Grandes Idées et Capital Intelligent",
     why_subtitle: "Pour les fondateurs, nous validons les concepts et vous préparons à l'investissement. Pour les VCs, nous fournissons des insights plus profonds et simplifions la due diligence avec l'analyse IA.",
     why_card1_title: "Pour les Fondateurs",
@@ -242,7 +242,7 @@ export const translations: AllTranslations = {
     feature5_cta: "Entraînez Votre Pitch",
     // More Than Tool
     more_title: "Un Écosystème Complet pour le Succès des Investissements",
-    more_subtitle: "Pitch-it va au-delà des fonctionnalités individuelles pour offrir une plateforme intégrée qui sert à la fois les fondateurs et les investisseurs tout au long du parcours de financement.",
+    more_subtitle: "NexVC va au-delà des fonctionnalités individuelles pour offrir une plateforme intégrée qui sert à la fois les fondateurs et les investisseurs tout au long du parcours de financement.",
     more_item1_title: "Insights IA Continus",
     more_item1_text: "Intelligence de marché en temps réel et analyse concurrentielle pour éclairer les décisions.",
     more_item2_title: "Hub Documentaire Centralisé",
@@ -253,22 +253,22 @@ export const translations: AllTranslations = {
     more_item4_text: "Partage fluide entre fondateurs, membres d'équipe et investisseurs potentiels.",
     // Final CTA
     final_cta_title: "Prêt à Transformer le Processus d'Investissement ?",
-    final_cta_subtitle: "Que vous soyez un fondateur à la recherche de financement ou un investisseur à la recherche de deals de qualité, Pitch-it fournit les outils pour des résultats plus réussis.",
+    final_cta_subtitle: "Que vous soyez un fondateur à la recherche de financement ou un investisseur à la recherche de deals de qualité, NexVC fournit les outils pour des résultats plus réussis.",
     final_cta_waitlist: "Rejoindre la Waitlist (Gratuit)",
     final_cta_demo: "Demander une Démo",
     // Footer
-    footer_text: "© {year} Pitch-it. Tous droits réservés. <br />Connecter les fondateurs visionnaires aux investisseurs stratégiques.",
+    footer_text: "© {year} NexVC. Tous droits réservés. <br />Connecter les fondateurs visionnaires aux investisseurs stratégiques.",
     footer_privacy: "Politique de Confidentialité",
     footer_terms: "Conditions d'Utilisation",
     // Modals
     waitlist_modal_title: "Rejoignez notre Waitlist !",
-    waitlist_modal_text: "Soyez parmi les premiers à accéder à Pitch-it et à transformer la façon dont les fondateurs et les investisseurs se connectent. Entrez votre email ci-dessous.",
+    waitlist_modal_text: "Soyez parmi les premiers à accéder à NexVC et à transformer la façon dont les fondateurs et les investisseurs se connectent. Entrez votre email ci-dessous.",
     waitlist_modal_email_label: "Adresse Email",
     waitlist_modal_email_placeholder: "vous@exemple.com",
     waitlist_modal_submit: "S'inscrire à la Waitlist",
     waitlist_modal_success: "Merci ! {email} a été ajouté à notre waitlist. Nous vous tiendrons informé !",
     demo_modal_title: "Demandez une Démo Personnalisée",
-    demo_modal_text: "Découvrez comment Pitch-it peut améliorer le processus d'investissement pour vos besoins spécifiques. Remplissez ce formulaire et nous vous contacterons.",
+    demo_modal_text: "Découvrez comment NexVC peut améliorer le processus d'investissement pour vos besoins spécifiques. Remplissez ce formulaire et nous vous contacterons.",
     demo_modal_name_label: "Nom Complet",
     demo_modal_name_placeholder: "Votre Nom",
     demo_modal_email_label: "Adresse Email",
@@ -280,7 +280,7 @@ export const translations: AllTranslations = {
     demo_modal_submit: "Envoyer la Demande de Démo",
     demo_modal_success: "Merci, {name} ! Votre demande de démo a été reçue. Nous vous contacterons bientôt.",
     // General
-    pitchit_brand: "Pitch-it",
+    pitchit_brand: "NexVC",
     close_button: "×",
     screenshot_placeholder_text: "Capture d'écran de fonctionnalité",
   }

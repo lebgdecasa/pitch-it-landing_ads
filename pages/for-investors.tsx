@@ -11,7 +11,7 @@ export default function ForInvestorsPage() {
   return (
     <>
       <SEO
-        title="For VCs & Investors | Pitch-it - Data-Driven Deal Flow Platform"
+        title="For VCs & Investors | NexVC - Data-Driven Deal Flow Platform"
         description="Streamline due diligence, evaluate startups faster, and discover pre-vetted investment opportunities with AI-powered insights."
         keywords={['venture capital', 'investment platform', 'due diligence', 'startup evaluation', 'deal flow']}
       />
@@ -82,7 +82,7 @@ export default function ForInvestorsPage() {
                 <div className="md:w-1/2 mb-6 md:mb-0">
                   <h3 className="text-2xl font-bold mb-4">Standardized Deal Flow</h3>
                   <p className="text-gray-600 mb-4">
-                    Every startup on Pitch-it follows the same comprehensive format, making comparison and evaluation seamless.
+                    Every startup on NexVC follows the same comprehensive format, making comparison and evaluation seamless.
                   </p>
                   <ul className="space-y-2">
                     <li className="flex items-start">
@@ -182,7 +182,7 @@ export default function ForInvestorsPage() {
                   <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
                 </svg>
                 <p className="text-xl text-gray-700 mb-6 italic">
-                  "Pitch-it has transformed our deal flow process. We're seeing higher quality startups that are better prepared,
+                  "NexVC has transformed our deal flow process. We're seeing higher quality startups that are better prepared,
                   and our initial evaluation time has dropped by 80%. It's become an essential tool for our team."
                 </p>
                 <div className="font-bold text-lg">Michael Chen</div>
@@ -197,7 +197,7 @@ export default function ForInvestorsPage() {
           <div className="container mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Upgrade Your Investment Process?</h2>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Join leading VCs who are finding and evaluating deals faster with Pitch-it
+              Join leading VCs who are finding and evaluating deals faster with NexVC
             </p>
             <div className="space-y-4 sm:space-y-0 sm:space-x-4">
               <button

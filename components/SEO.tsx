@@ -13,9 +13,9 @@ interface SEOProps {
 }
 
 const SEO = ({
-  title = 'Pitch-it | AI-Powered Platform for Founders & VCs',
-  description = 'Transform your startup journey with AI-driven pitch deck creation, market validation, and investor preparation. Join 500+ founders and VCs using Pitch-it.',
-  image = 'https://pitch-it-landing-updated.vercel.app/images/og-image.jpg',
+  title = 'NexVC | AI-Powered Platform for Founders & VCs',
+  description = 'Transform your startup journey with AI-driven pitch deck creation, market validation, and investor preparation. Join 500+ founders and VCs using NexVC.',
+  image = 'https://NexVC-landing-updated.vercel.app/images/og-image.jpg',
   type = 'website',
   publishedTime,
   author,
@@ -23,24 +23,24 @@ const SEO = ({
   noindex = false
 }: SEOProps) => {
   const router = useRouter();
-  const siteUrl = 'https://pitch-it-landing-updated.vercel.app';
+  const siteUrl = 'https://NexVC-landing-updated.vercel.app';
   const currentUrl = `${siteUrl}${router.asPath}`;
 
   // Structured data for organization
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Pitch-it",
+    "name": "NexVC",
     "url": siteUrl,
-    "logo": `${siteUrl}/images/logo.png`,
+    "logo_nexvc": `${siteUrl}/images/logo_nexvc.png`,
     "sameAs": [
       "https://twitter.com/pitchitai",
-      "https://linkedin.com/company/pitch-it",
-      "https://github.com/pitch-it"
+      "https://linkedin.com/company/NexVC",
+      "https://github.com/NexVC"
     ],
     "contactPoint": {
       "@type": "ContactPoint",
-      "email": "hello@pitch-it.ai",
+      "email": "hello@NexVC.ai",
       "contactType": "customer support"
     }
   };
@@ -49,7 +49,7 @@ const SEO = ({
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Pitch-it",
+    "name": "NexVC",
     "url": siteUrl,
     "potentialAction": {
       "@type": "SearchAction",
@@ -72,10 +72,10 @@ const SEO = ({
     },
     "publisher": {
       "@type": "Organization",
-      "name": "Pitch-it",
-      "logo": {
+      "name": "NexVC",
+      "logo_nexvc": {
         "@type": "ImageObject",
-        "url": `${siteUrl}/images/logo.png`
+        "url": `${siteUrl}/images/logo_nexvc.png`
       }
     }
   } : null;
@@ -95,7 +95,7 @@ const SEO = ({
       <meta property="og:type" content={type} />
       <meta property="og:url" content={currentUrl} />
       <meta property="og:image" content={image} />
-      <meta property="og:site_name" content="Pitch-it" />
+      <meta property="og:site_name" content="NexVC" />
       <meta property="og:locale" content="en_US" />
 
       {/* Article specific */}

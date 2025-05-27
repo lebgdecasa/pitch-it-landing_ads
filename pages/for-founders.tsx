@@ -11,8 +11,8 @@ export default function ForFoundersPage() {
   return (
     <>
       <SEO
-        title="For Founders | Pitch-it - AI-Powered Fundraising Platform"
-        description="Validate your idea, build compelling pitch decks, and practice with AI before meeting real investors. Join 500+ founders using Pitch-it."
+        title="For Founders | NexVC - AI-Powered Fundraising Platform"
+        description="Validate your idea, build compelling pitch decks, and practice with AI before meeting real investors. Join 500+ founders using NexVC."
         keywords={['startup founders', 'pitch deck builder', 'fundraising platform', 'investor preparation']}
       />
 
@@ -111,7 +111,7 @@ export default function ForFoundersPage() {
             <h2 className="text-3xl font-bold text-center mb-12">Founders Like You Are Winning</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               <div className="bg-blue-50 p-8 rounded-lg">
-                <p className="text-lg mb-4 italic">"Pitch-it helped me realize my initial idea wouldn't scale. The pivot saved me 6 months and $50k."</p>
+                <p className="text-lg mb-4 italic">"NexVC helped me realize my initial idea wouldn't scale. The pivot saved me 6 months and $50k."</p>
                 <div className="font-bold">Jessica Liu</div>
                 <div className="text-gray-600">Founder, TechFlow (Raised $2.5M)</div>
               </div>
@@ -129,7 +129,7 @@ export default function ForFoundersPage() {
           <div className="container mx-auto px-6 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Accelerate Your Fundraising?</h2>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Join 500+ founders who've validated their ideas and raised funding faster with Pitch-it
+              Join 500+ founders who've validated their ideas and raised funding faster with NexVC
             </p>
             <div className="space-y-4 sm:space-y-0 sm:space-x-4">
               <button

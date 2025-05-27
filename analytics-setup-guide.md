@@ -1,10 +1,10 @@
-# Analytics Setup Guide for Pitch-it
+# Analytics Setup Guide for NexVC
 
 ## 1. Google Analytics 4 Setup
 
 ### Create GA4 Property
 1. Go to [Google Analytics](https://analytics.google.com/)
-2. Create a new property for your Pitch-it project
+2. Create a new property for your NexVC project
 3. Get your Measurement ID (format: G-XXXXXXXXXX)
 
 ### Configure Environment Variables
@@ -47,7 +47,7 @@ npm install web-vitals
 
 When sharing on social media, use UTM parameters:
 ```
-https://pitch-it-landing-updated.vercel.app/?utm_source=linkedin&utm_medium=post&utm_campaign=launch_week
+https://NexVC-landing-updated.vercel.app/?utm_source=linkedin&utm_medium=post&utm_campaign=launch_week
 ```
 
 Common parameters:

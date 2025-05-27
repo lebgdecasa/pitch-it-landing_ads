@@ -61,7 +61,7 @@ export default function ValidateFastPage() {
   return (
     <>
       <SEO
-        title="Test with Real Users in 48 Hours | Pitch-it"
+        title="Test with Real Users in 48 Hours | NexVC"
         description="Stop building in the dark. Get real user feedback on your startup idea in just 48 hours. Skip the guesswork and validate before you code."
         keywords={['market validation', 'user feedback', 'startup validation', 'MVP testing']}
         noindex={false}
@@ -288,7 +288,7 @@ export default function ValidateFastPage() {
           </div>
         </section>
 
-        {/* Logo Bar */}
+        {/* logo_nexvc Bar */}
         <section className="py-8 md:py-12 px-4 md:px-6 bg-white border-t">
           <div className="max-w-5xl mx-auto">
             <p className="text-center text-sm text-gray-600 mb-6">
@@ -375,7 +375,7 @@ function ValidationCalculator() {
         <p className="text-3xl md:text-4xl font-bold text-red-600 mb-4">
           ${potentialCost.toLocaleString()}
         </p>
-        <p className="text-gray-600 mb-2">Cost of validation with Pitch-it:</p>
+        <p className="text-gray-600 mb-2">Cost of validation with NexVC:</p>
         <p className="text-2xl font-bold text-green-600 mb-4">${validationCost}</p>
         <div className="border-t pt-4">
           <p className="text-gray-600 mb-2">You could save:</p>

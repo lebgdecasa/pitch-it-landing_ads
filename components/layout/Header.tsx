@@ -26,7 +26,7 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
         <a
           href="#"
           className="text-3xl font-bold text-blue-700 hover:text-blue-800 transition-colors"
-          onClick={() => trackButtonClick('logo', 'header')}
+          onClick={() => trackButtonClick('logo_nexvc', 'header')}
         >
           {t('pitchit_brand')}
         </a>

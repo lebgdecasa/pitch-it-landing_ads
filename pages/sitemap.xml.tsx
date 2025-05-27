@@ -3,7 +3,7 @@ import { GetServerSideProps } from 'next';
 const Sitemap = () => null;
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
-  const baseUrl = 'https://pitch-it-landing-updated.vercel.app';
+  const baseUrl = 'https://NexVC-landing-updated.vercel.app';
 
   // Define your static pages
   const staticPages = [

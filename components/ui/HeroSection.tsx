@@ -76,7 +76,7 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
 
         {/* Overlay Image (Desktop Only) */}
         <div className="absolute top-0 right-0 w-2/6 h-full hidden md:flex items-center justify-center">
-          <img src="/images/logo.png" alt="Pitch-it Logo" className="h-auto max-h-80 md:max-h-90 opacity-100" />
+          <img src="/images/logo_nexvc.png" alt="NexVC logo_nexvc" className="h-auto max-h-80 md:max-h-90 opacity-100" />
         </div>
       </div>
     </section>

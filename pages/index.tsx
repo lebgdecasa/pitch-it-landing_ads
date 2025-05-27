@@ -47,8 +47,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Pitch-it | AI-Powered Pitch Deck Platform</title>
-        <meta name="description" content="Pitch-it is the AI platform that transforms your ideas into impactful presentations, validates your concepts, and prepares you to convince investors." />
+        <title>NexVC | AI-Powered Pitch Deck Platform</title>
+        <meta name="description" content="NexVC is the AI platform that transforms your ideas into impactful presentations, validates your concepts, and prepares you to convince investors." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -62,7 +62,7 @@ export default function Home() {
 
         <FeaturesSection onOpenDemoModal={() => openDemoModal('features')} />
         <MoreThanToolSection />
-  
+
         <FinalCTASection
           onOpenWaitlistModal={() => openWaitlistModal('final_cta')}
           onOpenDemoModal={() => openDemoModal('final_cta')}

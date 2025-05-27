@@ -46,7 +46,7 @@ export default function FounderStoryPage() {
       name: "Jessica Liu",
       company: "TechFlow (Raised $2.5M)",
       story: "I almost built a consumer app when my real opportunity was in enterprise.",
-      lesson: "Pitch-it's validation showed me enterprise users were desperately seeking our solution. That insight led to our seed round.",
+      lesson: "NexVC's validation showed me enterprise users were desperately seeking our solution. That insight led to our seed round.",
       savings: "$50,000",
       time: "4 months"
     },
@@ -63,7 +63,7 @@ export default function FounderStoryPage() {
   return (
     <>
       <SEO
-        title="I Spent 6 Months Building the Wrong Thing | Pitch-it"
+        title="I Spent 6 Months Building the Wrong Thing | NexVC"
         description="Learn from my $50K mistake. Discover how to validate your startup idea with real users before writing a single line of code."
         keywords={['startup failure', 'pivot story', 'market validation', 'founder lessons']}
         noindex={false}

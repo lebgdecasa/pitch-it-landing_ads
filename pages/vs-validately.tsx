@@ -48,17 +48,17 @@ export default function VsValidatelyPage() {
       category: "Market Validation",
       items: [
         { feature: "Real user feedback", pitchit: true, validately: true, difference: "48hr turnaround vs 7 days" },
-        { feature: "AI-powered insights", pitchit: true, validately: false, difference: "Exclusive to Pitch-it" },
-        { feature: "Competitor analysis", pitchit: true, validately: false, difference: "Exclusive to Pitch-it" },
-        { feature: "Trend identification", pitchit: true, validately: false, difference: "Exclusive to Pitch-it" }
+        { feature: "AI-powered insights", pitchit: true, validately: false, difference: "Exclusive to NexVC" },
+        { feature: "Competitor analysis", pitchit: true, validately: false, difference: "Exclusive to NexVC" },
+        { feature: "Trend identification", pitchit: true, validately: false, difference: "Exclusive to NexVC" }
       ]
     },
     {
       category: "Testing Features",
       items: [
         { feature: "Custom personas", pitchit: true, validately: true, difference: "AI-generated vs manual" },
-        { feature: "Virtual VC practice", pitchit: true, validately: false, difference: "Exclusive to Pitch-it" },
-        { feature: "Pitch deck builder", pitchit: true, validately: false, difference: "Exclusive to Pitch-it" },
+        { feature: "Virtual VC practice", pitchit: true, validately: false, difference: "Exclusive to NexVC" },
+        { feature: "Pitch deck builder", pitchit: true, validately: false, difference: "Exclusive to NexVC" },
         { feature: "Response analytics", pitchit: true, validately: true, difference: "Real-time vs batch" }
       ]
     },
@@ -86,7 +86,7 @@ export default function VsValidatelyPage() {
       name: "David Kim",
       company: "TechStart",
       image: "/images/testimonials/david-switcher.jpg",
-      quote: "Validately was fine for surveys, but Pitch-it's virtual VC practice got us funded.",
+      quote: "Validately was fine for surveys, but NexVC's virtual VC practice got us funded.",
       benefit: "Raised $1.2M",
       previousTool: "Validately + SurveyMonkey"
     },
@@ -94,7 +94,7 @@ export default function VsValidatelyPage() {
       name: "Emma Rodriguez",
       company: "HealthTech Inc",
       image: "/images/testimonials/emma-switcher.jpg",
-      quote: "The migration was seamless. Pitch-it imported all our data and we were running in minutes.",
+      quote: "The migration was seamless. NexVC imported all our data and we were running in minutes.",
       benefit: "3x faster insights",
       previousTool: "Validately Enterprise"
     }
@@ -103,7 +103,7 @@ export default function VsValidatelyPage() {
   return (
     <>
       <SEO
-        title="Pitch-it vs Validately: The Honest Comparison | See Why VCs Prefer Pitch-it"
+        title="NexVC vs Validately: The Honest Comparison | See Why VCs Prefer NexVC"
         description="Better than Validately. Faster than consultants. One platform: market tests, AI personas, pitch analysis. See why Sequoia scouts switched."
         keywords={['validately alternative', 'pitch validation tool', 'market research platform', 'startup validation']}
         noindex={false}
@@ -127,7 +127,7 @@ export default function VsValidatelyPage() {
 
             <div className="text-center mb-12">
               <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
-                <span className="text-blue-600">Pitch-it</span> vs Validately:<br />
+                <span className="text-blue-600">NexVC</span> vs Validately:<br />
                 The Honest Comparison
               </h1>
               <p className="text-xl text-gray-700 max-w-3xl mx-auto">
@@ -181,7 +181,7 @@ export default function VsValidatelyPage() {
               {/* Table Header */}
               <div className="grid grid-cols-12 bg-gray-800 text-white p-4">
                 <div className="col-span-6 font-medium">Feature</div>
-                <div className="col-span-2 text-center font-medium">Pitch-it</div>
+                <div className="col-span-2 text-center font-medium">NexVC</div>
                 <div className="col-span-2 text-center font-medium">Validately</div>
                 <div className="col-span-2 text-center font-medium">Advantage</div>
               </div>
@@ -236,7 +236,7 @@ export default function VsValidatelyPage() {
                       </div>
                       <div className="col-span-2 text-center">
                         <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded">
-                          Pitch-it
+                          NexVC
                         </span>
                       </div>
                     </div>
@@ -312,7 +312,7 @@ export default function VsValidatelyPage() {
                     />
                     <MigrationStep
                       number={2}
-                      title="Import to Pitch-it"
+                      title="Import to NexVC"
                       description="One-click import of all your projects and data"
                       completed={migrationSteps >= 2}
                       onClick={() => setMigrationSteps(2)}
@@ -478,7 +478,7 @@ export default function VsValidatelyPage() {
                 onClick={() => handleCTAClick('switch_now')}
                 className="bg-white text-blue-600 hover:bg-gray-100 font-bold py-4 px-8 rounded-lg text-lg shadow-lg transition-all hover:shadow-xl"
               >
-                Switch to Pitch-it Now
+                Switch to NexVC Now
               </button>
               <button
                 onClick={() => handleCTAClick('compare_plans')}
