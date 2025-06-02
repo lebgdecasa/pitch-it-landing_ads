@@ -1,27 +1,27 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  
+
   // Enable static generation for better performance
   output: 'standalone',
-  
+
   // Optimize images
   images: {
     domains: [],
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 31536000,
   },
-  
+
   // Enable compression and optimize builds
   compress: true,
   poweredByHeader: false,
-  
+
   // Vercel-specific optimizations for TTFB
   generateEtags: false,
-  
+
   // External packages to optimize
   serverExternalPackages: ['mongoose'],
-  
+
   // Critical performance optimizations for TTFB
   experimental: {
     optimizePackageImports: ['three'],
