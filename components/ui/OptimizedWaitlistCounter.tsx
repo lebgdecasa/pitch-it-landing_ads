@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from 'next-i18next';
 
 interface OptimizedWaitlistCounterProps {
   className?: string;
@@ -12,7 +12,7 @@ const OptimizedWaitlistCounter = ({
   showLabel = true,
   initialCount = 250
 }: OptimizedWaitlistCounterProps) => {
-  const t = useTranslation();
+  const { t } = useTranslation('common'); // UPDATED
   const [count, setCount] = useState<number>(initialCount);
   const [loading, setLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);

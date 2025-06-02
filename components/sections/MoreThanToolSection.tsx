@@ -1,11 +1,11 @@
 import React from 'react';
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from 'next-i18next';
 import useFadeInOnScroll from '@/hooks/useFadeInOnScroll';
 
 const MoreThanToolSection = () => {
-  const t = useTranslation();
+  const { t } = useTranslation('common'); // UPDATED
   const [ref, isVisible] = useFadeInOnScroll();
-  
+
   return (
     <section ref={ref} className="py-20 bg-gray-50">
       <div className="container mx-auto px-6">
@@ -13,7 +13,7 @@ const MoreThanToolSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('more_title')}</h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">{t('more_subtitle')}</p>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Item 1 */}
           <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -25,7 +25,7 @@ const MoreThanToolSection = () => {
             <h3 className="text-lg font-bold mb-2">{t('more_item1_title')}</h3>
             <p className="text-gray-600">{t('more_item1_text')}</p>
           </div>
-          
+
           {/* Item 2 */}
           <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
             <div className="bg-green-100 rounded-full w-12 h-12 flex items-center justify-center mb-4">
@@ -36,7 +36,7 @@ const MoreThanToolSection = () => {
             <h3 className="text-lg font-bold mb-2">{t('more_item2_title')}</h3>
             <p className="text-gray-600">{t('more_item2_text')}</p>
           </div>
-          
+
           {/* Item 3 */}
           <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
             <div className="bg-purple-100 rounded-full w-12 h-12 flex items-center justify-center mb-4">
@@ -47,7 +47,7 @@ const MoreThanToolSection = () => {
             <h3 className="text-lg font-bold mb-2">{t('more_item3_title')}</h3>
             <p className="text-gray-600">{t('more_item3_text')}</p>
           </div>
-          
+
           {/* Item 4 */}
           <div className="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300">
             <div className="bg-yellow-100 rounded-full w-12 h-12 flex items-center justify-center mb-4">

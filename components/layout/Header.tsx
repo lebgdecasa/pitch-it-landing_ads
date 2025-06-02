@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
-import useTranslation from '@/hooks/useTranslation';
+import Link from 'next/link'; // IMPORT Link
+import { useTranslation } from 'next-i18next'; // UPDATED
 import { LanguageContext } from '@/context/LanguageContext';
 import { trackLanguageChange, trackButtonClick } from '@/utils/analytics';
 
@@ -8,7 +9,7 @@ interface HeaderProps {
 }
 
 const Header = ({ onOpenDemoModal }: HeaderProps) => {
-  const t = useTranslation();
+  const { t } = useTranslation('common'); // UPDATED
   const { language, setLanguage } = useContext(LanguageContext);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -17,37 +18,28 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
     trackLanguageChange(newLanguage);
   };
 
-  const handleNavClick = (section: string) => {
+  // Updated to optionally accept path for Next.js Link compatibility
+  const handleNavClick = (section: string, path?: string) => {
     trackButtonClick(`nav_${section}`, 'header');
     setMobileMenuOpen(false); // close menu on nav click
+    // If path is provided, Next/Link handles navigation.
+    // If no path, it might be an in-page scroll for other links (if any remain).
   };
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <a
-          href="#"
-          className="text-3xl font-bold text-blue-700 hover:text-blue-800 transition-colors"
-          onClick={() => trackButtonClick('logo_NexTraction', 'header')}
-        >
+        <Link href="/" className="text-3xl font-bold text-blue-700 hover:text-blue-800 transition-colors" onClick={() => trackButtonClick('logo_NexTraction', 'header')}>
           {t('pitchit_brand')}
-        </a>
+        </Link>
         {/* Desktop Nav */}
         <nav className="space-x-2 sm:space-x-4 items-center hidden md:flex">
-          <a
-            href="#features"
-            className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors"
-            onClick={() => handleNavClick('features')}
-          >
+          <Link href="/features" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('features', '/features')}>
             {t('nav_features')}
-          </a>
-          <a
-            href="#why-pitchit"
-            className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors"
-            onClick={() => handleNavClick('why_us')}
-          >
+          </Link>
+          <Link href="/why-us" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('why_us', '/why-us')}>
             {t('nav_why_us')}
-          </a>
+          </Link>
           <button
             onClick={onOpenDemoModal}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg cta-button text-sm sm:text-base"
@@ -93,20 +85,12 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <a
-              href="#features"
-              className="text-gray-700 text-lg font-medium"
-              onClick={() => handleNavClick('features')}
-            >
+            <Link href="/features" className="text-gray-700 text-lg font-medium" onClick={() => handleNavClick('features', '/features')}>
               {t('nav_features')}
-            </a>
-            <a
-              href="#why-pitchit"
-              className="text-gray-700 text-lg font-medium"
-              onClick={() => handleNavClick('why_us')}
-            >
+            </Link>
+            <Link href="/why-us" className="text-gray-700 text-lg font-medium" onClick={() => handleNavClick('why_us', '/why-us')}>
               {t('nav_why_us')}
-            </a>
+            </Link>
             <button
               onClick={() => { onOpenDemoModal(); setMobileMenuOpen(false); }}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg cta-button text-lg"

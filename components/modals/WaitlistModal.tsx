@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from 'next-i18next';
 import SecurityBadges from '@/components/ui/SecurityBadges';
 import { trackFormSubmission, trackConversion, getStoredUTMParams } from '@/utils/analytics';
 
@@ -13,7 +13,7 @@ type WaitlistFormData = {
 };
 
 const WaitlistModal = ({ onClose }: WaitlistModalProps) => {
-  const t = useTranslation();
+  const { t } = useTranslation('common');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
