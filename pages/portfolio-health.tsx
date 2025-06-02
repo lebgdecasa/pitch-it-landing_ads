@@ -89,7 +89,7 @@ export default function PortfolioHealthPage() {
   return (
     <>
       <SEO
-        title="What Aren't Your Founders Telling You? | Portfolio Health - NexVC"
+        title="What Aren't Your Founders Telling You? | Portfolio Health - NexTraction"
         description="Anonymous market testing reveals the gaps founders hide. Protect your portfolio with early warning signals. Used by 50+ VCs."
         keywords={['portfolio monitoring', 'VC tools', 'startup health', 'investment protection']}
         noindex={false}
@@ -105,8 +105,8 @@ export default function PortfolioHealthPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <img src="/images/logo_nexvc.png" alt="NexVC" className="h-8 mr-2" />
-                <span className="font-bold text-xl text-gray-900">NexVC</span>
+                <img src="/images/logo_NexTraction.png" alt="NexTraction" className="h-8 mr-2" />
+                <span className="font-bold text-xl text-gray-900">NexTraction</span>
                 <span className="ml-2 text-sm text-gray-500">Portfolio Health</span>
               </div>
               <button
@@ -474,7 +474,7 @@ export default function PortfolioHealthPage() {
             <div className="grid md:grid-cols-2 gap-8">
               <div className="bg-gray-50 rounded-lg p-8">
                 <p className="text-gray-700 italic mb-6">
-                  "We discovered our star portfolio company was about to lose their CTO. The early warning gave us time to help with retention. That one save paid for NexVC for 5 years."
+                  "We discovered our star portfolio company was about to lose their CTO. The early warning gave us time to help with retention. That one save paid for NexTraction for 5 years."
                 </p>
                 <div className="flex items-center">
                   <img

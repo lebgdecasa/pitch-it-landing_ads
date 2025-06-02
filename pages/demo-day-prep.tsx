@@ -79,7 +79,7 @@ export default function DemoDayPrepPage() {
   return (
     <>
       <SEO
-        title="YC Interviews in 2 Weeks? Get Pitch-Perfect Fast | NexVC"
+        title="YC Interviews in 2 Weeks? Get Pitch-Perfect Fast | NexTraction"
         description="AI personas ask the hardest questions. Master your answers before it matters. Join 500+ founders who aced their demo days."
         keywords={['YC interview prep', 'demo day preparation', 'pitch practice', 'investor questions']}
         noindex={false}

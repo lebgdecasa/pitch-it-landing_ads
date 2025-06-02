@@ -47,8 +47,8 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>NexVC | AI-Powered Pitch Deck Platform</title>
-        <meta name="description" content="NexVC is the AI platform that transforms your ideas into impactful presentations, validates your concepts, and prepares you to convince investors." />
+        <title>NexTraction | AI-Powered Pitch Deck Platform</title>
+        <meta name="description" content="NexTraction is the AI platform that transforms your ideas into impactful presentations, validates your concepts, and prepares you to convince investors." />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 

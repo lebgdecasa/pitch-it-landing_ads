@@ -1,6 +1,6 @@
-# NexVC Landing Page - Full-Stack Integration
+# NexTraction Landing Page - Full-Stack Integration
 
-This project is a complete front-end/back-end integration for the NexVC landing page, ready for deployment on Vercel. It includes:
+This project is a complete front-end/back-end integration for the NexTraction landing page, ready for deployment on Vercel. It includes:
 
 - Next.js frontend with TypeScript and Tailwind CSS
 - MongoDB database integration for storing form submissions

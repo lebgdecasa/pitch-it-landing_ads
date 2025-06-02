@@ -13,9 +13,9 @@ interface SEOProps {
 }
 
 const SEO = ({
-  title = 'NexVC | AI-Powered Platform for Founders & VCs',
-  description = 'Transform your startup journey with AI-driven pitch deck creation, market validation, and investor preparation. Join 500+ founders and VCs using NexVC.',
-  image = 'https://NexVC-landing-updated.vercel.app/images/og-image.jpg',
+  title = 'NexTraction | AI-Powered Platform for Founders & VCs',
+  description = 'Transform your startup journey with AI-driven pitch deck creation, market validation, and investor preparation. Join 500+ founders and VCs using NexTraction.',
+  image = 'https://NexTraction-landing-updated.vercel.app/images/og-image.jpg',
   type = 'website',
   publishedTime,
   author,
@@ -23,24 +23,24 @@ const SEO = ({
   noindex = false
 }: SEOProps) => {
   const router = useRouter();
-  const siteUrl = 'https://NexVC-landing-updated.vercel.app';
+  const siteUrl = 'https://NexTraction-landing-updated.vercel.app';
   const currentUrl = `${siteUrl}${router.asPath}`;
 
   // Structured data for organization
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "NexVC",
+    "name": "NexTraction",
     "url": siteUrl,
-    "logo_nexvc": `${siteUrl}/images/logo_nexvc.png`,
+    "logo_NexTraction": `${siteUrl}/images/logo_NexTraction.png`,
     "sameAs": [
       "https://twitter.com/pitchitai",
-      "https://linkedin.com/company/NexVC",
-      "https://github.com/NexVC"
+      "https://linkedin.com/company/NexTraction",
+      "https://github.com/NexTraction"
     ],
     "contactPoint": {
       "@type": "ContactPoint",
-      "email": "hello@NexVC.ai",
+      "email": "hello@NexTraction.ai",
       "contactType": "customer support"
     }
   };
@@ -49,7 +49,7 @@ const SEO = ({
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "NexVC",
+    "name": "NexTraction",
     "url": siteUrl,
     "potentialAction": {
       "@type": "SearchAction",
@@ -72,10 +72,10 @@ const SEO = ({
     },
     "publisher": {
       "@type": "Organization",
-      "name": "NexVC",
-      "logo_nexvc": {
+      "name": "NexTraction",
+      "logo_NexTraction": {
         "@type": "ImageObject",
-        "url": `${siteUrl}/images/logo_nexvc.png`
+        "url": `${siteUrl}/images/logo_NexTraction.png`
       }
     }
   } : null;
@@ -95,7 +95,7 @@ const SEO = ({
       <meta property="og:type" content={type} />
       <meta property="og:url" content={currentUrl} />
       <meta property="og:image" content={image} />
-      <meta property="og:site_name" content="NexVC" />
+      <meta property="og:site_name" content="NexTraction" />
       <meta property="og:locale" content="en_US" />
 
       {/* Article specific */}

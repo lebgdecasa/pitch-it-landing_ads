@@ -49,8 +49,11 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
         </div>
 
         {/* Overlay Image (Desktop Only) */}
-        <div className="absolute top-0 right-0 w-2/6 h-full hidden md:flex items-center justify-center">
-          <img src="/images/logo_nexvc.png" alt="NexVC logo_nexvc" className="h-auto max-h-80 md:max-h-90 opacity-100" />
+        <div className="absolute top-0 right-0 w-2/6 h-full hidden md:flex flex-col items-center justify-center">
+          <img src="/images/logo_NexTraction.png" alt="NexTraction logo_NexTraction" className="h-auto max-h-96 md:max-h-[500px] opacity-100" />
+          <p className="mt-4 text-xl font-semibold text-white text-center"> {/* Slogan */}
+              Extract Clarity. Gain Traction.
+            </p>
         </div>
       </div>
     </section>

@@ -1,6 +1,6 @@
 {
-  "name": "NexVC - AI-Powered Platform for Founders & VCs",
-  "short_name": "NexVC",
+  "name": "NexTraction - AI-Powered Platform for Founders & VCs",
+  "short_name": "NexTraction",
   "description": "Transform your startup journey with AI-driven pitch deck creation, market validation, and investor preparation.",
   "start_url": "/",
   "display": "standalone",
@@ -61,7 +61,7 @@
     {
       "name": "For Founders",
       "short_name": "Founders",
-      "description": "Learn how NexVC helps founders",
+      "description": "Learn how NexTraction helps founders",
       "url": "/for-founders",
       "icons": [{ "src": "/icons/founders-96x96.png", "sizes": "96x96" }]
     },
@@ -75,7 +75,7 @@
     {
       "name": "Join Waitlist",
       "short_name": "Waitlist",
-      "description": "Get early access to NexVC",
+      "description": "Get early access to NexTraction",
       "url": "/?action=waitlist",
       "icons": [{ "src": "/icons/waitlist-96x96.png", "sizes": "96x96" }]
     }

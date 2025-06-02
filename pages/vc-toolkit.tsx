@@ -49,7 +49,7 @@ export default function VCToolkitPage() {
   return (
     <>
       <SEO
-        title="From Deck to Decision in Minutes | VC Toolkit - NexVC"
+        title="From Deck to Decision in Minutes | VC Toolkit - NexTraction"
         description="See market sentiment scores, buyer intent signals, and blind spots in minutes. Built for VCs. Join 50+ funds streamlining due diligence."
         keywords={['VC tools', 'due diligence software', 'startup evaluation', 'investment analysis']}
         noindex={false}
@@ -65,8 +65,8 @@ export default function VCToolkitPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <img src="/images/logo_nexvc.png" alt="NexVC" className="h-8 mr-2" />
-                <span className="font-bold text-xl text-gray-900">NexVC</span>
+                <img src="/images/logo_NexTraction.png" alt="NexTraction" className="h-8 mr-2" />
+                <span className="font-bold text-xl text-gray-900">NexTraction</span>
                 <span className="ml-2 text-sm text-gray-500">for VCs</span>
               </div>
               <button
@@ -399,7 +399,7 @@ export default function VCToolkitPage() {
                   </div>
                 </div>
                 <p className="text-gray-700 italic">
-                  "NexVC has transformed our deal flow process. We're seeing higher quality startups that are better prepared, and our initial evaluation time has dropped by 80%. It's become an essential tool for our team."
+                  "NexTraction has transformed our deal flow process. We're seeing higher quality startups that are better prepared, and our initial evaluation time has dropped by 80%. It's become an essential tool for our team."
                 </p>
               </div>
 
@@ -428,7 +428,7 @@ export default function VCToolkitPage() {
               </div>
             </div>
 
-            {/* logo_nexvc parade */}
+            {/* logo_NexTraction parade */}
             <div className="mt-12 pt-12 border-t">
               <p className="text-center text-gray-600 mb-8">Also trusted by partners and associates at:</p>
               <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-60">
@@ -449,7 +449,7 @@ export default function VCToolkitPage() {
               Ready to 10x Your Deal Flow Efficiency?
             </h2>
             <p className="text-xl mb-8 opacity-90">
-              Join 50+ VCs who are finding and evaluating deals faster with NexVC
+              Join 50+ VCs who are finding and evaluating deals faster with NexTraction
             </p>
 
             <div className="space-y-4 sm:space-y-0 sm:space-x-4">

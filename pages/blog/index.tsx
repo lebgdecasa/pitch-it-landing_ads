@@ -56,7 +56,7 @@ export default function BlogPage() {
   return (
     <>
       <SEO
-        title="Blog | NexVC - Insights for Founders & VCs"
+        title="Blog | NexTraction - Insights for Founders & VCs"
         description="Expert insights on fundraising, pitch decks, market validation, and startup strategy. Learn from successful founders and VCs."
         keywords={['startup blog', 'fundraising tips', 'pitch deck guide', 'VC insights']}
       />

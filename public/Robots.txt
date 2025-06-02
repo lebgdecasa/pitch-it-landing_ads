@@ -5,7 +5,7 @@ Disallow: /_next/
 Disallow: /admin/
 
 # Sitemap
-Sitemap: https://NexVC-landing-updated.vercel.app/sitemap.xml
+Sitemap: https://NexTraction-landing-updated.vercel.app/sitemap.xml
 
 # Crawl-delay
 Crawl-delay: 1
