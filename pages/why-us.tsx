@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Layout from '@/components/layout/Layout';
 import Head from 'next/head';
-// import IconWrapper from '@/components/ui/IconWrapper'; // Not directly used, but ValuePropositionTile uses it.
+import Image from 'next/image'; // For Social Proof Logos if using next/image directly here
 import ValuePropositionTile from '@/components/why-us/ValuePropositionTile';
 import TestimonialCard from '@/components/why-us/TestimonialCard';
 import FounderSpotlightCard from '@/components/why-us/FounderSpotlightCard';
-// import Image from 'next/image'; // For Social Proof Logos if using next/image directly here
 import { useTranslation } from 'next-i18next'; // Import useTranslation
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'; // Import for SSR
 
@@ -77,7 +76,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 animate-fade-in-down">
             {t('why_us_hero_h1')}
           </h1>
-          <p className="text-lg md:text-xl lg:text-2xl mb-10 max-w-2xl mx-auto animate-fade-in-up animation-delay-300">
+          <p className="text-lg md:text-xl lg:text-2xl mb-20 max-w-2xl mx-auto animate-fade-in-up animation-delay-200">
             {t('why_us_hero_p')}
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-4 animate-fade-in-up animation-delay-600">
@@ -90,7 +89,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
             </button>
             <button
               onClick={openDemoModal}
-              className="bg-white text-blue-700 font-semibold py-2 px-3 sm:px-4 rounded-lg cta-button text-sm sm:text-base w-full md:w-auto border border-blue-600 hover:bg-gray-100"
+              className="bg-white text-blue-700 font-semibold py-2 px-3 sm:px-4 rounded-lg cta-button text-sm sm:text-base w-full md:w-auto border border-blue-600 hover:bg-gray-200"
               data-cta-id="why-us-hero-book-demo"
             >
               {t('hero_cta_demo')}
@@ -157,14 +156,14 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
               name={t('why_us_founder1_name')}
               title={t('why_us_founder1_title')}
               bio={t('why_us_founder1_bio')}
-              imageSrc="placeholder"
+              imageSrc="/images/karim.png"
               imageAlt={t('why_us_founder1_alt')}
             />
             <FounderSpotlightCard
               name={t('why_us_founder2_name')}
               title={t('why_us_founder2_title')}
               bio={t('why_us_founder2_bio')}
-              imageSrc="placeholder"
+              imageSrc="/images/jad.png"
               imageAlt={t('why_us_founder2_alt')}
             />
           </div>
@@ -172,17 +171,62 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
       </section>
 
       {/* Section 5: Social Proof Band Section */}
-      <section className="py-12 bg-gray-100">
+      <section className="py-12 bg-gray-200">
         <div className="container mx-auto px-6 text-center">
           <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-6">
             {t('why_us_social_proof_h3')}
           </h3>
           <div className="flex flex-wrap justify-center items-center gap-x-8 md:gap-x-12 gap-y-4 mb-4">
-            <span className="text-gray-500 font-medium">{t('why_us_social_proof_logo_endeavor')}</span>
-            <span className="text-gray-500 font-medium">{t('why_us_social_proof_logo_oxford')}</span>
-            <span className="text-gray-500 font-medium">{t('why_us_social_proof_logo_moroccoai')}</span>
-            <span className="text-gray-500 font-medium">{t('why_us_social_proof_logo_uoft')}</span>
-            <span className="text-gray-500 font-medium">{t('why_us_social_proof_logo_plugandplay')}</span>
+            {/* Endeavor Logo */}
+            <div className="h-20 w-36 relative"> {/* Changed w-auto to w-36 */}
+              <Image
+                src="/images/logo-endeavor.svg" // Replace with actual path and extension
+                alt={t('why_us_social_proof_logo_endeavor')}
+                fill
+                style={{ objectFit: 'contain' }}
+                title={t('why_us_social_proof_logo_endeavor')}
+              />
+            </div>
+            {/* Oxford Logo */}
+            <div className="h-20 w-36 relative"> {/* Changed w-auto to w-36 */}
+              <Image
+                src="/images/logo-oxford.svg" // Replace with actual path and extension
+                alt={t('why_us_social_proof_logo_oxford')}
+                fill
+                style={{ objectFit: 'contain' }}
+                title={t('why_us_social_proof_logo_oxford')}
+              />
+            </div>
+            {/* MoroccoAI Logo */}
+            <div className="h-20 w-36 relative"> {/* Changed w-auto to w-36 */}
+              <Image
+                src="/images/logo-moroccoai.png" // Replace with actual path and extension
+                alt={t('why_us_social_proof_logo_moroccoai')}
+                fill
+                style={{ objectFit: 'contain' }}
+                title={t('why_us_social_proof_logo_moroccoai')}
+              />
+            </div>
+            {/* UofT Logo */}
+            <div className="h-20 w-36 relative"> {/* Changed w-auto to w-36 */}
+              <Image
+                src="/images/logo-uoft.svg" // Replace with actual path and extension
+                alt={t('why_us_social_proof_logo_uoft')}
+                fill
+                style={{ objectFit: 'contain' }}
+                title={t('why_us_social_proof_logo_uoft')}
+              />
+            </div>
+            {/* Plug and Play Logo */}
+            <div className="h-20 w-36 relative"> {/* Changed w-auto to w-36 */}
+              <Image
+                src="/images/logo-plugandplay.svg" // Replace with actual path and extension
+                alt={t('why_us_social_proof_logo_plugandplay')}
+                fill
+                style={{ objectFit: 'contain' }}
+                title={t('why_us_social_proof_logo_plugandplay')}
+              />
+            </div>
           </div>
           <p className="text-gray-600 max-w-xl mx-auto">
             {t('why_us_social_proof_p')}
@@ -219,7 +263,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
       {/* Section 7: Call-To-Action (Sticky on Mobile, Static on Desktop) */}
       {/* Sticky CTA for mobile: p-4 (16px) */}
       <div
-        className={`fixed bottom-0 left-0 right-0 bg-white p-4 shadow-2xl_top transform transition-transform duration-300 ease-in-out z-40 md:hidden ${
+        className={`fixed bottom-0 left-0 right-0 bg-white p-4 shadow-2xl_top transform transition-transform duration-200 ease-in-out z-40 md:hidden ${
           showStickyCTA ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
@@ -238,7 +282,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
           <h2 className="text-3xl font-semibold mb-6">{t('why_us_desktop_cta_h2')}</h2>
           <button
             onClick={openWaitlistModal}
-            className="bg-white text-blue-700 font-bold py-3 px-8 rounded-lg text-lg cta-button hover:bg-gray-100 shadow-xl"
+            className="bg-white text-blue-700 font-bold py-3 px-8 rounded-lg text-lg cta-button hover:bg-gray-200 shadow-xl"
             data-cta-id="why-us-desktop-cta-start-free"
           >
             {t('hero_cta_free')}
