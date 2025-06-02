@@ -4,7 +4,11 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        '2xl': '1920px', // Add or override for ultra-wide
+      },
+    },
   },
   plugins: [],
 }
