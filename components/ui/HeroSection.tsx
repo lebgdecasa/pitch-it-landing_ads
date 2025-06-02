@@ -1,8 +1,8 @@
 import React from 'react';
 import useTranslation from '@/hooks/useTranslation';
-import HeroBackground from '@/components/ui/HeroBackground'; // Desktop 3D animation
+import LazyHeroBackground from '@/components/ui/LazyHeroBackground'; // Lazy-loaded desktop 3D animation
 import MobileHeroBackground from '@/components/ui/MobileHeroBackground'; // Mobile bubbles animation
-import WaitlistCounter from '@/components/ui/WaitlistCounter';
+import OptimizedWaitlistCounter from '@/components/ui/OptimizedWaitlistCounter';
 
 interface HeroSectionProps {
   onOpenWaitlistModal: () => void;
@@ -16,7 +16,7 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
     <section className="relative overflow-hidden py-16 md:py-36 bg-white">
       {/* Desktop 3D Fluid Animation Background */}
       <div className="hidden md:block">
-        <HeroBackground />
+        <LazyHeroBackground />
       </div>
 
       {/* Mobile Bubbles Animation Background */}
@@ -44,7 +44,7 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
 
           {/* Waitlist Counter */}
           <div className="mb-10 animate-fade-in-up delay-300">
-            <WaitlistCounter className="justify-center md:justify-start" />
+            <OptimizedWaitlistCounter className="justify-center md:justify-start" />
           </div>
 
           <div className="space-y-4 md:space-y-0 md:space-x-6 animate-fade-in-up delay-600">

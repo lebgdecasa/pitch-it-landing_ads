@@ -12,6 +12,7 @@
     "@types/three": "^0.176.0",
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
+    "critters": "^0.0.23",
     "mongodb": "^6.16.0",
     "mongoose": "^7.5.0",
     "next": "^15.3.2",

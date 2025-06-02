@@ -1,6 +1,6 @@
 import React from 'react';
 import useTranslation from '@/hooks/useTranslation';
-import HeroBackground from '@/components/ui/HeroBackground'; // Desktop 3D animation
+import LazyHeroBackground from '@/components/ui/LazyHeroBackground'; // Lazy-loaded desktop 3D animation
 import MobileHeroBackground from '@/components/ui/MobileHeroBackground'; // Mobile bubbles animation
 
 interface HeroSectionProps {
@@ -15,7 +15,7 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
     <section className="relative overflow-hidden py-16 md:py-36 bg-white">
       {/* Desktop 3D Fluid Animation Background */}
       <div className="hidden md:block">
-        <HeroBackground />
+        <LazyHeroBackground />
       </div>
 
       {/* Mobile Bubbles Animation Background */}

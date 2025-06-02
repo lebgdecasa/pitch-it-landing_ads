@@ -12,7 +12,11 @@ import DemoModal from '@/components/modals/DemoModal';
 import useScrollTracking from '@/hooks/useScrollTracking';
 import { trackButtonClick } from '@/utils/analytics';
 
-export default function Home() {
+interface HomeProps {
+  generatedAt?: string;
+}
+
+export default function Home({ generatedAt }: HomeProps) {
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
@@ -78,4 +82,29 @@ export default function Home() {
       </Modal>
     </>
   );
+}
+
+// Static generation for optimal TTFB performance
+export async function getStaticProps() {
+  try {
+    // Pre-fetch any data that's needed for the page
+    // This could include waitlist count, testimonials, etc.
+
+    return {
+      props: {
+        // Add any pre-fetched data here
+        generatedAt: new Date().toISOString(),
+      },
+      // Incremental Static Regeneration: regenerate page every 5 minutes
+      revalidate: 300,
+    };
+  } catch (error) {
+    console.error('Error in getStaticProps:', error);
+    return {
+      props: {
+        generatedAt: new Date().toISOString(),
+      },
+      revalidate: 300,
+    };
+  }
 }
