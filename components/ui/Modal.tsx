@@ -1,5 +1,5 @@
 import React, { useEffect, ReactNode } from 'react';
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from 'next-i18next';
 
 interface ModalProps {
   isOpen: boolean;

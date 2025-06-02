@@ -11,12 +11,15 @@ import WaitlistModal from '@/components/modals/WaitlistModal';
 import DemoModal from '@/components/modals/DemoModal';
 import useScrollTracking from '@/hooks/useScrollTracking';
 import { trackButtonClick } from '@/utils/analytics';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useTranslation } from 'next-i18next';
 
 interface HomeProps {
   generatedAt?: string;
 }
 
 export default function Home({ generatedAt }: HomeProps) {
+  const { t } = useTranslation('common');
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
 
@@ -85,13 +88,14 @@ export default function Home({ generatedAt }: HomeProps) {
 }
 
 // Static generation for optimal TTFB performance
-export async function getStaticProps() {
+export async function getStaticProps({ locale }: { locale: string }) {
   try {
     // Pre-fetch any data that's needed for the page
     // This could include waitlist count, testimonials, etc.
 
     return {
       props: {
+        ...(await serverSideTranslations(locale, ['common'])),
         // Add any pre-fetched data here
         generatedAt: new Date().toISOString(),
       },
@@ -102,6 +106,7 @@ export async function getStaticProps() {
     console.error('Error in getStaticProps:', error);
     return {
       props: {
+        ...(await serverSideTranslations(locale, ['common'])),
         generatedAt: new Date().toISOString(),
       },
       revalidate: 300,

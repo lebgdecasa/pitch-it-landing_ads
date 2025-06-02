@@ -5,6 +5,12 @@ const nextConfig = {
   // Enable static generation for better performance
   output: 'standalone',
 
+  // i18n configuration
+  i18n: {
+    locales: ['en', 'fr'],
+    defaultLocale: 'en',
+  },
+
   // Optimize images
   images: {
     domains: [],

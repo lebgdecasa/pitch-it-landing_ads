@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from 'next-i18next';
 
 interface WaitlistCounterProps {
   className?: string;
@@ -7,7 +7,7 @@ interface WaitlistCounterProps {
 }
 
 const WaitlistCounter = ({ className = '', showLabel = true }: WaitlistCounterProps) => {
-  const t = useTranslation();
+  const { t } = useTranslation('common');
   const [count, setCount] = useState<number>(250);
   const [loading, setLoading] = useState(true);
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from 'next-i18next';
 import LazyHeroBackground from '@/components/ui/LazyHeroBackground'; // Lazy-loaded desktop 3D animation
 import MobileHeroBackground from '@/components/ui/MobileHeroBackground'; // Mobile bubbles animation
 
@@ -9,7 +9,7 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps) => {
-  const t = useTranslation();
+  const { t } = useTranslation('common'); // UPDATED
 
   return (
     <section className="relative overflow-hidden py-16 md:py-36 bg-white">

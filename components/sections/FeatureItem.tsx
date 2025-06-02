@@ -1,5 +1,5 @@
 import React from 'react';
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from 'next-i18next';
 
 interface FeatureItemProps {
   id: string;
@@ -24,7 +24,7 @@ const FeatureItem = ({
   imageUrl,
   onCtaClick,
 }: FeatureItemProps) => {
-  const t = useTranslation();
+  const { t } = useTranslation('common'); // UPDATED
 
   const textColor = `text-${color}-400`;
   const bgColor = `bg-${color}-400`; // Changed from bg-${color}-100

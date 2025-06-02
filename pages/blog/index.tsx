@@ -91,10 +91,8 @@ export default function BlogPage() {
                       <span className="ml-4 text-gray-500">{blogPosts[0].readTime}</span>
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold mb-4">
-                      <Link href={`/blog/${blogPosts[0].slug}`}>
-                        <a className="hover:text-blue-600 transition-colors">
-                          {blogPosts[0].title}
-                        </a>
+                      <Link href={`/blog/${blogPosts[0].slug}`} className="hover:text-blue-600 transition-colors">
+                        {blogPosts[0].title}
                       </Link>
                     </h2>
                     <p className="text-gray-600 mb-6">{blogPosts[0].excerpt}</p>
@@ -102,13 +100,8 @@ export default function BlogPage() {
                       <div className="text-sm text-gray-500">
                         By {blogPosts[0].author} • {new Date(blogPosts[0].date).toLocaleDateString()}
                       </div>
-                      <Link href={`/blog/${blogPosts[0].slug}`}>
-                        <a
-                          className="text-blue-600 hover:text-blue-700 font-medium"
-                          onClick={() => handleReadMore(blogPosts[0].slug)}
-                        >
-                          Read More →
-                        </a>
+                      <Link href={`/blog/${blogPosts[0].slug}`} className="text-blue-600 hover:text-blue-700 font-medium" onClick={() => handleReadMore(blogPosts[0].slug)}>
+                        Read More →
                       </Link>
                     </div>
                   </div>
@@ -132,10 +125,8 @@ export default function BlogPage() {
                       <span className="text-gray-500 text-sm">{post.readTime}</span>
                     </div>
                     <h3 className="text-xl font-bold mb-3">
-                      <Link href={`/blog/${post.slug}`}>
-                        <a className="hover:text-blue-600 transition-colors">
-                          {post.title}
-                        </a>
+                      <Link href={`/blog/${post.slug}`} className="hover:text-blue-600 transition-colors">
+                        {post.title}
                       </Link>
                     </h3>
                     <p className="text-gray-600 mb-4">{post.excerpt}</p>
@@ -143,13 +134,8 @@ export default function BlogPage() {
                       <div className="text-sm text-gray-500">
                         {new Date(post.date).toLocaleDateString()}
                       </div>
-                      <Link href={`/blog/${post.slug}`}>
-                        <a
-                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                          onClick={() => handleReadMore(post.slug)}
-                        >
-                          Read →
-                        </a>
+                      <Link href={`/blog/${post.slug}`} className="text-blue-600 hover:text-blue-700 text-sm font-medium" onClick={() => handleReadMore(post.slug)}>
+                        Read →
                       </Link>
                     </div>
                   </div>

@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import Link from 'next/link'; // IMPORT Link
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from 'next-i18next'; // UPDATED
 import { LanguageContext } from '@/context/LanguageContext';
 import { trackLanguageChange, trackButtonClick } from '@/utils/analytics';
 
@@ -9,7 +9,7 @@ interface HeaderProps {
 }
 
 const Header = ({ onOpenDemoModal }: HeaderProps) => {
-  const t = useTranslation();
+  const { t } = useTranslation('common'); // UPDATED
   const { language, setLanguage } = useContext(LanguageContext);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -29,31 +29,16 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" passHref>
-          <a
-            className="text-3xl font-bold text-blue-700 hover:text-blue-800 transition-colors"
-            onClick={() => trackButtonClick('logo_NexTraction', 'header')}
-          >
-            {t('pitchit_brand')}
-          </a>
+        <Link href="/" className="text-3xl font-bold text-blue-700 hover:text-blue-800 transition-colors" onClick={() => trackButtonClick('logo_NexTraction', 'header')}>
+          {t('pitchit_brand')}
         </Link>
         {/* Desktop Nav */}
         <nav className="space-x-2 sm:space-x-4 items-center hidden md:flex">
-          <Link href="/features" passHref>
-            <a
-              className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors"
-              onClick={() => handleNavClick('features', '/features')}
-            >
-              {t('nav_features')}
-            </a>
+          <Link href="/features" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('features', '/features')}>
+            {t('nav_features')}
           </Link>
-          <Link href="/why-us" passHref>
-            <a
-              className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors"
-              onClick={() => handleNavClick('why_us', '/why-us')}
-            >
-              {t('nav_why_us')}
-            </a>
+          <Link href="/why-us" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('why_us', '/why-us')}>
+            {t('nav_why_us')}
           </Link>
           <button
             onClick={onOpenDemoModal}
@@ -100,21 +85,11 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <Link href="/features" passHref>
-              <a
-                className="text-gray-700 text-lg font-medium"
-                onClick={() => handleNavClick('features', '/features')}
-              >
-                {t('nav_features')}
-              </a>
+            <Link href="/features" className="text-gray-700 text-lg font-medium" onClick={() => handleNavClick('features', '/features')}>
+              {t('nav_features')}
             </Link>
-            <Link href="/why-us" passHref>
-              <a
-                className="text-gray-700 text-lg font-medium"
-                onClick={() => handleNavClick('why_us', '/why-us')}
-              >
-                {t('nav_why_us')}
-              </a>
+            <Link href="/why-us" className="text-gray-700 text-lg font-medium" onClick={() => handleNavClick('why_us', '/why-us')}>
+              {t('nav_why_us')}
             </Link>
             <button
               onClick={() => { onOpenDemoModal(); setMobileMenuOpen(false); }}

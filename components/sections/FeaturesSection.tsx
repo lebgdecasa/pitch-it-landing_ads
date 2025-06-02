@@ -1,5 +1,5 @@
 import React from 'react';
-import useTranslation from '@/hooks/useTranslation';
+import { useTranslation } from 'next-i18next';
 import useFadeInOnScroll from '@/hooks/useFadeInOnScroll';
 import FeatureItem from './FeatureItem'; // Import the new component
 
@@ -8,7 +8,7 @@ interface FeaturesSectionProps {
 }
 
 const FeaturesSection = ({ onOpenDemoModal }: FeaturesSectionProps) => {
-  const t = useTranslation();
+  const { t } = useTranslation('common'); // UPDATED
   const [ref, isVisible] = useFadeInOnScroll();
 
   const features = [
