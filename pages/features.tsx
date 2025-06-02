@@ -20,12 +20,7 @@ const featureItemsData = (t: (key: string) => string) => [
     iconSvg: undefined,
     title: t('feature_item_trend_crawler_title'),
     content: t('features_item_trend_crawler_content'),
-    bullets: [
-      t('features_item_trend_crawler_bullet1'),
-      t('features_item_trend_crawler_bullet2'),
-      t('features_item_trend_crawler_bullet3'),
-      t('features_item_trend_crawler_bullet4')
-    ],
+
   },
   {
     iconSvg: undefined,
@@ -217,7 +212,7 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
                 iconSvg={item.iconSvg}
                 title={item.title}
                 content={item.content}
-                bullets={item.bullets}
+                bullets={item.bullets || []}
                 initiallyOpen={index === 0}
               />
             ))}
@@ -306,7 +301,7 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
                 iconSvg={item.iconSvg}
                 title={item.title}
                 content={item.content}
-                bullets={item.bullets}
+                bullets={item.bullets || []}
               />
             ))}
           </div>
