@@ -33,32 +33,40 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
           {t('pitchit_brand')}
         </Link>
         {/* Desktop Nav */}
-        <nav className="space-x-2 sm:space-x-4 items-center hidden md:flex">
-          <Link href="/features" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('features', '/features')}>
-            {t('nav_features')}
-          </Link>
-          <Link href="/why-us" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('why_us', '/why-us')}>
-            {t('nav_why_us')}
-          </Link>
-          <button
-            onClick={onOpenDemoModal}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg cta-button text-sm sm:text-base"
-          >
-            {t('nav_book_demo')}
-          </button>
-          <div className="ml-2 sm:ml-4 flex border border-gray-200 rounded-md">
+        <nav className="flex items-center md:flex">
+          {/* Nav links group */}
+          <div className="flex space-x-2 sm:space-x-4">
+            <Link href="/features" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('features', '/features')}>
+              {t('nav_features')}
+            </Link>
+            <Link href="/why-us" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('why_us', '/why-us')}>
+              {t('nav_why_us')}
+            </Link>
+          </div>
+          {/* Divider */}
+          <div className="border-l border-gray-200 h-8 mx-4"></div>
+          {/* Actions group */}
+          <div className="flex items-center space-x-2">
             <button
-              onClick={() => handleLanguageChange('en')}
-              className={`px-3 py-1 text-xs sm:text-sm rounded-l-md ${language === 'en' ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-500 hover:bg-gray-100 hover:text-blue-600'}`}
+              onClick={onOpenDemoModal}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg cta-button text-sm sm:text-base"
             >
-              EN
+              {t('nav_book_demo')}
             </button>
-            <button
-              onClick={() => handleLanguageChange('fr')}
-              className={`px-3 py-1 text-xs sm:text-sm rounded-r-md ${language === 'fr' ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-500 hover:bg-gray-100 hover:text-blue-600'}`}
-            >
-              FR
-            </button>
+            <div className="ml-2 sm:ml-4 flex border border-gray-200 rounded-md">
+              <button
+                onClick={() => handleLanguageChange('en')}
+                className={`px-3 py-1 text-xs sm:text-sm rounded-l-md ${language === 'en' ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-500 hover:bg-gray-100 hover:text-blue-600'}`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => handleLanguageChange('fr')}
+                className={`px-3 py-1 text-xs sm:text-sm rounded-r-md ${language === 'fr' ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-500 hover:bg-gray-100 hover:text-blue-600'}`}
+              >
+                FR
+              </button>
+            </div>
           </div>
         </nav>
         {/* Hamburger for Mobile */}

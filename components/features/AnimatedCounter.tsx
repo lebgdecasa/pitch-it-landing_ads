@@ -1,111 +1,116 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 interface AnimatedCounterProps {
-  /** The final number the counter should animate to. */
   targetValue: number;
-  /** An optional string to append after the number (e.g., "%", "+"). Defaults to empty string. */
+  prefix?: string;
   suffix?: string;
-  /** The total duration of the animation in milliseconds. Defaults to 2000ms. */
-  duration?: number;
-  /** A descriptive label displayed below the counter. */
   label: string;
+  duration?: number;
+  arrow?: 'up' | 'down'; // New prop
 }
 
-/**
- * AnimatedCounter displays a number that animates from 0 to a target value
- * when the component becomes visible in the viewport.
- * It uses IntersectionObserver to trigger the animation.
- *
- * @param {AnimatedCounterProps} props - The props for the AnimatedCounter component.
- * @returns {JSX.Element} A div element containing the animated number and label.
- */
 const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   targetValue,
+  arrow,
+  prefix = '',
   suffix = '',
-  duration = 2000, // Default animation duration: 2 seconds
   label,
+  duration = 2000,
 }) => {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null); // Ref for the component's root element for IntersectionObserver
-  const [isVisible, setIsVisible] = useState(false); // State to track if the component is in viewport
+  const [currentValue, setCurrentValue] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const counterRef = useRef<HTMLDivElement>(null);
 
-  // Effect for IntersectionObserver setup
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // When the component is intersecting with the viewport
-        if (entry.isIntersecting) {
-          setIsVisible(true); // Trigger animation
-          observer.unobserve(entry.target); // Stop observing once it's visible to save resources
+        if (entry.isIntersecting && !isVisible) {
+          setIsVisible(true);
+          animateCounter();
         }
       },
-      { threshold: 0.1 } // Trigger when at least 10% of the element is visible
+      { threshold: 0.5 }
     );
 
-    // Start observing the component's root element
-    if (ref.current) {
-      observer.observe(ref.current);
+    if (counterRef.current) {
+      observer.observe(counterRef.current);
     }
 
-    // Cleanup function to unobserve when the component unmounts
-    return () => {
-      if (ref.current) {
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        observer.unobserve(ref.current); // Exhaustive deps check disabled as ref.current is stable
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  const animateCounter = () => {
+    const startTime = Date.now();
+    const startValue = 0;
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Easing function for smooth animation
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const value = startValue + (targetValue - startValue) * easeOutQuart;
+
+      setCurrentValue(value);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
       }
     };
-  }, []); // Empty dependency array ensures this effect runs only once on mount
 
-  // Effect for handling the counting animation
-  useEffect(() => {
-    // Only start animation if the component is visible
-    if (!isVisible) return;
+    animate();
+  };
 
-    let start = 0;
-    // Calculate the increment per step for a smooth animation over the specified duration.
-    // The animation updates roughly every 50ms (20 times per second).
-    const increment = targetValue / (duration / 50);
-
-    const timer = setInterval(() => {
-      start += increment;
-      if (start >= targetValue) {
-        setCount(targetValue); // Ensure it ends exactly on targetValue
-        clearInterval(timer);  // Stop the interval
-      } else {
-        // Handle integer and floating-point numbers appropriately.
-        if (Number.isInteger(targetValue) && Number.isInteger(increment)) {
-          setCount(Math.ceil(start)); // Use Math.ceil for integers to avoid premature stopping
-        } else {
-          // For floating point numbers, maintain precision.
-          // If suffix is '%' and target is < 1 (e.g. 0.84), use 2 decimal places. Otherwise, 0.
-          const precision = (suffix.includes('%') || suffix.includes('.')) && Math.abs(targetValue) < 1 && targetValue !== 0 ? 2 : (targetValue % 1 !== 0 ? 2 : 0) ;
-          setCount(parseFloat(start.toFixed(precision)));
-        }
-      }
-    }, 50); // Interval duration for animation steps
-
-    // Cleanup function to clear interval if component unmounts or dependencies change
-    return () => clearInterval(timer);
-  }, [isVisible, targetValue, duration, suffix]); // Rerun effect if these dependencies change
-
-  // TODO: DATA: Performance stats are currently static. Confirm if these need to be dynamic.
-  // If dynamic, `targetValue`, `suffix`, and `label` would be fetched.
+  const formatValue = (value: number) => {
+    if (targetValue < 1) {
+      return (value * 100).toFixed(0);
+    }
+    return Math.floor(value).toString();
+  };
 
   return (
-    // Container for the counter: text centered, padding, light gray background, rounded, shadow.
-    // p-6 (24px), rounded-lg (8px), mt-2 (8px) - Adheres to 8pt spacing system.
-    <div ref={ref} className="text-center p-6 bg-gray-50 rounded-lg shadow-md">
-      {/* Animated number: large, bold, blue text. */}
-      <p className="text-4xl md:text-5xl font-bold text-blue-600">
-        {/* Format number with locale-specific separators and appropriate fraction digits */}
-        {count.toLocaleString(undefined, {
-          minimumFractionDigits: targetValue % 1 !== 0 ? ( (suffix.includes('%') || suffix.includes('.')) && Math.abs(targetValue) < 1 && targetValue !== 0 ? 2 : 0 ) : 0,
-          maximumFractionDigits: targetValue % 1 !== 0 ? ( (suffix.includes('%') || suffix.includes('.')) && Math.abs(targetValue) < 1 && targetValue !== 0 ? 2 : 2 ) : 0,
-        })}
-        {suffix}
-      </p>
-      {/* Label text below the number. */}
-      <p className="text-gray-600 mt-2">{label}</p>
+    <div ref={counterRef} className="text-center group">
+      <div className="relative">
+        {/* Animated Background Circle */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full opacity-20 group-hover:opacity-30 transition-opacity duration-300 animate-pulse"></div>
+
+        {/* Counter Display */}
+        <div className="relative z-10 py-8">
+          <div className="text-3xl md:text-4xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300 flex items-center justify-center gap-2">
+            <span className="inline-block">
+              {prefix}{formatValue(currentValue)}
+              <span className="text-yellow-300">{suffix}</span>
+            </span>
+            {arrow === 'up' && (
+              <svg className="w-6 h-6 text-green-400 inline-block animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 4l6 6H4l6-6z" />
+              </svg>
+            )}
+            {arrow === 'down' && (
+              <svg className="w-6 h-6 text-pink-400 inline-block animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 16l-6-6h12l-6 6z" />
+              </svg>
+            )}
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-28 h-1.5 bg-white/20 rounded-full mx-auto mb-4 overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full transition-all duration-1000 ease-out"
+              style={{ width: `${(currentValue / targetValue) * 100}%` }}
+            ></div>
+          </div>
+
+          {/* Label */}
+          <p className="text-blue-100 text-sm md:text-base font-medium group-hover:text-white transition-colors duration-300">
+            {label}
+          </p>
+        </div>
+
+        {/* Decorative Elements */}
+        <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full opacity-70 group-hover:scale-125 transition-transform duration-300"></div>
+        <div className="absolute -bottom-2 -left-2 w-3 h-3 bg-pink-400 rounded-full opacity-70 group-hover:scale-125 transition-transform duration-300"></div>
+      </div>
     </div>
   );
 };
