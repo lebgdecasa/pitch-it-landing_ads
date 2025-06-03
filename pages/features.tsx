@@ -165,15 +165,15 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
           </h1>
           <ul className={`text-lg md:text-xl text-blue-100 space-y-3 max-w-2xl mx-auto transform transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <li className="flex items-center justify-center space-x-2">
-              <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
+              {/* <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span> */}
               <span>{t('features_hero_li1')}</span>
             </li>
             <li className="flex items-center justify-center space-x-2">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse animation-delay-1000"></span>
+              {/* <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse animation-delay-1000"></span> */}
               <span>{t('features_hero_li2')}</span>
             </li>
             <li className="flex items-center justify-center space-x-2">
-              <span className="w-2 h-2 bg-pink-400 rounded-full animate-pulse animation-delay-2000"></span>
+              {/* <span className="w-2 h-2 bg-pink-400 rounded-full animate-pulse animation-delay-2000"></span> */}
               <span>{t('features_hero_li3')}</span>
             </li>
           </ul>
