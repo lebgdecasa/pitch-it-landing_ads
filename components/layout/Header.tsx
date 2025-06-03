@@ -33,7 +33,7 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
           {t('pitchit_brand')}
         </Link>
         {/* Desktop Nav */}
-        <nav className="flex items-center md:flex">
+        <nav className="hidden md:flex items-center">
           {/* Nav links group */}
           <div className="flex space-x-2 sm:space-x-4">
             <Link href="/features" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('features', '/features')}>
