@@ -257,20 +257,24 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
           <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch">
             <div className="transform hover:scale-105 transition-all duration-500">
               <FounderSpotlightCard
-                name={t('why_us_founder1_name')}
-                title={t('why_us_founder1_title')}
-                bio={t('why_us_founder1_bio')}
-                imageSrc="/images/karim.png"
-                imageAlt={t('why_us_founder1_alt')}
-              />
-            </div>
-            <div className="transform hover:scale-105 transition-all duration-500">
-              <FounderSpotlightCard
                 name={t('why_us_founder2_name')}
                 title={t('why_us_founder2_title')}
                 bio={t('why_us_founder2_bio')}
                 imageSrc="/images/jad.png"
                 imageAlt={t('why_us_founder2_alt')}
+                linkedinUrl="https://www.linkedin.com/in/jad-lahrichi-179004164/"
+                instagramUrl="https://www.instagram.com/jadlahrichi/"
+              />
+            </div>
+            <div className="transform hover:scale-105 transition-all duration-500">
+              <FounderSpotlightCard
+                name={t('why_us_founder1_name')}
+                title={t('why_us_founder1_title')}
+                bio={t('why_us_founder1_bio')}
+                imageSrc="/images/karim.png"
+                imageAlt={t('why_us_founder1_alt')}
+                linkedinUrl="https://www.linkedin.com/in/karimamor/"
+                instagramUrl="https://www.instagram.com/karimamor_/"
               />
             </div>
           </div>
@@ -357,7 +361,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
       </section>
 
       {/* Enhanced Testimonials Grid Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-white to-gray-50">
+      <section className="flex flex-col py-16 md:py-24 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-semibold text-center text-gray-800 mb-4">
             {t('why_us_testimonials_h2')}
