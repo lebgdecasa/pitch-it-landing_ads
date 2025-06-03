@@ -260,7 +260,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
                 name={t('why_us_founder2_name')}
                 title={t('why_us_founder2_title')}
                 bio={t('why_us_founder2_bio')}
-                imageSrc="/images/jad.png"
+                imageSrc="/images/jad_2.jpeg"
                 imageAlt={t('why_us_founder2_alt')}
                 linkedinUrl="https://www.linkedin.com/in/jad-lahrichi-179004164/"
                 instagramUrl="https://www.instagram.com/jadlahrichi/"
@@ -271,7 +271,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
                 name={t('why_us_founder1_name')}
                 title={t('why_us_founder1_title')}
                 bio={t('why_us_founder1_bio')}
-                imageSrc="/images/karim.png"
+                imageSrc="/images/karim_2.png"
                 imageAlt={t('why_us_founder1_alt')}
                 linkedinUrl="https://www.linkedin.com/in/karimamor/"
                 instagramUrl="https://www.instagram.com/karimamor_/"
