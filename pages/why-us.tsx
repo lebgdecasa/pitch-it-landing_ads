@@ -64,7 +64,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
             setAnimatedStats({
               stat1: Math.floor(118 * progress),
               stat2: Math.floor(30 * progress),
-              stat3: Math.floor(25 * progress)
+              stat3: Math.floor(55 * progress)
             });
 
             if (progress < 1) {
@@ -209,7 +209,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
                 <h3 className="text-xl font-semibold text-gray-800 mb-3">{t('why_us_vp1_headline')}</h3>
                 <p className="text-gray-600 mb-4">{t('why_us_vp1_body')}</p>
                 <div className="text-3xl font-bold text-green-600">
-                  {animatedStats.stat1}h → 8h avg. diligence time saved
+                  {animatedStats.stat1}h → 8h {t('why_us_vp1_metric')}
                 </div>
               </div>
             </div>
@@ -225,7 +225,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
                 <h3 className="text-xl font-semibold text-gray-800 mb-3">{t('why_us_vp2_headline')}</h3>
                 <p className="text-gray-600 mb-4">{t('why_us_vp2_body')}</p>
                 <div className="text-3xl font-bold text-blue-600">
-                  Up to {animatedStats.stat2}% higher valuation
+                  {t('why_us_vp2_metric')}
                 </div>
               </div>
             </div>
@@ -240,7 +240,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
                 <h3 className="text-xl font-semibold text-gray-800 mb-3">{t('why_us_vp3_headline')}</h3>
                 <p className="text-gray-600 mb-4">{t('why_us_vp3_body')}</p>
                 <div className="text-3xl font-bold text-purple-600">
-                  Reduce risk by {animatedStats.stat3}%
+                  {t('why_us_vp3_metric')} {animatedStats.stat3}%
                 </div>
               </div>
             </div>
