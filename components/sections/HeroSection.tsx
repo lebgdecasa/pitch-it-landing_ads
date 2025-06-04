@@ -24,7 +24,7 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
       </div>
 
       {/* Content Layer */}
-      <div className="container mx-auto px-4 md:px-6 text-center md:text-left relative z-10">
+      <div className="container mx-auto px-4 md:px-6 text-center w-[85vw] md:text-left relative z-10">
         <div className="max-w-full md:max-w-2xl">
           <h1 className="text-3xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight animate-fade-in-down text-blue-700">
             {t('hero_title')}

@@ -82,12 +82,12 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
               <span className="text-yellow-300">{suffix}</span>
             </span>
             {arrow === 'up' && (
-              <svg className="w-6 h-6 text-green-400 inline-block animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-6 h-6 text-green-600 inline-block animate-bounce" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 4l6 6H4l6-6z" />
               </svg>
             )}
             {arrow === 'down' && (
-              <svg className="w-6 h-6 text-pink-400 inline-block animate-bounce" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-6 h-6 text-red-700 inline-block animate-bounce" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 16l-6-6h12l-6 6z" />
               </svg>
             )}

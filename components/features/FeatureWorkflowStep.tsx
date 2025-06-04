@@ -72,7 +72,7 @@ const FeatureWorkflowStep: React.FC<FeatureWorkflowStepProps> = ({
 
   return (
     <div className="flex-shrink-0 w-full md:w-auto snap-center group">
-      <div className="bg-white p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 h-full">
+      <div className="bg-white py-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 border border-gray-100 h-full space-x-flex">
         {/* Step Number Circle */}
         <div className="relative mb-6">
           <div className={`w-16 h-16 bg-gradient-to-r ${getStepColor(stepNumber)} rounded-full flex items-center justify-center mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300`}>
@@ -80,7 +80,7 @@ const FeatureWorkflowStep: React.FC<FeatureWorkflowStepProps> = ({
           </div>
 
           {/* Icon */}
-          <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-white mr-5 rounded-full shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
             <div className={getIconColor(stepNumber)}>
               {getIcon(stepNumber)}
             </div>
@@ -107,4 +107,3 @@ const FeatureWorkflowStep: React.FC<FeatureWorkflowStepProps> = ({
 };
 
 export default FeatureWorkflowStep;
-

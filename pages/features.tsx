@@ -159,7 +159,7 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
           <div className="absolute top-40 left-40 w-80 h-80 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
         </div>
 
-        <div className="container mx-auto px-6 text-center relative z-10">
+        <div className="w-[80vw] container mx-auto px-6 text-center relative z-10">
           <h1 className={`text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             {t('features_hero_h1')}
           </h1>
@@ -181,7 +181,7 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
       </section>
 
       {/* Core Features Section - Card Grid Layout */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
+      <section className="center *:w-[80vw] py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -222,7 +222,7 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
       </section>
 
       {/* Workflow Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      <section className="center *:w-[90vw] py-16 md:py-24 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
@@ -270,7 +270,7 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
             <div className="w-16 h-1 bg-gradient-to-r from-green-500 to-teal-500 mx-auto rounded-full"></div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="center grid md:grid-cols-2 gap-16 max-w-4xl mx-auto">
             {additionalTools.map((tool, index) => (
               <FeatureCard
                 key={index}
@@ -286,7 +286,7 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
       </section>
 
       {/* Performance Stats Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 text-white relative overflow-hidden">
+      <section className="py-16 md:py-24 bg-gradient-to-r from-blue-900 via-blue-400 to-blue-700 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black opacity-20"></div>
         <div className="container mx-auto px-6 relative z-10">
           <h2 className="text-3xl md:text-4xl font-semibold text-center mb-4">
@@ -294,21 +294,21 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-yellow-400 to-pink-400 mx-auto mb-12 rounded-full"></div>
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20">
-              <AnimatedCounter targetValue={0.84} suffix="%+" label={t('features_perf_stat1_label')} />
+            <div className="text-center bg-white/10 backdrop-blur-lg p-4 rounded-xl border border-white/20">
+              <AnimatedCounter arrow="up" targetValue={0.84} suffix="%" label={t('features_perf_stat1_label')} />
             </div>
-            <div className="text-center bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20">
-              <AnimatedCounter targetValue={6} suffix="%+" label={t('features_perf_stat2_label')} />
+            <div className="text-center bg-white/10 backdrop-blur-lg p-4 rounded-xl border border-white/20">
+              <AnimatedCounter arrow="up" targetValue={6} suffix="%" label={t('features_perf_stat2_label')} />
             </div>
-            <div className="text-center bg-white/10 backdrop-blur-lg p-6 rounded-xl border border-white/20">
-              <AnimatedCounter targetValue={75} suffix="%" label={t('features_perf_stat3_label')} />
+            <div className="text-center bg-white/10 backdrop-blur-lg p-4 rounded-xl border border-white/20">
+              <AnimatedCounter arrow="down" targetValue={75} suffix="%" label={t('features_perf_stat3_label')} />
             </div>
           </div>
         </div>
       </section>
 
       {/* FAQ Section - Keep accordion here as it's appropriate */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-gray-100 to-gray-50">
+      <section className="py-16 md:py-16 bg-gradient-to-b from-gray-100 to-gray-50">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-semibold text-center text-gray-800 mb-4">
             {t('features_faq_h2')}

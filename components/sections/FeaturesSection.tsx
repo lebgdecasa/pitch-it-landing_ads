@@ -71,13 +71,13 @@ const FeaturesSection = ({ onOpenDemoModal }: FeaturesSectionProps) => {
 
   return (
     <section id="features" ref={ref} className="py-20 bg-gray-50">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-6 w-[80vw]">
         <div className={`text-center mb-16 transition-all duration-700 ease-out ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">{t('features_title')}</h2>
         </div>
 
         {/* Feature Navigation */}
-        <div className="flex flex-wrap justify-center gap-2 md:gap-4 mb-16">
+        <div className=" flex justify-center gap-2 md:gap-4 mb-16">
           {features.map((feature, index) => (
             <a key={feature.id} href={`#${feature.id}`} className="flex items-center">
               <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold ${

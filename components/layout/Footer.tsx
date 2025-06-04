@@ -6,11 +6,8 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-800 text-gray-400 py-12">
-      <div className="container mx-auto px-6 text-center">
-        <a href="#" className="text-2xl font-bold text-white hover:text-blue-300 transition-colors">
-          {t('pitchit_brand')}
-        </a>
+    <footer className="bg-gray-800 text-gray-400 py-4">
+      <div className="container flex justify-center items-center gap-6 mx-auto px-6 text-center">
         <p
           className="my-4 text-sm"
           dangerouslySetInnerHTML={{ __html: t('footer_text', { year: currentYear }) }}

@@ -129,7 +129,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
       </section>
 
       {/* Enhanced Mission & Vision Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
+      <section className="center *:w-[80vw] py-16 md:py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 border-l-4 border-blue-500">
@@ -184,7 +184,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
       </section>
 
       {/* Enhanced Value Proposition Tiles Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      <section className="center *:w-[80vw] py-16 md:py-2 bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -249,7 +249,7 @@ const WhyUsPage = ({ openWaitlistModal, openDemoModal }: WhyUsPageProps) => {
       </section>
 
       {/* Enhanced Founder Spotlight Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-br from-indigo-50 to-purple-50">
+      <section className="center *:w-[80vw] py-16 md:py-24 bg-gradient-to-br from-indigo-50 to-purple-50">
         <div className="container mx-auto px-6">
           <h2 className="text-3xl font-semibold text-center text-gray-800 mb-4">{t('why_us_founders_h2')}</h2>
           <div className="w-24 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto mb-12 rounded-full"></div>
