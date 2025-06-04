@@ -1,4 +1,5 @@
 import React from 'react';
+import { trackButtonClick } from '@/utils/analytics'; // Import the tracking function
 
 interface CTAButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** Text content of the button */
@@ -27,6 +28,7 @@ const CTAButton: React.FC<CTAButtonProps> = ({
   secondary = false,
   className = '',
   'data-cta-id': dataCtaId, // Destructure and rename for clarity within the component
+  onClick, // Capture onClick to wrap it
   ...props // Spread remaining button attributes (e.g., onClick, type)
 }) => {
   // Base styles applicable to all button variants
@@ -48,10 +50,22 @@ const CTAButton: React.FC<CTAButtonProps> = ({
     specificStyle = 'bg-gray-200 hover:bg-gray-300 text-gray-800 focus:ring-gray-400';
   }
 
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (dataCtaId) {
+      // Assuming the location might be derived from context or a new prop later
+      // For now, using a generic location or the button ID itself if no better context.
+      trackButtonClick(dataCtaId, dataCtaId);
+    }
+    if (onClick) {
+      onClick(event); // Call the original onClick handler if it exists
+    }
+  };
+
   return (
     <button
       className={`${baseStyle} ${specificStyle} ${className}`} // Combine base, specific, and any custom classes
       data-cta-id={dataCtaId} // Apply data attribute for analytics
+      onClick={handleClick} // Use the wrapped handleClick
       {...props} // Spread other HTML button attributes
     >
       {text}
