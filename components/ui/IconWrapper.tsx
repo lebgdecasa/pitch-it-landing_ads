@@ -29,13 +29,13 @@ const IconWrapper: React.FC<IconWrapperProps> = ({ svgContent, className }) => {
       <span
         className={className}
         dangerouslySetInnerHTML={{ __html: svgContent }}
-        role="img" // Basic accessibility, consider adding aria-label if svgContent doesn't have a title
+        role="svg" // Basic accessibility, consider adding aria-label if svgContent doesn't have a title
       />
     );
   }
 
   // Placeholder for when an icon library (e.g., Heroicons, FontAwesome) might be used,
-  // or when icons are loaded via an `src` prop (e.g., <img src="/icons/my-icon.svg" />).
+  // or when icons are loaded via an `src` prop (e.g., <img src="/icons/my-favicon.svgsvg" />).
   // The current placeholder is a gray rounded square.
   // w-6 (24px), h-6 (24px) - Adheres to 8pt spacing system.
   // TODO: ICON: Implement actual icon rendering strategy (e.g., using an icon library, mapping names to SVGs).

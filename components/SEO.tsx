@@ -115,8 +115,8 @@ const SEO = ({
       <link rel="manifest" href="/manifest.json" />
 
       {/* Favicon */}
-      <link rel="icon" href="/favicon.ico" />
-      <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+      <link rel="icon" href="/images/favicon.svg" />
+      <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.svg" />
 
       {/* Structured Data */}
       <script

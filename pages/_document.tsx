@@ -15,7 +15,7 @@ class MyDocument extends Document {
             rel="stylesheet"
           />
           {/* Favicon */}
-          <link rel="icon" type="image/png" href="/images/icon.png" />
+          <link rel="icon" type="image/png" href="/images/favicon.svg" />
         </Head>
         <body>
           <Main />

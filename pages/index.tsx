@@ -56,7 +56,7 @@ export default function Home({ generatedAt }: HomeProps) {
       <Head>
         <title>NexTraction | AI-Powered Pitch Deck Platform</title>
         <meta name="description" content="NexTraction is the AI platform that transforms your ideas into impactful presentations, validates your concepts, and prepares you to convince investors." />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="" />
       </Head>
 
       <Layout onOpenDemoModal={() => openDemoModal('header')}>
