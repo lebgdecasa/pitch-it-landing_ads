@@ -29,7 +29,7 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" className="text-3xl font-bold text-blue-700 hover:text-blue-800 transition-colors" onClick={() => trackButtonClick('logo_NexTraction', 'header')}>
+        <Link href="/" className="text-3xl font-bold text-blue-700 hover:text-blue-800 transition-colors" onClick={() => trackButtonClick('logo_final', 'header')}>
           {t('pitchit_brand')}
         </Link>
         {/* Desktop Nav */}

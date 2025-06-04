@@ -105,7 +105,7 @@ export default function PortfolioHealthPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <img src="/images/logo_NexTraction.png" alt="NexTraction" className="h-8 mr-2" />
+                <img src="/images/logo_final.svg" alt="NexTraction" className="h-8 mr-2" />
                 <span className="font-bold text-xl text-gray-900">NexTraction</span>
                 <span className="ml-2 text-sm text-gray-500">Portfolio Health</span>
               </div>

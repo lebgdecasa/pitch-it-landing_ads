@@ -32,7 +32,7 @@ const SEO = ({
     "@type": "Organization",
     "name": "NexTraction",
     "url": siteUrl,
-    "logo_NexTraction": `${siteUrl}/images/logo_NexTraction.png`,
+    "logo_final": `${siteUrl}/images/logo_final.svg`,
     "sameAs": [
       "https://twitter.com/pitchitai",
       "https://linkedin.com/company/NexTraction",
@@ -73,9 +73,9 @@ const SEO = ({
     "publisher": {
       "@type": "Organization",
       "name": "NexTraction",
-      "logo_NexTraction": {
+      "logo_final": {
         "@type": "ImageObject",
-        "url": `${siteUrl}/images/logo_NexTraction.png`
+        "url": `${siteUrl}/images/logo_final.svg`
       }
     }
   } : null;

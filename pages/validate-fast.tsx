@@ -288,7 +288,7 @@ export default function ValidateFastPage() {
           </div>
         </section>
 
-        {/* logo_NexTraction Bar */}
+        {/* logo_final Bar */}
         <section className="py-8 md:py-12 px-4 md:px-6 bg-white border-t">
           <div className="max-w-5xl mx-auto">
             <p className="text-center text-sm text-gray-600 mb-6">

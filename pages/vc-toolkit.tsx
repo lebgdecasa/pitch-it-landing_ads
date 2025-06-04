@@ -65,7 +65,7 @@ export default function VCToolkitPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <img src="/images/logo_NexTraction.png" alt="NexTraction" className="h-8 mr-2" />
+                <img src="/images/logo_final.svg" alt="NexTraction" className="h-8 mr-2" />
                 <span className="font-bold text-xl text-gray-900">NexTraction</span>
                 <span className="ml-2 text-sm text-gray-500">for VCs</span>
               </div>
@@ -428,7 +428,7 @@ export default function VCToolkitPage() {
               </div>
             </div>
 
-            {/* logo_NexTraction parade */}
+            {/* logo_final parade */}
             <div className="mt-12 pt-12 border-t">
               <p className="text-center text-gray-600 mb-8">Also trusted by partners and associates at:</p>
               <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-60">
