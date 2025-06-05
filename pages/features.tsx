@@ -22,42 +22,43 @@ const coreFeatureData = (t: (key: string) => string) => [
     iconSvg: `<svg fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>`,
     title: t('feature_item_trend_crawler_title'),
     description: t('features_item_trend_crawler_content'),
-    highlight: "AI-powered market intelligence",
+    highlight: t('features_item_trend_crawler_highlight'),
+    cta: t("learn_more"),
     colorTheme: 'purple' as const,
   },
   {
     iconSvg: `<svg fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/></svg>`,
     title: t('feature_item_real_world_pulse_title'),
     description: t('features_item_real_world_pulse_content'),
-    highlight: "Validate with real users in days",
+    highlight: t('features_item_real_world_pulse_highlight'),
     colorTheme: 'blue' as const,
   },
   {
     iconSvg: `<svg fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2H4zm2 6a2 2 0 104 0 2 2 0 00-4 0zm6 0a2 2 0 104 0 2 2 0 00-4 0z"/></svg>`,
     title: t('feature_item_deck_builder_title'),
     description: t('features_item_deck_builder_content'),
-    highlight: "Investor-grade presentations",
+    highlight: t('features_item_deck_builder_highlight'),
     colorTheme: 'orange' as const,
   },
   {
     iconSvg: `<svg fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/></svg>`,
     title: t('feature_item_virtual_vc_title'),
     description: t('features_item_virtual_vc_content'),
-    highlight: "Practice with AI investors",
+    highlight: t('features_item_virtual_vc_highlight'),
     colorTheme: 'indigo' as const,
   },
   {
     iconSvg: `<svg fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/></svg>`,
     title: t('feature_item_buyer_persona_title'),
     description: t('features_item_buyer_persona_content'),
-    highlight: "Data-driven customer profiles",
+    highlight: t('features_item_buyer_persona_highlight'),
     colorTheme: 'teal' as const,
   },
   {
     iconSvg: `<svg fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/></svg>`,
     title: t('feature_item_insights_panel_title'),
     description: t('features_item_insights_panel_content'),
-    highlight: "Real-time analytics dashboard",
+    highlight: t('features_item_insights_panel_highlight'),
     colorTheme: 'pink' as const,
   }
 ];
@@ -67,13 +68,13 @@ const additionalToolsData = (t: (key: string) => string) => [
   {
     iconSvg: `<svg fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/><path fillRule="evenodd" d="M3 8a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"/></svg>`,
     title: t('features_item_document_hub_title'),
-    description: "Centralized storage for all your pitch materials and research documents.",
+    description: t('features_item_document_hub_content'),
     colorTheme: 'green' as const,
   },
   {
     iconSvg: `<svg fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd"/></svg>`,
     title: t('features_item_road_mapped_extras_title'),
-    description: "Advanced features and integrations coming soon to enhance your workflow.",
+    description: t('features_item_road_mapped_extras_content'),
     colorTheme: 'red' as const,
   }
 ];
@@ -126,8 +127,8 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
 
   const pageTitle = t('features_page_title');
   const pageDescription = t('features_page_description');
-  const pageUrl = "https://www.nextraction.com/features";
-  const ogImageUrl = "https://www.nextraction.com/images/og-features.png";
+  const pageUrl = "https://www.nextraction.io/features";
+  const ogImageUrl = "https://www.nextraction.io/images/og-features.png";
 
   const coreFeatures = coreFeatureData(t);
   const additionalTools = additionalToolsData(t);
@@ -189,7 +190,7 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
             </h2>
             <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mb-6 rounded-full"></div>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Everything you need to validate your ideas, build compelling pitches, and secure funding
+              {t('features_core_section_subtitle')}
             </p>
           </div>
 
@@ -215,7 +216,7 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
               onClick={openDemoModal}
               className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl"
             >
-              See All Features in Action
+              {t('see_all_features')}
             </button>
           </div>
         </div>
@@ -266,7 +267,7 @@ const FeaturesPage = ({ openDemoModal, openWaitlistModal }: FeaturesPageProps) =
       <section className="py-16 md:py-24 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Additional Tools</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">{t('additional_tools')}</h2>
             <div className="w-16 h-1 bg-gradient-to-r from-green-500 to-teal-500 mx-auto rounded-full"></div>
           </div>
 

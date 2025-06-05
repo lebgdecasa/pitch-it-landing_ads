@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'next-i18next';
 
 interface FeatureCardProps {
   /** SVG content string for the feature icon */
@@ -15,6 +16,7 @@ interface FeatureCardProps {
   ctaText?: string;
   /** CTA click handler */
   onCtaClick?: () => void;
+
 }
 
 /**
@@ -28,9 +30,11 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   description,
   highlight,
   colorTheme,
-  ctaText = "Learn More",
+  ctaText = ('learn_more'),
   onCtaClick
 }) => {
+  const { t } = useTranslation('common');
+
   const getColorClasses = (theme: string) => {
     const themes = {
       purple: {
@@ -145,7 +149,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
             onClick={onCtaClick}
             className={`inline-flex items-center text-sm font-semibold ${colors.cta} transition-all duration-200 px-4 py-2 rounded-lg mt-auto`}
           >
-            {ctaText}
+            {t(ctaText)}
             <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
@@ -161,4 +165,3 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 };
 
 export default FeatureCard;
-
