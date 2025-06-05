@@ -20,7 +20,16 @@ const Footer = () => {
             {t('footer_terms')}
           </a>
         </div>
+        <a
+          href="http://linkedin.com/company/nextractionio"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-blue-300 transition-colors text-sm"
+        >
+          LinkedIn
+        </a>
       </div>
+
     </footer>
   );
 };
