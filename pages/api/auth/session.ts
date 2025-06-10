@@ -1,7 +1,8 @@
 // pages/api/auth/session.ts
-import { createServerClient } from '@supabase/ssr'; // Changed
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Database } from '../../../supa_database/types/database'; // Corrected path
+// Database type is now inferred from createSupabaseAPIClient if not explicitly needed here
+// import { Database } from '../../../supa_database/types/database';
+import { createSupabaseAPIClient } from '../../../../supa_database/utils/supabase/apiClient'; // Adjusted path
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -9,8 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
 
-  // Create a Supabase client configured to use cookies
-  const supabase = createServerClient<Database>({ req, res }); // Changed
+  const supabase = createSupabaseAPIClient(req, res);
 
   try {
     // supabase.auth.getSession() could also be used if you need the full session object

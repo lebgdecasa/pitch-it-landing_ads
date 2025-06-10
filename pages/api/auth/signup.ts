@@ -1,9 +1,10 @@
 // pages/api/auth/signup.ts
-import { createServerClient } from '@supabase/ssr'; // Changed
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Database } from '../../../supa_database/types/database'; // Corrected path
+// import { Database } from '../../../supa_database/types/database'; // Inferred
+import { createSupabaseAPIClient } from '../../../../supa_database/utils/supabase/apiClient'; // Adjusted path
 
 // Define types for RPC functions if not already globally available or in Database types
+// This AccessCodeValidation might be better defined alongside the API client or in a shared types file if complex.
 interface AccessCodeValidation {
   valid: boolean;
   university: string | null; // Or whatever your RPC returns, e.g. 'reason' for invalidity
@@ -22,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Email, password, and access code are required' });
   }
 
-  const supabase = createServerClient<Database>({ req, res }); // Changed
+  const supabase = createSupabaseAPIClient(req, res);
 
   try {
     // 1. Validate Access Code

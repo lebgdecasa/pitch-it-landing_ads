@@ -1,7 +1,7 @@
 // pages/api/auth/signin.ts
-import { createServerClient } from '@supabase/ssr'; // Changed
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { Database } from '../../../supa_database/types/database'; // Corrected path
+// import { Database } from '../../../supa_database/types/database'; // Inferred
+import { createSupabaseAPIClient } from '../../../../supa_database/utils/supabase/apiClient'; // Adjusted path
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Create a Supabase client configured to use cookies
   // This will automatically read and write auth cookies to the request/response.
-  const supabase = createServerClient<Database>({ req, res }); // Changed
+  const supabase = createSupabaseAPIClient(req, res);
 
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
