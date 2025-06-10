@@ -1,7 +1,7 @@
 // supa_database/auth/index.ts
-import { useState, useEffect, useCallback } from 'react' // Added useCallback
-import { User, Session, AuthError } from '@supabase/supabase-js' // AuthError might be unused after removing direct auth calls
-import { supabaseBrowserClient as supabase } from '../utils/supabase/client'; // Use new client
+import { useState, useEffect, useCallback } from 'react'
+import { User, Session, AuthError, AuthChangeEvent } from '@supabase/supabase-js'; // Added AuthChangeEvent
+import { supabaseBrowserClient as supabase } from '../utils/supabase/client';
 import { UserProfile } from '../types/database'
 
 export interface AuthState {
@@ -59,7 +59,7 @@ export const useAuth = () => {
     fetchInitialSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: AuthChangeEvent, session: Session | null) => { // Added explicit types
         // This listener reacts to client-side auth events (e.g., tab sync, token refresh, explicit client-side signOut)
         // It's also a fallback if the initial /api/auth/session call is missed or fails.
         // SIGNED_IN: Often handled by redirect after API call, but this syncs tabs or recovers session.
@@ -126,12 +126,6 @@ export const updateUserProfile = async (
     return null
   }
 }
-
-// Define types for RPC functions - This might be obsolete here if not used by remaining functions
-// interface AccessCodeValidation {
-//   valid: boolean
-//   university: string | null
-// }
 
 // Sign up, Sign in, Sign out, validateAccessCode are now handled by API routes.
 // Client-side direct calls for these are removed.

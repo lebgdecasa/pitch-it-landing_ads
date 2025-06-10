@@ -1,5 +1,5 @@
 // pages/api/auth/session.ts
-import { createPagesServerClient } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr'; // Changed
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Database } from '../../../supa_database/types/database'; // Corrected path
 
@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Create a Supabase client configured to use cookies
-  const supabase = createPagesServerClient<Database>({ req, res });
+  const supabase = createServerClient<Database>({ req, res }); // Changed
 
   try {
     // supabase.auth.getSession() could also be used if you need the full session object

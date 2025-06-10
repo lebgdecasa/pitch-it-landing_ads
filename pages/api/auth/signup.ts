@@ -1,5 +1,5 @@
 // pages/api/auth/signup.ts
-import { createPagesServerClient } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr'; // Changed
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Database } from '../../../supa_database/types/database'; // Corrected path
 
@@ -22,7 +22,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: 'Email, password, and access code are required' });
   }
 
-  const supabase = createPagesServerClient<Database>({ req, res });
+  const supabase = createServerClient<Database>({ req, res }); // Changed
 
   try {
     // 1. Validate Access Code

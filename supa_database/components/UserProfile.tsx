@@ -1,10 +1,12 @@
 // supa_database/components/UserProfile.tsx
 import React, { useState } from 'react'
+import { useRouter } from 'next/router'; // Added
 import { useAuthContext } from './AuthProvider'
-import { updateUserProfile, signOut } from '../auth'
+import { updateUserProfile } from '../auth'; // signOut removed
 
 export const UserProfile: React.FC = () => {
   const { user, profile } = useAuthContext()
+  const router = useRouter(); // Added
   const [editing, setEditing] = useState(false)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -27,7 +29,24 @@ export const UserProfile: React.FC = () => {
   }
 
   const handleSignOut = async () => {
-    await signOut()
+    try {
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Sign-out failed');
+      }
+
+      // Sign-out successful, cookie is cleared by server.
+      // Redirect to home and reload for clean state.
+      router.push('/').then(() => router.reload());
+
+    } catch (err: any) {
+      console.error('Sign-out error:', err.message);
+      alert('Failed to sign out: ' + err.message); // Or a more sophisticated error display
+    }
   }
 
   if (!user || !profile) return null
