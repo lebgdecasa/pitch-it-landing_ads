@@ -72,7 +72,7 @@ const AuthForm: React.FC = () => {
 
   return (
     // Adjusted container for page layout instead of modal
-    <div className="bg-white rounded-lg p-8 w-full max-w-md mx-auto my-10 shadow-xl">
+    <div className="bg-white rounded-lg p-4 sm:p-6 md:p-8 w-full max-w-md mx-auto my-10 shadow-xl"> {/* Updated padding */}
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-center">
           {mode === 'signin' ? 'Sign In'
