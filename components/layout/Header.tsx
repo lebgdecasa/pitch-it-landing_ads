@@ -79,12 +79,18 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
             {loading ? (
               <div className="text-gray-500 text-sm">Loading...</div>
             ) : user ? (
-              <button
-                onClick={handleSignOut}
-                className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors"
-              >
-                {t('nav_sign_out', 'Sign Out')}
-              </button>
+              <>
+                <Link href="/dashboard" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('dashboard', '/dashboard')}>
+                  {t('nav_dashboard', 'Dashboard')}
+                </Link>
+                <div className="border-l border-gray-200 h-8 mx-2"></div> {/* Divider */}
+                <button
+                  onClick={handleSignOut}
+                  className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors"
+                >
+                  {t('nav_sign_out', 'Sign Out')}
+                </button>
+              </>
             ) : (
               <Link href="/auth" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('auth_desktop', '/auth')}>
                 {t('nav_sign_in_up', 'Sign In / Up')}
@@ -149,12 +155,17 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
             {loading ? (
               <p className="text-gray-500 text-lg">Loading...</p>
             ) : user ? (
-              <button
-                onClick={handleSignOut}
-                className="w-full text-left text-gray-700 text-lg font-medium hover:text-blue-600 transition-colors"
-              >
-                {t('nav_sign_out', 'Sign Out')}
-              </button>
+              <>
+                <Link href="/dashboard" className="text-gray-700 text-lg font-medium hover:text-blue-600 transition-colors" onClick={() => handleNavClick('dashboard', '/dashboard')}>
+                  {t('nav_dashboard', 'Dashboard')}
+                </Link>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full text-left text-gray-700 text-lg font-medium hover:text-blue-600 transition-colors mt-2 pt-2 border-t border-gray-200" // Added some separation
+                >
+                  {t('nav_sign_out', 'Sign Out')}
+                </button>
+              </>
             ) : (
               <Link href="/auth" className="text-gray-700 text-lg font-medium hover:text-blue-600 transition-colors" onClick={() => handleNavClick('auth_mobile', '/auth')}>
                 {t('nav_sign_in_up', 'Sign In / Up')}
