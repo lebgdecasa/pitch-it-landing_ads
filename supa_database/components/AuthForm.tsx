@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import { resetPassword } from '../auth' // signIn, signUp, validateAccessCode removed
+import { resetPassword, supabase } from '../auth' // signIn, signUp, validateAccessCode removed
 
 // Interface for form data
 interface AuthFormData {
@@ -81,6 +81,7 @@ const AuthForm: React.FC = () => {
         // Sign-in was successful. The cookie is set by the API route.
         // The onAuthStateChange listener will trigger a state update.
         // Just push the user to the dashboard. No reload needed.
+        await supabase.auth.getSession(); 
         router.push('/dashboard');
         return; // Prevent finally block from clearing potential success message if we were to show one
       }
