@@ -81,8 +81,8 @@ const AuthForm: React.FC = () => {
         // Sign-in was successful. The cookie is set by the API route.
         // The onAuthStateChange listener will trigger a state update.
         // Just push the user to the dashboard. No reload needed.
-        await supabase.auth.getSession(); 
-        router.push('/dashboard');
+        await supabase.auth.getSession();
+        router.push('/dashboard').then(() => window.location.reload());
         return; // Prevent finally block from clearing potential success message if we were to show one
       }
     } catch (err: any) { // Type explicitly as any or Error

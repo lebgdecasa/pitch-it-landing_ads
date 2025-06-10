@@ -41,7 +41,7 @@ export const UserProfile: React.FC = () => {
 
       // Sign-out successful, cookie is cleared by server.
       // Redirect to home and reload for clean state.
-      router.push('/').then(() => router.reload());
+      router.push('/');
 
     } catch (err: any) {
       console.error('Sign-out error:', err.message);

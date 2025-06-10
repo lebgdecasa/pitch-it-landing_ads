@@ -32,9 +32,7 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
 
       // Sign-out successful on the server, cookie is cleared.
       // Redirect and reload to ensure client state is reset.
-      router.push('/').then(() => {
-        router.reload(); // Force a reload to clear all client-side state
-      });
+      router.push('/'); // Force a reload to clear all client-side state
 
     } catch (err: any) {
       console.error('Sign-out error:', err.message);
