@@ -5,6 +5,7 @@ import Modal from '@/components/ui/Modal';
 import DemoModal from '@/components/modals/DemoModal';
 import SEO from '@/components/SEO';
 import { trackButtonClick, trackTimeOnPage, trackFeatureInterest } from '@/utils/analytics';
+import { AuthTest } from '../tests/AuthTest'
 
 export default function VCToolkitPage() {
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
@@ -60,6 +61,7 @@ export default function VCToolkitPage() {
       </Head>
 
       <div className="min-h-screen bg-gray-50">
+        <AuthTest />
         {/* Navigation Bar - Professional Look for VCs */}
         <nav className="bg-white shadow-sm sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

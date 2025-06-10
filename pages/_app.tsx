@@ -5,16 +5,24 @@ import { LanguageProvider } from '@/context/LanguageContext';
 import LazyGoogleAnalytics from '@/components/LazyGoogleAnalytics';
 import OptimizedAnalytics from '@/components/OptimizedAnalytics';
 import ResourcePrefetcher from '@/components/ResourcePrefetcher';
-import Modal from '@/components/ui/Modal'; // Import the Modal wrapper
+import Modal from '@/components/ui/Modal';
 import DemoModal from '@/components/modals/DemoModal';
 import WaitlistModal from '@/components/modals/WaitlistModal';
 import '@/styles/globals.css';
 import { appWithTranslation } from 'next-i18next';
 
+import { AuthProvider } from '@/supa_database/components/AuthProvider';
+import AuthModal from '@/supa_database/components/AuthModal';
+
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Function to open the authentication modal
+  const openAuthModal = () => setIsAuthModalOpen(true);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
 
   const openDemoModal = () => setIsDemoModalOpen(true);
   const closeDemoModal = () => setIsDemoModalOpen(false);
@@ -26,6 +34,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     ...pageProps,
     openDemoModal,
     openWaitlistModal,
+    openAuthModal,
   };
 
   return (
@@ -51,6 +60,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <LazyGoogleAnalytics />
       <OptimizedAnalytics />
       <ResourcePrefetcher />
+      <AuthProvider>
       <LanguageProvider>
         <Component {...enhancedPageProps} />
         {/* Wrap DemoModal and WaitlistModal with the Modal component */}
@@ -64,7 +74,10 @@ function MyApp({ Component, pageProps }: AppProps) {
             <WaitlistModal onClose={closeWaitlistModal} />
           </Modal>
         )}
+        <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />
+
       </LanguageProvider>
+    </AuthProvider>
     </>
   );
 }

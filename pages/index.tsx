@@ -14,6 +14,7 @@ import { trackButtonClick } from '@/utils/analytics';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 
+
 interface HomeProps {
   generatedAt?: string;
 }
