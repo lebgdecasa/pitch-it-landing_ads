@@ -1,7 +1,7 @@
 // pages/api/auth/signup.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 // import { Database } from '../../../supa_database/types/database'; // Inferred
-import { createSupabaseAPIClient } from '../../../../supa_database/utils/supabase/apiClient'; // Adjusted path
+import { createSupabaseAPIClient } from '@/supa_database/utils/supabase/apiClient'; // Adjusted path
 
 // Define types for RPC functions if not already globally available or in Database types
 // This AccessCodeValidation might be better defined alongside the API client or in a shared types file if complex.

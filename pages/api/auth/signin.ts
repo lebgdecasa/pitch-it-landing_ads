@@ -1,7 +1,7 @@
 // pages/api/auth/signin.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 // import { Database } from '../../../supa_database/types/database'; // Inferred
-import { createSupabaseAPIClient } from '../../../../supa_database/utils/supabase/apiClient'; // Adjusted path
+import { createSupabaseAPIClient } from '@/supa_database/utils/supabase/apiClient'; // Adjusted path
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {

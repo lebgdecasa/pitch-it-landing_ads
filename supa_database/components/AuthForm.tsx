@@ -79,7 +79,7 @@ const AuthForm: React.FC = () => {
           throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
         }
         // API route now handles cookie setting. AuthProvider will sync state.
-        router.push('/dashboard');
+        router.push('/dashboard').then(() => window.location.reload());
         return; // Prevent finally block from clearing potential success message if we were to show one
       }
     } catch (err: any) { // Type explicitly as any or Error

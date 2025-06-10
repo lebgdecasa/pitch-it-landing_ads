@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 // Database type is now inferred from createSupabaseAPIClient if not explicitly needed here
 // import { Database } from '../../../supa_database/types/database';
-import { createSupabaseAPIClient } from '../../../../supa_database/utils/supabase/apiClient'; // Adjusted path
+import { createSupabaseAPIClient } from '@/supa_database/utils/supabase/apiClient'; // Adjusted path
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
@@ -18,8 +18,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError) {
-      // This error might occur if the JWT is malformed or other issues,
-      // but typically if there's no valid session, user will just be null.
+      // If the error is 'Auth session missing!', treat as no session (not an error)
+      if (
+        userError.message === 'Auth session missing!' ||
+        userError.message?.toLowerCase().includes('auth session missing')
+      ) {
+        // Don't log this as an error, it's a normal case
+        return res.status(200).json({ user: null, session: null });
+      }
+      // Other errors are real errors
       console.error('Error fetching user for session endpoint:', userError.message);
       return res.status(userError.status || 500).json({ error: userError.message });
     }
