@@ -1,25 +1,31 @@
 // supa_database/components/AuthForm.tsx
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { signIn, signUp, signInWithMagicLink, validateAccessCode } from '../auth' // Assuming this path is correct
+import { useRouter } from 'next/router' // Added useRouter
+import { signIn, signUp, validateAccessCode, resetPassword } from '../auth'
 
 // Interface for form data
 interface AuthFormData {
   email: string
-  password: string // Password is not used for magic link, but field is present
-  accessCode?: string // Conditionally required for signup
+  password: string
+  confirmPassword?: string
+  accessCode?: string
 }
 
 const AuthForm: React.FC = () => {
-  const [mode, setMode] = useState<'signin' | 'signup' | 'magic'>('signin')
+  const [mode, setMode] = useState<'signin' | 'signup' | 'resetPassword'>('signin') // Removed 'magic'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter(); // Added router instance
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<AuthFormData>({
     defaultValues: {
       email: '',
       password: '',
+      confirmPassword: '',
       accessCode: '',
     }
   })
@@ -33,30 +39,29 @@ const AuthForm: React.FC = () => {
     setMessage(null)
 
     try {
-      if (mode === 'magic') {
-        const { error: magicLinkError } = await signInWithMagicLink(data.email)
-        if (magicLinkError) throw magicLinkError
-        setMessage('Check your email for the magic link!')
-        return // Early return after sending magic link
+      if (mode === 'resetPassword') {
+        const { error: resetError } = await resetPassword(data.email)
+        if (resetError) throw resetError
+        setMessage('If an account with that email exists, a password reset link has been sent. Please check your inbox.')
+        // Optionally, switch mode back to signin after a delay or keep user on this view with the message.
+        // For now, we'll keep them on the view.
+        return;
       }
 
       if (mode === 'signup') {
-        // Access code is now required by form validation if mode is 'signup'
-        // if (!data.accessCode) { // This check is now handled by react-hook-form's required validation
-        //   throw new Error('Access code is required for sign up.')
-        // }
-        const validation = await validateAccessCode(data.accessCode!) // Non-null assertion as it's required
+        const validation = await validateAccessCode(data.accessCode!)
         if (!validation.valid) {
           throw new Error(validation.university === 'used' ? 'Access code has already been used.' : 'Invalid access code.')
         }
         const { error: signUpError } = await signUp(data.email, data.password, data.accessCode)
         if (signUpError) throw signUpError
         setMessage('Check your email to confirm your account!')
-      } else { // signin
+      } else if (mode === 'signin') {
         const { error: signInError } = await signIn(data.email, data.password)
         if (signInError) throw signInError
-        setMessage('Signed in successfully!') // Provide feedback for sign-in
-        // onClose() // Removed as this is no longer a modal
+        // setMessage('Signed in successfully!') // Removed message
+        router.push('/dashboard'); // Redirect to dashboard
+        return; // Early return to prevent further state updates if not necessary
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
@@ -68,11 +73,12 @@ const AuthForm: React.FC = () => {
   return (
     // Adjusted container for page layout instead of modal
     <div className="bg-white rounded-lg p-8 w-full max-w-md mx-auto my-10 shadow-xl">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">
-          {mode === 'signin' ? 'Sign In' : mode === 'signup' ? 'Sign Up' : 'Sign In with Magic Link'}
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-center">
+          {mode === 'signin' ? 'Sign In'
+            : mode === 'signup' ? 'Sign Up'
+            : 'Reset Password'} {/* Removed Magic Link title */}
         </h2>
-        {/* Close button removed */}
       </div>
 
       {error && (
@@ -110,51 +116,93 @@ const AuthForm: React.FC = () => {
           )}
         </div>
 
-        {mode !== 'magic' && (
+        {(mode === 'signin' || mode === 'signup') && ( // Show password only for signin and signup
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
-            <input
-              id="password"
-              {...register('password', {
-                required: mode !== 'magic' ? 'Password is required' : false,
-                minLength: {
-                  value: 6,
-                  message: 'Password must be at least 6 characters'
-                }
-              })}
-              type="password"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="••••••••"
-            />
-            {errors.password && (
+            <div className="relative">
+              <input
+                id="password"
+                {...register('password', {
+                  required: (mode === 'signin' || mode === 'signup') ? 'Password is required' : false,
+                  minLength: {
+                    value: 6,
+                    message: 'Password must be at least 6 characters'
+                  }
+                })}
+                type={showPassword ? 'text' : 'password'}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10" // Added pr-10 for button spacing
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-800 focus:outline-none"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            {errors.password && (mode === 'signin' || mode === 'signup') && (
               <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
             )}
           </div>
         )}
 
         {mode === 'signup' && (
-          <div>
-            <label htmlFor="accessCode" className="block text-sm font-medium text-gray-700 mb-1">
-              Access Code
-            </label>
-            <input
-              id="accessCode"
-              {...register('accessCode', {
-                  required: mode === 'signup' ? 'Access code is required' : false
-              })}
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your access code"
-            />
-            {errors.accessCode && mode === 'signup' && ( // Ensure message only shows for signup
-              <p className="text-red-500 text-sm mt-1">{errors.accessCode.message}</p>
-            )}
-            <p className="text-sm text-gray-500 mt-1">
-              A valid access code is required to sign up.
-            </p>
-          </div>
+          <> {/* Use a fragment to group signup-specific fields */}
+            <div> {/* Confirm Password Field */}
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  {...register('confirmPassword', {
+                    required: 'Please confirm your password', // Always required in signup
+                    validate: value =>
+                      value === watch('password') || 'Passwords do not match'
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
+                  placeholder="Re-enter your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-800 focus:outline-none"
+                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                >
+                  {showConfirmPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            <div> {/* Access Code Field */}
+              <label htmlFor="accessCode" className="block text-sm font-medium text-gray-700 mb-1">
+                Access Code
+              </label>
+              <input
+                id="accessCode"
+                {...register('accessCode', {
+                    required: 'Access code is required' // Always required in signup
+                })}
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter your access code"
+              />
+              {errors.accessCode && ( // Error shown if present
+                <p className="text-red-500 text-sm mt-1">{errors.accessCode.message}</p>
+              )}
+              <p className="text-sm text-gray-500 mt-1">
+                A valid access code is required to sign up.
+              </p>
+            </div>
+          </>
         )}
 
         <button
@@ -162,7 +210,10 @@ const AuthForm: React.FC = () => {
           disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
         >
-          {loading ? 'Loading...' : mode === 'signin' ? 'Sign In' : mode === 'signup' ? 'Sign Up' : 'Send Magic Link'}
+          {loading ? 'Loading...'
+            : mode === 'signin' ? 'Sign In'
+            : mode === 'signup' ? 'Sign Up'
+            : 'Send Reset Link'} {/* Removed Magic Link button text */}
         </button>
       </form>
 
@@ -171,38 +222,30 @@ const AuthForm: React.FC = () => {
           <>
             <button
               type="button"
+              onClick={() => { setMode('resetPassword'); setError(null); setMessage(null); }}
+              className="w-full text-blue-600 hover:text-blue-700 text-sm py-1"
+            >
+              Forgot Password?
+            </button>
+            <hr className="my-2"/> {/* Visual separator */}
+            <button
+              type="button"
               onClick={() => { setMode('signup'); setError(null); setMessage(null); }}
               className="w-full text-blue-600 hover:text-blue-700 text-sm py-1"
             >
               Don't have an account? Sign up
             </button>
-            <button
-              type="button"
-              onClick={() => { setMode('magic'); setError(null); setMessage(null); }}
-              className="w-full text-blue-600 hover:text-blue-700 text-sm py-1"
-            >
-              Sign in with magic link
-            </button>
+            {/* Magic Link button removed */}
           </>
         )}
 
-        {mode === 'signup' && (
+        {(mode === 'signup' || mode === 'resetPassword') && ( // Removed 'magic' from condition
           <button
             type="button"
             onClick={() => { setMode('signin'); setError(null); setMessage(null); }}
             className="w-full text-blue-600 hover:text-blue-700 text-sm py-1"
           >
-            Already have an account? Sign in
-          </button>
-        )}
-
-        {mode === 'magic' && (
-          <button
-            type="button"
-            onClick={() => { setMode('signin'); setError(null); setMessage(null); }}
-            className="w-full text-blue-600 hover:text-blue-700 text-sm py-1"
-          >
-            Back to sign in
+            Back to Sign In
           </button>
         )}
       </div>
