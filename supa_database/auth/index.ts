@@ -1,89 +1,58 @@
 // supa_database/auth/index.ts
-import { useState, useEffect, useCallback } from 'react'
-import { User, Session, AuthError, AuthChangeEvent } from '@supabase/supabase-js'; // Added AuthChangeEvent
+import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
+import { User, AuthError } from '@supabase/supabase-js';
 import { supabaseBrowserClient as supabase } from '../utils/supabase/client';
-import { UserProfile } from '../types/database'
+import { UserProfile } from '../types/database';
 
 export interface AuthState {
-  user: User | null
-  profile: UserProfile | null
-  loading: boolean
-  session: Session | null
+  user: User | null;
+  profile: UserProfile | null;
+  loading: boolean;
 }
+
+const AuthContext = createContext<AuthState>({
+  user: null,
+  profile: null,
+  loading: true,
+});
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     profile: null,
     loading: true,
-    session: null,
   });
 
-  const fetchUserProfile = useCallback(async (user: User | null) => {
-    if (user) {
-      const profile = await getUserProfile(user.id);
-      setAuthState(prev => ({ ...prev, profile, user, loading: false }));
-    } else {
-      setAuthState(prev => ({ ...prev, user: null, profile: null, loading: false }));
+  const checkUser = useCallback(async () => {
+    try {
+      const response = await fetch('/api/auth/session');
+      if (response.ok) {
+        const data = await response.json();
+        setAuthState({ user: data.user, profile: data.profile, loading: false });
+      } else {
+        // No active session or an error occurred
+        setAuthState({ user: null, profile: null, loading: false });
+      }
+    } catch (error) {
+      console.error("Error fetching auth session:", error);
+      setAuthState({ user: null, profile: null, loading: false });
     }
   }, []);
 
-  const fetchInitialSession = useCallback(async () => {
-    try {
-      setAuthState(prev => ({ ...prev, loading: true }));
-      const response = await fetch('/api/auth/session');
-
-      if (!response.ok) {
-        // If API returns error or if session is just not there (e.g. user is null)
-        console.warn('Failed to fetch initial session or no active session found.');
-        setAuthState(prev => ({ ...prev, user: null, session: null, profile: null, loading: false }));
-        return;
-      }
-
-      const { user, session } = await response.json();
-
-      if (user && session) {
-        setAuthState(prev => ({ ...prev, user, session, loading: true })); // Keep loading while profile fetches
-        await fetchUserProfile(user);
-      } else {
-        await fetchUserProfile(null); // Clear user, profile and set loading false
-      }
-    } catch (error) {
-      console.error('Error fetching initial session:', error);
-      await fetchUserProfile(null); // Clear user, profile and set loading false
-    }
-  }, [fetchUserProfile]);
-
-
   useEffect(() => {
-    fetchInitialSession();
+    // Check user on initial load
+    checkUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: AuthChangeEvent, session: Session | null) => { // Added explicit types
-        // This listener reacts to client-side auth events (e.g., tab sync, token refresh, explicit client-side signOut)
-        // It's also a fallback if the initial /api/auth/session call is missed or fails.
-        // SIGNED_IN: Often handled by redirect after API call, but this syncs tabs or recovers session.
-        // SIGNED_OUT: If API call to signout succeeded, cookie is cleared. This handles client-side state sync.
-        // TOKEN_REFRESHED: Updates session.
-        // USER_UPDATED: Updates user.
-
-        // Update authState with the latest session and user information
-        // Set loading to true before fetching profile to indicate state is being updated
-        setAuthState(prev => ({ ...prev, session, user: session?.user ?? null, loading: true }));
-
-        if (session?.user) {
-          await fetchUserProfile(session.user);
-        } else {
-          // Handles SIGNED_OUT or cases where session becomes null
-          await fetchUserProfile(null);
-        }
-      }
-    );
+    // Set up a listener for auth changes. This will handle login/logout events in other tabs.
+    // It simply re-triggers our reliable server check.
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      checkUser();
+    });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [fetchInitialSession, fetchUserProfile]);
+  }, [checkUser]);
 
   return authState;
 };

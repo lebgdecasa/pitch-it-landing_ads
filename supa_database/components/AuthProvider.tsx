@@ -5,8 +5,7 @@ import { useAuth, AuthState } from '../auth'
 const AuthContext = createContext<AuthState>({
   user: null,
   profile: null,
-  loading: true,
-  session: null
+  loading: true
 })
 
 interface AuthProviderProps {
@@ -30,4 +29,3 @@ export const useAuthContext = () => {
   }
   return context
 }
-

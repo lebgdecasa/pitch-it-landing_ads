@@ -78,8 +78,10 @@ const AuthForm: React.FC = () => {
         if (!response.ok) {
           throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
         }
-        // API route now handles cookie setting. AuthProvider will sync state.
-        router.push('/dashboard').then(() => window.location.reload());
+        // Sign-in was successful. The cookie is set by the API route.
+        // The onAuthStateChange listener will trigger a state update.
+        // Just push the user to the dashboard. No reload needed.
+        router.push('/dashboard');
         return; // Prevent finally block from clearing potential success message if we were to show one
       }
     } catch (err: any) { // Type explicitly as any or Error
