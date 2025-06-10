@@ -1,6 +1,6 @@
 // AuthTest.tsx - Test auth functionality
 import React, { useState } from 'react'
-import { signUp, signIn, signOut } from '../supa_database/auth'
+import { supabase } from '../supa_database/auth' // Assuming 'supabase' client is exported
 
 export const AuthTest: React.FC = () => {
   const [email, setEmail] = useState('test@gmail.com')
@@ -8,17 +8,17 @@ export const AuthTest: React.FC = () => {
   const [result, setResult] = useState('')
 
   const testSignUp = async () => {
-    const { user, error } = await signUp(email, password)
-    setResult(error ? `SignUp Error: ${error.message}` : `SignUp Success: ${user?.id}`)
+    const { data, error } = await supabase.auth.signUp({ email, password })
+    setResult(error ? `SignUp Error: ${error.message}` : `SignUp Success: ${data?.user?.id}`)
   }
 
   const testSignIn = async () => {
-    const { user, error } = await signIn(email, password)
-    setResult(error ? `SignIn Error: ${error.message}` : `SignIn Success: ${user?.id}`)
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    setResult(error ? `SignIn Error: ${error.message}` : `SignIn Success: ${data?.user?.id}`)
   }
 
   const testSignOut = async () => {
-    const { error } = await signOut()
+    const { error } = await supabase.auth.signOut()
     setResult(error ? `SignOut Error: ${error.message}` : 'SignOut Success')
   }
 

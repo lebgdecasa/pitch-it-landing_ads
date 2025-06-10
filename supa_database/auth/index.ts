@@ -195,3 +195,5 @@ export const deductCredits = async (
     return false
   }
 }
+
+export { supabase };
