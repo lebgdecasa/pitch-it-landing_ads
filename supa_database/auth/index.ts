@@ -56,34 +56,22 @@ export const useAuth = () => {
 
 
   useEffect(() => {
-    fetchInitialSession();
+    fetchInitialSession(); // Initial fetch when the hook mounts
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: AuthChangeEvent, session: Session | null) => { // Added explicit types
-        // This listener reacts to client-side auth events (e.g., tab sync, token refresh, explicit client-side signOut)
-        // It's also a fallback if the initial /api/auth/session call is missed or fails.
-        // SIGNED_IN: Often handled by redirect after API call, but this syncs tabs or recovers session.
-        // SIGNED_OUT: If API call to signout succeeded, cookie is cleared. This handles client-side state sync.
-        // TOKEN_REFRESHED: Updates session.
-        // USER_UPDATED: Updates user.
-
-        // Update authState with the latest session and user information
-        // Set loading to true before fetching profile to indicate state is being updated
-        setAuthState(prev => ({ ...prev, session, user: session?.user ?? null, loading: true }));
-
-        if (session?.user) {
-          await fetchUserProfile(session.user);
-        } else {
-          // Handles SIGNED_OUT or cases where session becomes null
-          await fetchUserProfile(null);
-        }
+      async (event: AuthChangeEvent, session: Session | null) => {
+        // An auth event has occurred (e.g., SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED, USER_UPDATED).
+        // Instead of directly using the session object from the event,
+        // re-fetch the session from our API endpoint to ensure it's validated via supabase.auth.getUser().
+        console.log('onAuthStateChange event:', event); // Optional: for debugging
+        await fetchInitialSession();
       }
     );
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [fetchInitialSession, fetchUserProfile]);
+  }, [fetchInitialSession]); // Keep fetchInitialSession in the dependency array
 
   return authState;
 };
