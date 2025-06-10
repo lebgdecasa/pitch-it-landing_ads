@@ -1,8 +1,8 @@
 // supa_database/components/AuthForm.tsx
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useRouter } from 'next/router' // Added useRouter
-import { signIn, signUp, validateAccessCode, resetPassword } from '../auth'
+import { useRouter } from 'next/router'
+import { resetPassword } from '../auth' // signIn, signUp, validateAccessCode removed
 
 // Interface for form data
 interface AuthFormData {
@@ -19,7 +19,8 @@ const AuthForm: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const router = useRouter(); // Added router instance
+  const [rememberMe, setRememberMe] = useState(true); // Added rememberMe state
+  const router = useRouter();
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<AuthFormData>({
     defaultValues: {
@@ -48,23 +49,41 @@ const AuthForm: React.FC = () => {
         return;
       }
 
+      // Common fetch options
+      const fetchOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      };
+
       if (mode === 'signup') {
-        const validation = await validateAccessCode(data.accessCode!)
-        if (!validation.valid) {
-          throw new Error(validation.university === 'used' ? 'Access code has already been used.' : 'Invalid access code.')
+        const response = await fetch('/api/auth/signup', {
+          ...fetchOptions,
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+            accessCode: data.accessCode,
+          }),
+        });
+        const responseData = await response.json();
+        if (!response.ok) {
+          throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
         }
-        const { error: signUpError } = await signUp(data.email, data.password, data.accessCode)
-        if (signUpError) throw signUpError
-        setMessage('Check your email to confirm your account!')
+        setMessage(responseData.message || 'Sign-up successful. Please check your email.');
       } else if (mode === 'signin') {
-        const { error: signInError } = await signIn(data.email, data.password)
-        if (signInError) throw signInError
-        // setMessage('Signed in successfully!') // Removed message
-        router.push('/dashboard'); // Redirect to dashboard
-        return; // Early return to prevent further state updates if not necessary
+        const response = await fetch('/api/auth/signin', {
+          ...fetchOptions,
+          body: JSON.stringify({ email: data.email, password: data.password, rememberMe }),
+        });
+        const responseData = await response.json();
+        if (!response.ok) {
+          throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
+        }
+        // API route now handles cookie setting. AuthProvider will sync state.
+        router.push('/dashboard');
+        return; // Prevent finally block from clearing potential success message if we were to show one
       }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+    } catch (err: any) { // Type explicitly as any or Error
+      setError(err.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false)
     }
@@ -147,6 +166,24 @@ const AuthForm: React.FC = () => {
             {errors.password && (mode === 'signin' || mode === 'signup') && (
               <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
             )}
+          </div>
+        )}
+
+        {mode === 'signin' && (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input
+                id="rememberMe"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-900">
+                Remember me
+              </label>
+            </div>
+            {/* Keep Forgot Password link on the right if needed, or adjust layout */}
           </div>
         )}
 

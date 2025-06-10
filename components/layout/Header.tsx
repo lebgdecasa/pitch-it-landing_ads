@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import { LanguageContext } from '@/context/LanguageContext';
-import { useAuthContext } from '@/supa_database/components/AuthProvider'; // Added
-import { signOut } from '@/supa_database/auth'; // Added
+import { useAuthContext } from '@/supa_database/components/AuthProvider';
+// import { signOut } from '@/supa_database/auth'; // Removed signOut import
 import { trackLanguageChange, trackButtonClick } from '@/utils/analytics';
 
 interface HeaderProps {
@@ -20,9 +20,28 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
 
   const handleSignOut = async () => {
     trackButtonClick('sign_out', 'header');
-    await signOut();
-    setMobileMenuOpen(false); // Close mobile menu if open
-    router.push('/'); // Redirect to homepage
+    try {
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Sign-out failed');
+      }
+
+      // Sign-out successful on the server, cookie is cleared.
+      // Redirect and reload to ensure client state is reset.
+      router.push('/').then(() => {
+        router.reload(); // Force a reload to clear all client-side state
+      });
+
+    } catch (err: any) {
+      console.error('Sign-out error:', err.message);
+      alert('Failed to sign out: ' + err.message); // Simple alert for now
+    } finally {
+      setMobileMenuOpen(false); // Close mobile menu if open
+    }
   };
 
   const handleLanguageChange = (newLanguage: string) => {

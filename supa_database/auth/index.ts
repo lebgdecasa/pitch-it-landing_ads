@@ -1,7 +1,7 @@
 // supa_database/auth/index.ts
-import { useState, useEffect } from 'react'
-import { User, Session, AuthError } from '@supabase/supabase-js'
-import { supabase } from '../config/supabase'
+import { useState, useEffect, useCallback } from 'react' // Added useCallback
+import { User, Session, AuthError } from '@supabase/supabase-js' // AuthError might be unused after removing direct auth calls
+import { supabaseBrowserClient as supabase } from '../utils/supabase/client'; // Use new client
 import { UserProfile } from '../types/database'
 
 export interface AuthState {
@@ -16,60 +16,83 @@ export const useAuth = () => {
     user: null,
     profile: null,
     loading: true,
-    session: null
-  })
+    session: null,
+  });
+
+  const fetchUserProfile = useCallback(async (user: User | null) => {
+    if (user) {
+      const profile = await getUserProfile(user.id);
+      setAuthState(prev => ({ ...prev, profile, user, loading: false }));
+    } else {
+      setAuthState(prev => ({ ...prev, user: null, profile: null, loading: false }));
+    }
+  }, []);
+
+  const fetchInitialSession = useCallback(async () => {
+    try {
+      setAuthState(prev => ({ ...prev, loading: true }));
+      const response = await fetch('/api/auth/session');
+
+      if (!response.ok) {
+        // If API returns error or if session is just not there (e.g. user is null)
+        console.warn('Failed to fetch initial session or no active session found.');
+        setAuthState(prev => ({ ...prev, user: null, session: null, profile: null, loading: false }));
+        return;
+      }
+
+      const { user, session } = await response.json();
+
+      if (user && session) {
+        setAuthState(prev => ({ ...prev, user, session, loading: true })); // Keep loading while profile fetches
+        await fetchUserProfile(user);
+      } else {
+        await fetchUserProfile(null); // Clear user, profile and set loading false
+      }
+    } catch (error) {
+      console.error('Error fetching initial session:', error);
+      await fetchUserProfile(null); // Clear user, profile and set loading false
+    }
+  }, [fetchUserProfile]);
+
 
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session?.user) {
-        const profile = await getUserProfile(session.user.id)
-        setAuthState({
-          user: session.user,
-          profile,
-          loading: false,
-          session
-        })
-      } else {
-        setAuthState(prev => ({ ...prev, loading: false }))
-      }
-    }
+    fetchInitialSession();
 
-    getInitialSession()
-
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // This listener reacts to client-side auth events (e.g., tab sync, token refresh, explicit client-side signOut)
+        // It's also a fallback if the initial /api/auth/session call is missed or fails.
+        // SIGNED_IN: Often handled by redirect after API call, but this syncs tabs or recovers session.
+        // SIGNED_OUT: If API call to signout succeeded, cookie is cleared. This handles client-side state sync.
+        // TOKEN_REFRESHED: Updates session.
+        // USER_UPDATED: Updates user.
+
+        // Update authState with the latest session and user information
+        // Set loading to true before fetching profile to indicate state is being updated
+        setAuthState(prev => ({ ...prev, session, user: session?.user ?? null, loading: true }));
+
         if (session?.user) {
-          const profile = await getUserProfile(session.user.id)
-          setAuthState({
-            user: session.user,
-            profile,
-            loading: false,
-            session
-          })
+          await fetchUserProfile(session.user);
         } else {
-          setAuthState({
-            user: null,
-            profile: null,
-            loading: false,
-            session: null
-          })
+          // Handles SIGNED_OUT or cases where session becomes null
+          await fetchUserProfile(null);
         }
       }
-    )
+    );
 
-    return () => subscription.unsubscribe()
-  }, [])
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [fetchInitialSession, fetchUserProfile]);
 
-  return authState
-}
+  return authState;
+};
+
 
 // Get user profile from database
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabase // supabase is now supabaseBrowserClient
       .from('users')
       .select('*')
       .eq('id', userId)
@@ -104,107 +127,18 @@ export const updateUserProfile = async (
   }
 }
 
-// Define types for RPC functions
-interface AccessCodeValidation {
-  valid: boolean
-  university: string | null
-}
+// Define types for RPC functions - This might be obsolete here if not used by remaining functions
+// interface AccessCodeValidation {
+//   valid: boolean
+//   university: string | null
+// }
 
-// Sign up with email/password
-export const signUp = async (
-  email: string,
-  password: string,
-  accessCode?: string
-): Promise<{ user: User | null; error: AuthError | null }> => {
-  try {
-    // Validate access code if provided
-    if (accessCode) {
-      const rpcValidateResponse = await (supabase.rpc as any)('validate_access_code', { input_code: accessCode }).single();
-      const validation = rpcValidateResponse.data as AccessCodeValidation | null;
-      const rpcError = rpcValidateResponse.error;
+// Sign up, Sign in, Sign out, validateAccessCode are now handled by API routes.
+// Client-side direct calls for these are removed.
 
-      if (rpcError || !validation?.valid) {
-        return {
-          user: null,
-          error: {
-            message: 'Invalid or expired access code',
-            name: 'AuthError',
-            status: 400
-          } as AuthError
-        };
-      }
-    }
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          access_code: accessCode
-        }
-      }
-    })
-
-    // If signup successful and access code provided, use it
-    if (data.user && accessCode) {
-      await (supabase.rpc as any)('use_access_code', {
-        input_code: accessCode,
-        user_id: data.user.id
-      });
-    }
-
-    return { user: data.user, error }
-  } catch (error) {
-    return {
-      user: null,
-      error: error as AuthError
-    }
-  }
-}
-
-// Sign in with email/password
-export const signIn = async (
-  email: string,
-  password: string
-): Promise<{ user: User | null; error: AuthError | null }> => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  })
-
-  // Update last login
-  if (data.user) {
-    await supabase
-      .from('users')
-      .update({ last_login: new Date().toISOString() })
-      .eq('id', data.user.id)
-  }
-
-  return { user: data.user, error }
-}
-
-// Sign in with magic link
-export const signInWithMagicLink = async (
-  email: string,
-  redirectTo?: string
-): Promise<{ error: AuthError | null }> => {
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: redirectTo || `${window.location.origin}/auth/callback`
-    }
-  })
-
-  return { error }
-}
-
-// Sign out
-export const signOut = async (): Promise<{ error: AuthError | null }> => {
-  const { error } = await supabase.auth.signOut()
-  return { error }
-}
-
-// Reset password
+// Reset password - This is a client-side action that sends an email via Supabase.
+// It does not directly manage session cookies like sign-in/sign-up API routes do.
+// So, it can remain as a direct client-side Supabase call.
 export const resetPassword = async (
   email: string,
   redirectTo?: string
@@ -227,23 +161,7 @@ export const updatePassword = async (
   return { error }
 }
 
-// Validate access code
-export const validateAccessCode = async (code: string): Promise<{ valid: boolean; university: string | null }> => {
-  try {
-    const response = await (supabase.rpc as any)('validate_access_code', { input_code: code }).single();
-
-    if (response.error) throw response.error;
-    const data = response.data as AccessCodeValidation | null;
-
-    return {
-      valid: data?.valid || false,
-      university: data?.university || null
-    };
-  } catch (error) {
-    console.error('Error in validateAccessCode RPC:', error);
-    return { valid: false, university: null };
-  }
-}
+// Validate access code - Removed, handled by /api/auth/signup
 
 // Check if user has credits
 export const hasCredits = (profile: UserProfile | null): boolean => {
