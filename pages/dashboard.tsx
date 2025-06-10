@@ -1,3 +1,4 @@
+// pages/dashboard.tsx
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
@@ -14,45 +15,35 @@ export default function AnalyticsDashboard() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [dateRange, setDateRange] = useState('7d');
 
+  // This useEffect will now only fetch data.
+  // The old authorization logic has been removed.
   useEffect(() => {
-    // Protect dashboard route
-    const isAuthorized = checkAuthorization();
-    if (!isAuthorized) {
-      router.push('/');
-      return;
-    }
+    const fetchAnalyticsData = async (range: string) => {
+      // Fetch from GA4 API or your backend
+      // This is a placeholder
+      setData({
+        totalVisits: 1250,
+        conversions: { waitlist: 87, demo: 23 },
+        topSources: [
+          { source: 'linkedin', visits: 450 },
+          { source: 'facebook', visits: 320 },
+          { source: 'instagram', visits: 280 }
+        ],
+        averageTimeOnPage: 125,
+        bounceRate: 42.5
+      });
+    };
 
     fetchAnalyticsData(dateRange);
   }, [dateRange]);
 
-  const checkAuthorization = () => {
-    // Implement your auth logic
-    return process.env.NODE_ENV === 'development';
-  };
-
-  const fetchAnalyticsData = async (range: string) => {
-    // Fetch from GA4 API or your backend
-    // This is a placeholder
-    setData({
-      totalVisits: 1250,
-      conversions: { waitlist: 87, demo: 23 },
-      topSources: [
-        { source: 'linkedin', visits: 450 },
-        { source: 'facebook', visits: 320 },
-        { source: 'instagram', visits: 280 }
-      ],
-      averageTimeOnPage: 125,
-      bounceRate: 42.5
-    });
-  };
-
   const handleLogout = async () => {
-    // Call your API to sign out (Supabase or custom endpoint)
+    // Call your API to sign out
     await fetch('/api/auth/signout', { method: 'POST' });
     router.push('/');
   };
 
-  if (!data) return <div>Loading...</div>;
+  if (!data) return <div>Loading Dashboard...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
