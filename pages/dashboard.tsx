@@ -14,8 +14,7 @@ const ProjectCard = ({
   name,
   description,
   stage,
-  updatedAt,
-  locked
+  updatedAt
 }: {
   id: string;
   name: string;
@@ -52,7 +51,7 @@ const ProjectCard = ({
   const formattedDate = new Date(updatedAt).toLocaleDateString();
 
   return (
-    <div className={`block ${locked ? 'opacity-50 cursor-not-allowed' : ''}`}>
+    <div className={`block `}>
       <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-5 border border-gray-100">
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-lg font-semibold text-gray-900">{name}</h3>
@@ -61,11 +60,6 @@ const ProjectCard = ({
         <p className="text-gray-600 text-sm line-clamp-2 mb-4">{description}</p>
         <div className="flex justify-between items-center text-xs text-gray-500">
           <span>Last updated: {formattedDate}</span>
-          {locked ? (
-            <span className="text-red-500 font-semibold">Locked</span>
-          ) : (
-            <Link href={`/project/${id}`}>View Project →</Link>
-          )}
         </div>
       </div>
     </div>
@@ -127,20 +121,25 @@ export default function Dashboard() {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">My Projects</h1>
             <p className="text-gray-600 mt-1">Manage and track your business ideas</p>
           </div>
-          <Button asChild size="lg" className="rounded-full bg-blue-700 text-white">
-            <Link href="/projects/new" className="flex items-center">
-              <PlusCircle className="mr-2 h-5 w-5" />
-              New Project
-            </Link>
-          </Button>
+          {projects.length > 0 && (
+            <Button asChild size="lg" className="rounded-full bg-blue-700 text-white">
+              <Link href="/projects/new" className="flex items-center">
+                <PlusCircle className="mr-2 h-5 w-5" />
+                New Project
+              </Link>
+            </Button>
+          )}
         </div>
 
         {projects.length === 0 ? (
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-            <h3 className="font-semibold text-lg mb-2">No projects yet</h3>
-            <p className="text-gray-600 mb-6">Get started by creating your first project</p>
-            <Button asChild>
-              <Link href="/wizard">Create Project</Link>
+          <div className="flex flex-col items-center justify-center text-center bg-gray-50 border border-gray-200 rounded-lg p-40 min-h-[60vh] center *: min-w-[96vw]">
+            <h3 className="font-semibold text-3xl mb-4">No projects yet</h3>
+            <p className="text-gray-600 mb-8 max-w-md">Get started by creating your first project. Let's bring your idea to life.</p>
+            <Button asChild size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
+              <Link href="/wizard" className="flex items-center">
+                <PlusCircle className="mr-2 h-5 w-5" />
+                Create Project
+              </Link>
             </Button>
           </div>
         ) : (
