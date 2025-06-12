@@ -129,7 +129,7 @@ ${recentHistory}
 User just said: "${userMessage}"
 ${otherResponsesText}
 
-Respond as ${persona.name} in character. Keep responses conversational, under 150 words, and true to your role and background. Consider your pain points and goals when responding. If other team members have already responded, acknowledge their input when relevant.`;
+Respond as ${persona.name} in character. Keep responses conversational, under 20 words, and true to your role and background. Consider your pain points and goals when responding. If other team members have already responded, acknowledge their input when relevant.`;
 
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`, {
         method: 'POST',
