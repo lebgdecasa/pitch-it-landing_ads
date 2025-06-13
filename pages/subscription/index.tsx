@@ -18,7 +18,7 @@ export async function getStaticProps({ locale }: { locale: string }) {
 
 export default function SubscriptionPage() {
   const { t } = useTranslation('common'); // Initialize useTranslation
-  const { user, profile, refreshProfile } = useAuthContext(); // Destructure profile, add refreshProfile
+  const { user, profile, checkUser } = useAuthContext(); // Replaced refreshProfile with checkUser
   const [showPopup, setShowPopup] = useState(false);
   const [popupTitle, setPopupTitle] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
@@ -64,9 +64,8 @@ export default function SubscriptionPage() {
         setLocalUserPlan(newPlan);
         // Using t function for user-facing messages
         alert(t('plan_updated_successfully', { plan: newPlan, message: responseData.message || 'Plan updated successfully!' }));
-        if (refreshProfile) {
-          await refreshProfile(); // Refresh profile data in AuthContext
-        }
+        // Call checkUser to refresh session and profile data from the server
+        await checkUser();
       } else {
         alert(t('plan_update_failed', { error: responseData.error || 'Unknown error' }));
       }

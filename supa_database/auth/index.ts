@@ -8,35 +8,43 @@ export interface AuthState {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
+  checkUser: () => Promise<void>; // Added checkUser
 }
 
+// This AuthContext is locally defined and likely not the one consumed by AuthProvider.tsx.
+// The primary goal is to ensure useAuth returns the correct shape.
 const AuthContext = createContext<AuthState>({
   user: null,
   profile: null,
   loading: true,
+  checkUser: async () => {}, // Default async function for checkUser
 });
 
 export const useAuth = () => {
-  const [authState, setAuthState] = useState<AuthState>({
-    user: null,
-    profile: null,
-    loading: true,
-  });
+  // Individual state hooks
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const checkUser = useCallback(async () => {
+    setLoading(true); // Set loading true at the beginning of the check
     try {
       const response = await fetch('/api/auth/session');
       if (response.ok) {
         const data = await response.json();
-        setAuthState({ user: data.user, profile: data.profile, loading: false });
+        setUser(data.user);
+        setProfile(data.profile);
       } else {
         // No active session or an error occurred
-        setAuthState({ user: null, profile: null, loading: false });
+        setUser(null);
+        setProfile(null);
       }
     } catch (error) {
       console.error("Error fetching auth session:", error);
-      setAuthState({ user: null, profile: null, loading: false });
+      setUser(null);
+      setProfile(null);
     }
+    setLoading(false); // Set loading false at the end
   }, []);
 
   useEffect(() => {
@@ -46,15 +54,17 @@ export const useAuth = () => {
     // Set up a listener for auth changes. This will handle login/logout events in other tabs.
     // It simply re-triggers our reliable server check.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      // When auth state changes (login, logout), re-check the user session from the server
       checkUser();
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [checkUser]);
+  }, [checkUser]); // checkUser is stable due to useCallback
 
-  return authState;
+  // Return the individual states and the checkUser function
+  return { user, profile, loading, checkUser };
 };
 
 
