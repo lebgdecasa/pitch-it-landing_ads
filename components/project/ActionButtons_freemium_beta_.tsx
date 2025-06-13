@@ -50,7 +50,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({ projectId, buttonC
     {
       icon: <Users className="h-5 w-5" />,
       label: 'Chat with Personas',
-      redirectPath: `/project/${projectId}/chat`,
+      redirectPath: `/project/${projectId}/chat_2`,
     },
     {
       icon: <Activity className="h-5 w-5" />,

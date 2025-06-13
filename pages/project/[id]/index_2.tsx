@@ -1,4 +1,4 @@
-// pages/project/[id]/index_freemium_beta.tsx
+// pages/project/[id]/index_2.tsx
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -271,7 +271,7 @@ export default function ProjectPage() {
                   ))}
                 </div>
                 <Button
-                  onClick={() => router.push(`/project/${project.id}/chat`)}
+                  onClick={() => router.push(`/project/${project.id}/chat_2`)}
                   className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
                 >
                   <Users className="h-5 w-5 mr-2" />

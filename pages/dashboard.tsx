@@ -49,7 +49,7 @@ const ProjectCard = ({
   };
 
   return (
-    <Link href={`/project/${id}`} passHref legacyBehavior>
+    <Link href={`/project/${id}/index_2`} passHref legacyBehavior>
       <a className="block cursor-pointer h-full group"> {/* Removed relative */}
         <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-5 border border-gray-100 h-full flex flex-col justify-between">
           <div> {/* Content wrapper */}
