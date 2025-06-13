@@ -118,7 +118,7 @@
   "waitlist_modal_email_label": "Email Address",
   "waitlist_modal_email_placeholder": "you@example.com",
   "waitlist_modal_submit": "Sign Up for Priority List",
-  "waitlist_modal_success": "Thank you! {email} has been added to our priority list. We'll keep you informed!",
+  "waitlist_modal_success": "Thank you! Your email has been added to our priority list. We'll keep you informed!",
   "demo_modal_title": "Request a Personalized Demo",
   "demo_modal_text": "Discover how NexTraction can improve the investment process for your specific needs. Fill out this form, and we'll contact you.",
   "demo_modal_name_label": "Full Name",
