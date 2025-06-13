@@ -75,9 +75,14 @@ export default function SubscriptionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8 relative">
+      <div className="absolute top-4 left-4">
+        <Button className="w-full mt-auto bg-blue-600 hover:bg-blue-700 text-white">
+          <Link href="/dashboard">{t('back_to_dashboard_button', 'Back to Dashboard')}</Link>
+        </Button>
+      </div>
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-12">
+        <h1 className="text-4xl font-extrabold text-center text-gray-900 mb-12 pt-16 md:pt-0">
           {t('subscription_page_title')}
         </h1>
 
