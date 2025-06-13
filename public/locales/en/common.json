@@ -326,7 +326,6 @@
   "investor_vc_plan_update_title": "Investor/VC Plan Update",
   "common_popup_message": "You can't upgrade right now as this is a beta version but can sign-up to the waitlist to have early access to the full features.",
   "join_waitlist_button": "Join Waitlist",
-  "close_button": "Close",
   "current_plan_alert": "This is your current plan.",
   "selected_free_plan_alert": "You have selected the Free Plan."
 }

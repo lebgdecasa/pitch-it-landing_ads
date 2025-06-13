@@ -326,7 +326,6 @@
   "investor_vc_plan_update_title": "Mise à Jour du Plan Investisseur/VC",
   "common_popup_message": "Vous ne pouvez pas mettre à niveau pour le moment car il s'agit d'une version bêta, mais vous pouvez vous inscrire sur la liste d'attente pour avoir un accès anticipé à toutes les fonctionnalités.",
   "join_waitlist_button": "Rejoindre la Liste d'Attente",
-  "close_button": "Fermer",
   "current_plan_alert": "C'est votre plan actuel.",
   "selected_free_plan_alert": "Vous avez sélectionné le plan gratuit."
 }
