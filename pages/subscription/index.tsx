@@ -8,6 +8,9 @@ import { Check } from 'lucide-react';
 import { useTranslation } from 'next-i18next'; // Import useTranslation
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations'; // Import serverSideTranslations
 
+// Define the specific type for subscription tiers
+type SubscriptionTier = 'free' | 'premium' | 'enterprise';
+
 export async function getStaticProps({ locale }: { locale: string }) {
   return {
     props: {
@@ -27,12 +30,14 @@ export default function SubscriptionPage() {
   // Use a local state to simulate plan changes if user object from context is not directly mutable
   // or if we don't want to risk modifying the context's state without a proper dispatcher.
   // Initialize with profile.subscription_tier or a default.
-  const [localUserPlan, setLocalUserPlan] = useState(profile?.subscription_tier || 'free');
+  const [localUserPlan, setLocalUserPlan] = useState<SubscriptionTier>(
+    (profile?.subscription_tier as SubscriptionTier) || 'free'
+  );
 
   // Update localUserPlan if profile from context changes
   useEffect(() => {
     if (profile?.subscription_tier) {
-      setLocalUserPlan(profile.subscription_tier);
+      setLocalUserPlan(profile.subscription_tier as SubscriptionTier);
     }
   }, [profile?.subscription_tier]);
 
@@ -40,7 +45,7 @@ export default function SubscriptionPage() {
 
   const commonPopupMessage = t('common_popup_message');
 
-  const handleUpdateSubscription = async (newPlan: string) => {
+  const handleUpdateSubscription = async (newPlan: SubscriptionTier) => { // Typed newPlan
     if (!user) {
       // It's good practice to use translated strings for alerts
       alert(t('user_not_authenticated_error', 'You must be logged in to change your subscription.'));
