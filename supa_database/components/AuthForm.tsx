@@ -2,7 +2,8 @@
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import { resetPassword, supabase } from '../auth' // signIn, signUp, validateAccessCode removed
+import { resetPassword } from '../auth' // signIn, signUp, validateAccessCode removed
+import { supabase } from '../config/supabase' // Import supabase directly from config
 
 // Interface for form data
 interface AuthFormData {

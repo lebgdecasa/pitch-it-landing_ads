@@ -1,7 +1,7 @@
 // supa_database/auth/index.ts
 import { useState, useEffect, useCallback, createContext, useContext, ReactNode } from 'react';
 import { User, AuthError } from '@supabase/supabase-js';
-import { supabaseBrowserClient as supabase } from '../utils/supabase/client';
+import { supabase } from '../config/supabase'; // Changed to use the unified client from config
 import { UserProfile } from '../types/database';
 
 export interface AuthState {
@@ -174,5 +174,3 @@ export const deductCredits = async (
     return false
   }
 }
-
-export { supabase };

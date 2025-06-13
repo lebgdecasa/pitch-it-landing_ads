@@ -96,3 +96,64 @@ export const useProjects = (userId?: string) => {
     refetch: fetchProjects
   }
 }
+
+export const useProjectById = (projectId: string | undefined) => {
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProjectById = async () => {
+    if (!projectId) {
+      setProject(null);
+      setLoading(false);
+      setError(null); // Clear error if no projectId
+      return;
+    }
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error: fetchError } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('id', projectId)
+        .maybeSingle(); // Changed from .single() to .maybeSingle()
+
+      if (fetchError) {
+        // Log the specific error code and message for better debugging
+        console.error(`Supabase fetch error: ${fetchError.code} - ${fetchError.message}`, fetchError);
+        // PGRST116 is "The result contains 0 rows"
+        // PGRST100 is "Not a single item selected" (can happen with .single() if RLS blocks)
+        // A 406 error might present differently, so we catch generic fetchError too.
+        if (fetchError.code === 'PGRST116') {
+          setError('Project not found or access denied.');
+        } else {
+          setError(fetchError.message || 'Failed to fetch project.');
+        }
+        setProject(null);
+      } else if (!data) {
+        // If maybeSingle() returns null data and no error, it means no row was found.
+        setError('Project not found or access denied.');
+        setProject(null);
+      } else {
+        setProject(data);
+      }
+    } catch (err) {
+      console.error("Error fetching project by ID:", err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred while fetching the project.');
+      setProject(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjectById();
+  }, [projectId]);
+
+  return {
+    project,
+    loading,
+    error,
+    refetchProject: fetchProjectById,
+  };
+};

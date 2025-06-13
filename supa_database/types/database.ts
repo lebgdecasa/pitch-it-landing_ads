@@ -243,16 +243,81 @@ export interface UserProfile {
   credits_remaining: number
 }
 
+interface MetricValue {
+  label: string;
+  value: number;
+  prefix?: string;
+  suffix?: string;
+  tooltip: string;
+}
+
+interface ProjectMetrics {
+  Potential: {
+    TAM: MetricValue;
+    PEs: MetricValue;
+    MGR: MetricValue;
+    PMS: MetricValue;
+  };
+  Profitability: {
+    CAC: MetricValue;
+    CLTV: MetricValue;
+    CAC_CLTV_ratio: MetricValue;
+    Avg_gross_margin: MetricValue;
+    CAC_Payback: MetricValue;
+  };
+  Time_to_Market: {
+    Sales_Cycle: MetricValue;
+    Time_to_MVP: MetricValue;
+    Seed_to_Launch: MetricValue;
+    Time_to_revenue: MetricValue;
+  };
+}
+
+interface AnalysisSection {
+  title: string;
+  content: string;
+}
+
+interface ProjectAnalysisData {
+  Key_Trends: {
+    title: string;
+    summary: string;
+    sections: AnalysisSection[];
+  };
+  Netnographic: {
+    title: string;
+    summary: string;
+    sections: AnalysisSection[];
+  };
+}
+
+interface ProjectOverview {
+  Problem: string;
+  Solution: string;
+  Target_Market: string;
+  Business_Model: string;
+  Competition: string;
+  Unique_selling_point: string;
+  Marketing_Strategy: string;
+}
+
+// The main, corrected Project type
 export interface Project {
-  id: string
-  user_id: string
-  title: string
-  description?: string
-  industry?: string
-  target_market?: string
-  status: 'draft' | 'analyzing' | 'completed' | 'archived'
-  created_at: string
-  updated_at: string
+  id: string;
+  user_id: string;
+  name: string; // Changed from title to name
+  description: string;
+  industry: string;
+  created_at: string;
+  updated_at: string;
+  locked: boolean;
+  description_completeness: number;
+  stage: 'Idea' | 'Prototype' | 'MVP' | 'Series A' | 'Series B' | 'Series C'; // Changed from status to stage
+  files: any[];
+  overview: ProjectOverview | null;
+  metrics: ProjectMetrics | null;
+  analysis: ProjectAnalysisData | null;
+  deck: any | null;
 }
 
 export interface Persona {

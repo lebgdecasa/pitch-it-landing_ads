@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 // Import both client creators: one for user session, one for admin operations
 import {
-  createSupabaseClientForApiRoute,
+  createServerSupabaseClientWithUser, // Corrected import name
   createServerSupabaseClient
 } from '../../../supa_database/config/supabase';
 
@@ -25,7 +25,7 @@ export default async function handler(
   }
 
   // 1. Create Supabase client with user context
-  const supabaseUserClient = createSupabaseClientForApiRoute(req, res);
+  const supabaseUserClient = createServerSupabaseClientWithUser(req, res); // Corrected function call
 
   // 2. Get authenticated user
   const { data: { user }, error: authError } = await supabaseUserClient.auth.getUser();
