@@ -45,14 +45,14 @@ export interface Feedback {
 
 // Project Types
 export enum ProjectStage {
-  IDEA = 'IDEA',
-  PROTOTYPE = 'PROTOTYPE',
-  MVP = 'MVP',
-  PRE_SEED = 'PRE SEED',
-  SEED = 'SEED',
-  SERIES_A = 'SERIES A',
-  SERIES_B = 'SERIES B',
-  SERIES_C = 'SERIES C'
+  IDEA = 'idea',
+  PROTOTYPE = 'prototype',
+  MVP = 'mvp',
+  PRE_SEED = 'pre seed',
+  SEED = 'seed',
+  SERIES_A = 'series a',
+  SERIES_B = 'series b',
+  SERIES_C = 'series c'
 }
 
 export interface Project {

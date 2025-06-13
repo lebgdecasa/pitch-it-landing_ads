@@ -1,5 +1,5 @@
 // supa_database/hooks/useProjects.ts
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react' // Added useCallback
 import { supabase } from '../config/supabase'
 import { Project } from '../types/database'
 
@@ -8,13 +8,12 @@ export const useProjects = (userId?: string) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (userId) {
-      fetchProjects()
+  const fetchProjects = useCallback(async () => { // Wrapped in useCallback
+    if (!userId) { // Added a guard to prevent fetching if userId is not available
+      setProjects([]);
+      setLoading(false);
+      return;
     }
-  }, [userId])
-
-  const fetchProjects = async () => {
     try {
       setLoading(true)
       const { data, error } = await supabase
@@ -30,7 +29,11 @@ export const useProjects = (userId?: string) => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [userId]); // Added userId to dependency array
+
+  useEffect(() => {
+    fetchProjects()
+  }, [fetchProjects]) // Now depends on the memoized fetchProjects
 
   const createProject = async (projectData: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => {
     try {
