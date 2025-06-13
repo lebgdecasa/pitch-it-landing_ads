@@ -73,11 +73,11 @@ export default function ChatPage({ project, projectId, initialPersonas }: ChatPa
     const mentionRegex = /@(\w+)/g;
     const mentions = [];
     let match;
-    
+
     while ((match = mentionRegex.exec(text)) !== null) {
       mentions.push(match[1].toLowerCase());
     }
-    
+
     return mentions;
   };
 
@@ -86,35 +86,35 @@ export default function ChatPage({ project, projectId, initialPersonas }: ChatPa
   };
 
   const generatePersonaResponse = async (
-    persona: Persona, 
-    userMessage: string, 
+    persona: Persona,
+    userMessage: string,
     chatHistory: ChatMessage[],
     otherResponses: { persona: string; response: string }[] = []
   ): Promise<string> => {
     try {
       // Build context from recent chat history
-      const recentHistory = chatHistory.slice(-10).map(msg => 
+      const recentHistory = chatHistory.slice(-10).map(msg =>
         `${msg.sender}: ${msg.content}`
       ).join('\n');
 
       // Build context from other personas' responses in this round
-      const otherResponsesText = otherResponses.length > 0 
-        ? '\n\nOther team members have responded:\n' + otherResponses.map(r => 
+      const otherResponsesText = otherResponses.length > 0
+        ? '\n\nOther team members have responded:\n' + otherResponses.map(r =>
             `${r.persona}: ${r.response}`
           ).join('\n')
         : '';
 
       // Build persona context
-      const painPointsText = persona.pain_points && persona.pain_points.length > 0 
-        ? `\nPain Points: ${persona.pain_points.join(', ')}` 
+      const painPointsText = persona.pain_points && persona.pain_points.length > 0
+        ? `\nPain Points: ${persona.pain_points.join(', ')}`
         : '';
-      
-      const goalsText = persona.goals && persona.goals.length > 0 
-        ? `\nGoals: ${persona.goals.join(', ')}` 
+
+      const goalsText = persona.goals && persona.goals.length > 0
+        ? `\nGoals: ${persona.goals.join(', ')}`
         : '';
 
       const companyText = persona.company ? `\nCompany: ${persona.company}` : '';
-      
+
       const demographicsText = persona.demographics && Object.keys(persona.demographics).length > 0
         ? `\nBackground: ${Object.entries(persona.demographics).map(([key, value]) => `${key}: ${value}`).join(', ')}`
         : '';
@@ -196,11 +196,11 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
       // Generate responses sequentially so later personas can consider earlier ones
       const personaResponses: { persona: string; response: string }[] = [];
-      
+
       for (const persona of responsivePersonas) {
         const response = await generatePersonaResponse(
-          persona, 
-          inputMessage, 
+          persona,
+          inputMessage,
           [...messages, userMessage],
           personaResponses
         );
@@ -217,7 +217,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
         };
 
         setMessages(prev => [...prev, personaMessage]);
-        
+
         // Small delay between responses for better UX
         if (responsivePersonas.length > 1) {
           await new Promise(resolve => setTimeout(resolve, 1000));
@@ -242,7 +242,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
     const cursorPosition = inputRef.current?.selectionStart || 0;
     const beforeCursor = currentValue.substring(0, cursorPosition);
     const afterCursor = currentValue.substring(cursorPosition);
-    
+
     setInputMessage(`${beforeCursor}@${personaName} ${afterCursor}`);
     setShowMentions(false);
     inputRef.current?.focus();
@@ -271,7 +271,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
             Team Members ({personas.length})
           </div>
         </div>
-        
+
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {personas.map((persona) => (
             <div key={persona.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
@@ -282,11 +282,11 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
               <div className="flex-1 min-w-0">
                 <h3 className="font-medium text-gray-900 text-sm truncate">{persona.name}</h3>
                 <p className="text-xs text-gray-500 line-clamp-2">{persona.description}</p>
-                <p className="text-xs text-blue-600 mt-1 truncate">{persona.expertise}</p>
+                {/* <p className="text-xs text-blue-600 mt-1 truncate">{persona.expertise}</p> */}
               </div>
             </div>
           ))}
-          
+
           {personas.length === 0 && (
             <div className="text-center py-8 text-gray-500">
               <Bot className="mx-auto h-12 w-12 mb-3 text-gray-300" />
@@ -317,7 +317,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Start the conversation</h3>
               <p className="max-w-md mx-auto text-sm">
-                Send a message to begin collaborating with your AI team members. 
+                Send a message to begin collaborating with your AI team members.
                 {personas.length > 0 && " Use @name to mention specific team members."}
               </p>
             </div>
@@ -335,10 +335,10 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                       {message.sender.charAt(0).toUpperCase()}
                     </div>
                   )}
-                  
+
                   <div className={`px-4 py-2 rounded-lg ${
-                    isUser 
-                      ? 'bg-blue-600 text-white' 
+                    isUser
+                      ? 'bg-blue-600 text-white'
                       : 'bg-white border border-gray-200 text-gray-900'
                   }`}>
                     {!isUser && (
@@ -351,7 +351,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                       {formatTime(message.timestamp)}
                     </div>
                   </div>
-                  
+
                   {isUser && (
                     <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-medium">
                       {currentUser.charAt(0).toUpperCase()}
@@ -407,7 +407,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
               >
                 <AtSign className="h-5 w-5" />
               </button>
-              
+
               <div className="flex-1 relative">
                 <textarea
                   ref={inputRef}
@@ -425,7 +425,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                   }}
                 />
               </div>
-              
+
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isLoading}
@@ -434,7 +434,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                 <Send className="h-5 w-5" />
               </button>
             </div>
-            
+
             <div className="mt-2 text-xs text-gray-500">
               Press Enter to send, Shift+Enter for new line
             </div>
@@ -447,19 +447,19 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params!;
-  
+
   // Create Supabase client
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
-  
+
   // Fetch the project from Supabase
   const { data: project, error: projectError } = await supabase
     .from('projects')
     .select('*')
     .eq('id', id)
     .single();
-  
+
   // Handle errors or missing project
   if (projectError || !project) {
     console.error('Error fetching project:', projectError);
