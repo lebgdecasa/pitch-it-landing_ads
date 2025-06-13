@@ -68,7 +68,6 @@ export default function SubscriptionPage() {
       if (response.ok) {
         setLocalUserPlan(newPlan);
         // Using t function for user-facing messages
-        alert(t('plan_updated_successfully', { plan: newPlan, message: responseData.message || 'Plan updated successfully!' }));
         // Call checkUser to refresh session and profile data from the server
         await checkUser();
       } else {
@@ -185,9 +184,12 @@ export default function SubscriptionPage() {
             </ul>
             <Button
               onClick={handlePremiumModalOpen}
-              className="w-full mt-auto bg-blue-600 hover:bg-blue-700 text-white"
+              className={`w-full mt-auto ${currentUserPlan === 'premium' ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+              disabled={currentUserPlan === 'premium' || isUpdatingPlan}
             >
-              {t('upgrade_to_premium_button')}
+              {currentUserPlan === 'premium'
+                ? t('current_plan_button')
+                : t('upgrade_to_premium_button')}
             </Button>
           </div>
 
@@ -211,9 +213,12 @@ export default function SubscriptionPage() {
             </ul>
             <Button
               onClick={handleInvestorModalOpen}
-              className="w-full mt-auto bg-gray-800 hover:bg-gray-900 text-white"
+              className={`w-full mt-auto ${currentUserPlan === 'enterprise' ? 'bg-gray-400 cursor-not-allowed' : 'bg-gray-800 hover:bg-gray-900'} text-white`}
+              disabled={currentUserPlan === 'enterprise' || isUpdatingPlan}
             >
-              {t('contact_us_button')}
+              {currentUserPlan === 'enterprise'
+                ? t('current_plan_button')
+                : t('contact_us_button')}
             </Button>
           </div>
         </div>
