@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Added useEffect for profile sync
 import Link from 'next/link';
 import { Button } from '../../components/ui/button'; // Assuming this path is correct
 import Modal from '../../components/ui/Modal'; // Import the Modal component
@@ -18,18 +18,19 @@ export async function getStaticProps({ locale }: { locale: string }) {
 
 export default function SubscriptionPage() {
   const { t } = useTranslation('common'); // Initialize useTranslation
-  const { user, profile } = useAuthContext(); // Destructure profile
+  const { user, profile, refreshProfile } = useAuthContext(); // Destructure profile, add refreshProfile
   const [showPopup, setShowPopup] = useState(false);
   const [popupTitle, setPopupTitle] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
   const [showWaitlistModal, setShowWaitlistModal] = useState(false); // State for WaitlistModal
+  const [isUpdatingPlan, setIsUpdatingPlan] = useState(false); // Added loading state for plan updates
   // Use a local state to simulate plan changes if user object from context is not directly mutable
   // or if we don't want to risk modifying the context's state without a proper dispatcher.
   // Initialize with profile.subscription_tier or a default.
   const [localUserPlan, setLocalUserPlan] = useState(profile?.subscription_tier || 'free');
 
   // Update localUserPlan if profile from context changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (profile?.subscription_tier) {
       setLocalUserPlan(profile.subscription_tier);
     }
@@ -39,15 +40,53 @@ export default function SubscriptionPage() {
 
   const commonPopupMessage = t('common_popup_message');
 
-  const handleSelectFreePlan = () => {
+  const handleUpdateSubscription = async (newPlan: string) => {
+    if (!user) {
+      // It's good practice to use translated strings for alerts
+      alert(t('user_not_authenticated_error', 'You must be logged in to change your subscription.'));
+      console.error("User not authenticated. Cannot update subscription.");
+      return;
+    }
+
+    setIsUpdatingPlan(true);
+    try {
+      const response = await fetch('/api/subscription/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.id, newPlan: newPlan }),
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        setLocalUserPlan(newPlan);
+        // Using t function for user-facing messages
+        alert(t('plan_updated_successfully', { plan: newPlan, message: responseData.message || 'Plan updated successfully!' }));
+        if (refreshProfile) {
+          await refreshProfile(); // Refresh profile data in AuthContext
+        }
+      } else {
+        alert(t('plan_update_failed', { error: responseData.error || 'Unknown error' }));
+      }
+    } catch (error: any) {
+      console.error('Error updating subscription:', error);
+      alert(t('plan_update_failed', { error: error.message || 'Network error' }));
+    } finally {
+      setIsUpdatingPlan(false);
+    }
+  };
+
+  const handleSelectFreePlan = async () => {
     if (currentUserPlan === 'free') {
       alert(t('current_plan_alert'));
-    } else {
-      // Simulate switching to Free plan
-      alert(t('selected_free_plan_alert'));
-      setLocalUserPlan('free'); // Update local state for immediate UI feedback
-      // In a real app, you would call a backend service here to update the user's plan.
-      // e.g., updateUserPlan('free');
+    } else if (!user) {
+       alert(t('user_not_authenticated_error', 'You must be logged in to change your subscription.'));
+       return;
+    }
+    else {
+      await handleUpdateSubscription('free');
     }
   };
 
@@ -112,9 +151,13 @@ export default function SubscriptionPage() {
             <Button
               onClick={handleSelectFreePlan}
               className={`w-full mt-auto ${currentUserPlan === 'free' ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
-              disabled={currentUserPlan === 'free'}
+              disabled={currentUserPlan === 'free' || isUpdatingPlan}
             >
-              {currentUserPlan === 'free' ? t('current_plan_button') : t('select_plan_button')}
+              {currentUserPlan === 'free'
+                ? t('current_plan_button')
+                : isUpdatingPlan
+                  ? t('updating_button_text', 'Updating...')
+                  : t('select_plan_button')}
             </Button>
           </div>
 
