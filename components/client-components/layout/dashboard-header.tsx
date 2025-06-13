@@ -92,10 +92,7 @@ export const DashboardHeader = () => {
 
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50"> {/* Added z-50 */}
-                    <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setIsProfileOpen(false)} >
-                      Profile Settings
-                    </Link>
-                    <Link href="/subscription/page" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setIsProfileOpen(false)}>
+                    <Link href="/subscription" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" onClick={() => setIsProfileOpen(false)}>
                       Subscription
                     </Link>
                     <div className="border-t border-gray-100 my-1"></div>

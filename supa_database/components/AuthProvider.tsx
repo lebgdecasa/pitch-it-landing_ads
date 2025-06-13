@@ -5,7 +5,8 @@ import { useAuth, AuthState } from '../auth'
 const AuthContext = createContext<AuthState>({
   user: null,
   profile: null,
-  loading: true
+  loading: true,
+  checkUser: async () => {} // Added default checkUser function
 })
 
 interface AuthProviderProps {

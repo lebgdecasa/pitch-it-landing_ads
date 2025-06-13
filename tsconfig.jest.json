@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["jest", "@testing-library/jest-dom"] // Add jest types here
+  },
+  "include": [
+    "**/*.ts", // Broader include for utility files if any
+    "**/*.tsx",
+    "jest.setup.js" // if you create one
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
