@@ -3,6 +3,8 @@ import { GetServerSideProps } from 'next';
 import { createClient } from '@supabase/supabase-js';
 import { Send, AtSign, Users, Bot, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import ProjectLayout from '@/components/layout/ProjectLayout';
+
 
 interface Persona {
   id: string;
@@ -253,14 +255,13 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
   };
 
   return (
+    <ProjectLayout>
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar with Personas */}
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-4 border-b border-gray-100">
           <div className="flex items-center mb-2">
-            <Link href={`/project/${project.id}`} className="mr-3 p-1 hover:bg-gray-100 rounded">
-              <ArrowLeft className="h-5 w-5 text-gray-600" />
-            </Link>
+            
             <div className="flex-1">
               <h1 className="text-lg font-semibold text-gray-900 truncate">{project.name}</h1>
               <p className="text-sm text-gray-500">Project Chat</p>
@@ -442,6 +443,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
         )}
       </div>
     </div>
+    </ProjectLayout>
   );
 }
 
