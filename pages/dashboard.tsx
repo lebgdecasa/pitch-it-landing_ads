@@ -8,7 +8,10 @@ import { Button } from '@/components/ui/button';
 import { ProjectStage, Project } from '@/types';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useProjects } from '@/supa_database/hooks/useProject';
-import ConfirmationDialog from '@/components/modals/ConfirmationDialog'; // Import ConfirmationDialog
+// import ConfirmationDialog from '@/components/modals/ConfirmationDialog'; // Lazy loaded
+import dynamic from 'next/dynamic';
+
+const ConfirmationDialog = dynamic(() => import('@/components/modals/ConfirmationDialog'), { ssr: false });
 
 // Project card component for dashboard
 const ProjectCard = ({
@@ -42,7 +45,7 @@ const ProjectCard = ({
   const { color, label } = stageInfo[stage] || { color: 'bg-gray-100 text-gray-800', label: 'UNKNOWN' };
   const formattedDate = new Date(updatedAt).toLocaleDateString();
 
-  const handleDeleteClick = (event: MouseEvent<HTMLDivElement>) => {
+  const handleDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent Link navigation
     event.stopPropagation(); // Stop event bubbling
     onDeleteRequest(id, name || 'Untitled Project'); // Pass project name as well
@@ -62,13 +65,14 @@ const ProjectCard = ({
           <div className="flex justify-between items-center text-xs text-gray-500 mt-auto">
             <span>Last updated: {formattedDate}</span>
             {/* Delete Icon - now on the bottom right */}
-            <div
-              onClick={handleDeleteClick} // Changed to handleDeleteClick
-              className="p-1.5 rounded-full text-red-500 hover:bg-red-100 transition-colors cursor-pointer ml-2" // Always visible, adjusted styling
-              title="Delete project"
+            <button
+              type="button"
+              onClick={handleDeleteClick}
+              className="p-1.5 rounded-full text-red-500 hover:bg-red-100 transition-colors cursor-pointer ml-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
+              aria-label={`Delete project ${name || 'Untitled Project'}`}
             >
               <Trash2 size={18} />
-            </div>
+            </button>
           </div>
         </div>
       </a>

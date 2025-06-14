@@ -6,11 +6,11 @@ import { AuthProvider } from '../supa_database/components/AuthProvider'; // To p
 const AuthPage: React.FC = () => {
   return (
     <AuthProvider> {/* Wrap with AuthProvider as AuthForm or its children might use useAuthContext */}
-      <div className="container mx-auto px-4 py-8 flex flex-col items-center min-h-screen bg-gray-50">
-        {/* Optional: Add a header or rely on a global Layout component */}
-        {/* <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">Authentication</h1> */}
+      <main className="container mx-auto px-4 py-8 flex flex-col items-center min-h-screen bg-gray-50">
+        <h1 className="text-3xl font-bold text-center mb-8 text-gray-800 sr-only">Authentication</h1> {/* Added sr-only for now, can be made visible */}
+        {/* The AuthForm component contains h2 for "Sign In", "Sign Up", etc. */}
         <AuthForm />
-      </div>
+      </main>
     </AuthProvider>
   );
 };

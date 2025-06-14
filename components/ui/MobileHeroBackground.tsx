@@ -58,49 +58,79 @@ const MobileHeroBackground: React.FC = () => {
     };
 
     const animate = () => {
-      ctx.clearRect(0, 0, width, height);
+      if (!ctx || !canvasRef.current) return; // Ensure context and canvas are still valid
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
       bubblesRef.current.forEach(bubble => {
-        // Move bubble
         bubble.x += bubble.vx;
         bubble.y += bubble.vy;
 
-        // Bounce off edges
-        if (bubble.x - bubble.radius < 0 || bubble.x + bubble.radius > width) {
+        if (bubble.x - bubble.radius < 0 || bubble.x + bubble.radius > canvasRef.current!.width) {
           bubble.vx *= -1;
         }
-        if (bubble.y - bubble.radius < 0 || bubble.y + bubble.radius > height) {
+        if (bubble.y - bubble.radius < 0 || bubble.y + bubble.radius > canvasRef.current!.height) {
           bubble.vy *= -1;
         }
 
-        // Keep bubbles within bounds after bounce
-        bubble.x = Math.max(bubble.radius, Math.min(width - bubble.radius, bubble.x));
-        bubble.y = Math.max(bubble.radius, Math.min(height - bubble.radius, bubble.y));
+        bubble.x = Math.max(bubble.radius, Math.min(canvasRef.current!.width - bubble.radius, bubble.x));
+        bubble.y = Math.max(bubble.radius, Math.min(canvasRef.current!.height - bubble.radius, bubble.y));
 
-        // Draw bubble
         ctx.beginPath();
         ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
-        ctx.fillStyle = bubble.color; // Use bubble's specific color
-        // ctx.globalAlpha = bubble.opacity; // Applying opacity directly to fillStyle is better
+        ctx.fillStyle = bubble.color;
         ctx.fill();
         ctx.closePath();
       });
 
-      // ctx.globalAlpha = 1.0; // Reset global alpha
       animationFrameIdRef.current = requestAnimationFrame(animate);
     };
 
+    const startAnimation = () => {
+      if (!animationFrameIdRef.current) {
+        animate();
+      }
+    };
+
+    const stopAnimation = () => {
+      if (animationFrameIdRef.current) {
+        cancelAnimationFrame(animationFrameIdRef.current);
+        animationFrameIdRef.current = null;
+      }
+    };
+
     setCanvasDimensions(); // Initial setup
-    animate(); // Start animation
+
+    // Intersection Observer
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          startAnimation();
+        } else {
+          stopAnimation();
+        }
+      },
+      { threshold: 0.1 } // Trigger when 10% of the element is visible
+    );
+
+    if (canvas) {
+      observer.observe(canvas);
+    }
 
     // Handle resize
     const resizeObserver = new ResizeObserver(setCanvasDimensions);
-    resizeObserver.observe(canvas.parentElement!); // Observe parent size changes
+    if (canvas && canvas.parentElement) {
+      resizeObserver.observe(canvas.parentElement);
+    }
 
     // Cleanup
     return () => {
-      if (animationFrameIdRef.current) {
-        cancelAnimationFrame(animationFrameIdRef.current);
+      stopAnimation();
+      if (canvas) {
+        observer.unobserve(canvas);
+      }
+      observer.disconnect();
+      if (canvas && canvas.parentElement) {
+        resizeObserver.unobserve(canvas.parentElement);
       }
       resizeObserver.disconnect();
     };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react'; // Import useId
 
 interface AccordionItemProps {
   iconSvg?: string;
@@ -21,10 +21,14 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
     setIsOpen(!isOpen);
   };
 
+  const panelId = useId(); // Generate a unique ID for the panel
+
   return (
     <div className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
       <button
         onClick={toggleOpen}
+        aria-expanded={isOpen} // Set aria-expanded
+        aria-controls={panelId} // Set aria-controls
         className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 group"
       >
         <div className="flex items-center space-x-4">
@@ -45,7 +49,11 @@ const AccordionItem: React.FC<AccordionItemProps> = ({
         </div>
       </button>
 
-      <div className={`overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+      <div
+        id={panelId} // Set id for the panel
+        className={`overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+        // Optionally add role="region" and aria-labelledby if the title is complex or needs specific announcement
+      >
         <div className="px-6 pb-6">
           <div className="border-l-4 border-blue-200 pl-4">
             <p className="text-gray-600 leading-relaxed mb-4">{content}</p>

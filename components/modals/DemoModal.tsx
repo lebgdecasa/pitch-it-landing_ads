@@ -108,9 +108,11 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
                 {...register('name', {
                   required: 'Name is required'
                 })}
+                aria-invalid={errors.name ? "true" : "false"}
+                aria-describedby={errors.name ? "demo_name-error" : undefined}
               />
               {errors.name && (
-                <p className="mt-1 text-red-500 text-sm">{errors.name.message}</p>
+                <p id="demo_name-error" className="mt-1 text-red-500 text-sm">{errors.name.message}</p>
               )}
             </div>
             <div>
@@ -129,9 +131,11 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
                     message: 'Invalid email address'
                   }
                 })}
+                aria-invalid={errors.email ? "true" : "false"}
+                aria-describedby={errors.email ? "demo_email-error" : undefined}
               />
               {errors.email && (
-                <p className="mt-1 text-red-500 text-sm">{errors.email.message}</p>
+                <p id="demo_email-error" className="mt-1 text-red-500 text-sm">{errors.email.message}</p>
               )}
             </div>
           </div>
@@ -158,6 +162,8 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
                 id="demo_role"
                 className={`w-full px-4 py-3 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow focus:shadow-md`}
                 {...register('role', { required: 'Please select your role' })}
+                aria-invalid={errors.role ? "true" : "false"}
+                aria-describedby={errors.role ? "demo_role-error" : undefined}
               >
                 <option value="">Select your role</option>
                 <option value="founder">Founder/Entrepreneur</option>
@@ -165,7 +171,7 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
                 <option value="other">Other</option>
               </select>
               {errors.role && (
-                <p className="mt-1 text-red-500 text-sm">{errors.role.message}</p>
+                <p id="demo_role-error" className="mt-1 text-red-500 text-sm">{errors.role.message}</p>
               )}
             </div>
           </div>
@@ -221,9 +227,11 @@ const DemoModal = ({ onClose }: DemoModalProps) => {
               {...register('interest', {
                 required: 'Please tell us what interests you'
               })}
+              aria-invalid={errors.interest ? "true" : "false"}
+              aria-describedby={errors.interest ? "demo_interest-error" : undefined}
             ></textarea>
             {errors.interest && (
-              <p className="mt-1 text-red-500 text-sm">{errors.interest.message}</p>
+              <p id="demo_interest-error" className="mt-1 text-red-500 text-sm">{errors.interest.message}</p>
             )}
           </div>
 

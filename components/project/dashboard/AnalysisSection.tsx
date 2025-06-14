@@ -1,7 +1,10 @@
 // components/project/dashboard/AnalysisSection.tsx
 import React, { useState } from 'react';
 import { ChevronRight, TrendingUp, Users, FileText } from 'lucide-react';
-import AnalysisModal from './AnalysisModal';
+// import AnalysisModal from './AnalysisModal'; // Lazy loaded
+import dynamic from 'next/dynamic';
+
+const AnalysisModal = dynamic(() => import('./AnalysisModal'), { ssr: false });
 
 interface Report {
   id: string;
