@@ -1,6 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IWaitlistEntry extends Document {
+  firstName: string;
+  lastName: string;
   email: string;
   language: string;
   createdAt: Date;
@@ -14,6 +16,16 @@ export interface IWaitlistEntry extends Document {
 }
 
 const WaitlistEntrySchema: Schema = new Schema({
+  firstName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  lastName: {
+    type: String,
+    required: true,
+    trim: true
+  },
   email: {
     type: String,
     required: true,

@@ -13,6 +13,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await dbConnect();
 
     const {
+      firstName,
+      lastName,
       email,
       language,
       utm_source,
@@ -22,9 +24,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       utm_content
     } = req.body;
 
-    // Validate input
-    if (!email) {
-      return res.status(400).json({ success: false, error: 'Email is required' });
+    // Validate required input
+    if (!firstName || !lastName || !email) {
+      return res.status(400).json({
+        success: false,
+        error: 'First name, last name, and email are required'
+      });
+    }
+
+    // Validate name fields (basic validation)
+    if (firstName.trim().length < 1 || lastName.trim().length < 1) {
+      return res.status(400).json({
+        success: false,
+        error: 'First name and last name must not be empty'
+      });
     }
 
     // Validate email format
@@ -42,8 +55,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    // Create new waitlist entry with UTM parameters
+    // Create new waitlist entry with all fields
     const waitlistEntry = new WaitlistEntry({
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
       email,
       language: language || 'en',
       source: 'website',

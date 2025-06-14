@@ -21,6 +21,7 @@
     "@vercel/speed-insights": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "critters": "^0.0.23",
+    "dotenv": "^16.5.0",
     "lucide-react": "^0.514.0",
     "mongodb": "^6.16.0",
     "mongoose": "^7.5.0",

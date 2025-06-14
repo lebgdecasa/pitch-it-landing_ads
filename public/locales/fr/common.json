@@ -118,7 +118,22 @@
   "waitlist_modal_email_label": "Adresse Email",
   "waitlist_modal_email_placeholder": "vous@exemple.com",
   "waitlist_modal_submit": "S'inscrire à la Waitlist",
-  "waitlist_modal_success": "Merci ! Votre email a été ajouté à notre waitlist. Nous vous tiendrons informé !",
+    "waitlist_modal_first_name_label": "Prénom",
+    "waitlist_modal_first_name_placeholder": "Entrez votre prénom",
+    "waitlist_modal_first_name_required": "Le prénom est requis",
+    "waitlist_modal_first_name_min_length": "Le prénom ne peut pas être vide",
+
+    "waitlist_modal_last_name_label": "Nom de famille",
+    "waitlist_modal_last_name_placeholder": "Entrez votre nom de famille",
+    "waitlist_modal_last_name_required": "Le nom de famille est requis",
+  "waitlist_modal_last_name_min_length": "Le nom de famille ne peut pas être vide",
+
+  "waitlist_modal_email_required": "L'email est requis",
+  "waitlist_modal_email_invalid": "Adresse email invalide",
+
+  "waitlist_modal_submitting": "Envoi en cours...",
+  "waitlist_modal_success": "Merci {{firstName}} {{lastName}} ! Vous avez été ajouté(e) à notre liste d'attente. Nous vous contacterons bientôt à {{email}}.",
+  "waitlist_modal_error": "Une erreur s'est produite lors de l'inscription. Veuillez réessayer plus tard.",
   "demo_modal_title": "Demandez une Démo Personnalisée",
   "demo_modal_text": "Découvrez comment NexTraction peut améliorer le processus d'investissement pour vos besoins spécifiques. Remplissez ce formulaire et nous vous contacterons.",
   "demo_modal_name_label": "Nom Complet",
