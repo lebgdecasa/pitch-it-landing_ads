@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChevronLeft, Edit, Download, Users, AlertTriangle, Lightbulb, Briefcase, Swords, Sparkles, Megaphone } from 'lucide-react';
 import ProjectLayout from '@/components/layout/ProjectLayout_2';
 import dynamic from 'next/dynamic';
+import { useAuthContext } from '../../../supa_database/components/AuthProvider'; // Import useAuthContext
 
 // Component imports
 // import ShareTeamDialog from '../../../components/project/ShareTeamDialog'; // Lazy loaded
@@ -22,7 +23,6 @@ const GroupChat = dynamic(() => import('../../../components/project/chat/GroupCh
 import { useProjects, useProjectById } from '../../../supa_database/hooks/useProject';
 import { usePersonas } from '../../../supa_database/hooks/usePersonas';
 import { supabase } from '../../../supa_database/config/supabase'; // Ensure Supabase client is imported
-import { useAuthContext } from '../../../supa_database/components/AuthProvider'; // Import useAuthContext
 
 // Type definitions
 interface StageInfo {
@@ -50,11 +50,11 @@ const PitchDetail = ({ label, value, icon: Icon, color }: {
 
 export default function ProjectPage() {
   const router = useRouter();
-  const { id: projectIdFromRouter } = router.query; // Renamed to avoid conflict
-  const { user, loading: authLoading, profile } = useAuthContext(); // Get user and auth loading state
+  const { id: projectIdFromRouter } = router.query;
+  const { user, loading: authLoading, profile } = useAuthContext();
 
-  // Log current auth state when it changes or projectIdFromRouter changes
   useEffect(() => {
+    // Log current auth state when it changes or projectIdFromRouter changes
     if (!authLoading) {
       console.log('Auth context loaded. User:', user);
       console.log('Current authenticated user ID (from AuthContext):', user?.id);
@@ -65,6 +65,14 @@ export default function ProjectPage() {
     }
   }, [user, authLoading, profile, projectIdFromRouter]);
 
+  useEffect(() => {
+    if (!authLoading && profile && projectIdFromRouter) {
+      if (profile.subscription_tier === 'premium' || profile.subscription_tier === 'enterprise') {
+        router.push(`/project/${projectIdFromRouter}`);
+      }
+    }
+  }, [authLoading, profile, router, projectIdFromRouter]);
+
   // Fetch project and personas only if authenticated and projectId is available
   const projectIdToFetch = authLoading || !user ? undefined : projectIdFromRouter as string;
 
@@ -74,7 +82,16 @@ export default function ProjectPage() {
   const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
   const [showGroupChat, setShowGroupChat] = useState(false);
 
-  if (authLoading || projectLoading || personasLoading) {
+  if (authLoading || (!profile && !user && authLoading !== false)) { // Adjusted loading check
+    return <div>Loading user information...</div>;
+  }
+
+  if (profile && (profile.subscription_tier === 'premium' || profile.subscription_tier === 'enterprise')) {
+    // This condition is primarily handled by useEffect, but this can be a fallback.
+    return <div>Redirecting to the appropriate version for your plan...</div>;
+  }
+
+  if (projectLoading || personasLoading) {
     let statusMessage = "Loading...";
     if (authLoading) statusMessage = "Authenticating user...";
     else if (projectLoading) statusMessage = "Loading project details...";

@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
+import { useAuthContext } from '@/supa_database/components/AuthProvider'; // Corrected import path
 import { createClient } from '@supabase/supabase-js';
+import { GetServerSideProps } from 'next';
 import { Send, AtSign, Users, Bot, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import ProjectLayout from '@/components/layout/ProjectLayout';
@@ -38,7 +40,23 @@ interface ChatPageProps {
   initialPersonas: Persona[];
 }
 
-export default function ChatPage({ project, projectId, initialPersonas }: ChatPageProps) {
+export default function ChatPage({ project, projectId: initialProjectId, initialPersonas }: ChatPageProps) {
+  const router = useRouter();
+  // Use projectId from router.query if available, otherwise fallback to initialProjectId from props
+  // This is to ensure router.query.id is available for redirection logic
+  const { id: queryProjectId } = router.query;
+  const projectId = queryProjectId || initialProjectId;
+
+  const { profile, loading: authLoading } = useAuthContext();
+
+  useEffect(() => {
+    if (!authLoading && profile && projectId) {
+      if (profile.subscription_tier === 'free') {
+        router.push(`/project/${projectId}/chat_2`);
+      }
+    }
+  }, [authLoading, profile, router, projectId]);
+
   const [personas, setPersonas] = useState<Persona[]>(initialPersonas);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -47,6 +65,14 @@ export default function ChatPage({ project, projectId, initialPersonas }: ChatPa
   const [currentUser] = useState('You'); // You can replace this with actual user context
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  if (authLoading || !profile) {
+    return <div>Loading user information...</div>;
+  }
+
+  if (profile.subscription_tier === 'free') {
+    return <div>Redirecting to the appropriate version for your plan...</div>;
+  }
 
   // Colors for persona avatars
   const avatarColors = [
@@ -261,7 +287,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
       <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
         <div className="p-4 border-b border-gray-100">
           <div className="flex items-center mb-2">
-            
+
             <div className="flex-1">
               <h1 className="text-lg font-semibold text-gray-900 truncate">{project.name}</h1>
               <p className="text-sm text-gray-500">Project Chat</p>
