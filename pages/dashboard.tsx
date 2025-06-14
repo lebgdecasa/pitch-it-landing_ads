@@ -45,7 +45,7 @@ const ProjectCard = ({
   const { color, label } = stageInfo[stage] || { color: 'bg-gray-100 text-gray-800', label: 'UNKNOWN' };
   const formattedDate = new Date(updatedAt).toLocaleDateString();
 
-  const handleDeleteClick = (event: MouseEvent<HTMLDivElement>) => {
+  const handleDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent Link navigation
     event.stopPropagation(); // Stop event bubbling
     onDeleteRequest(id, name || 'Untitled Project'); // Pass project name as well
