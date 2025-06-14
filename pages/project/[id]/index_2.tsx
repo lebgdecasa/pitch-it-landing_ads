@@ -169,18 +169,6 @@ export default function ProjectPage() {
           </div>
 
           <div className="flex mt-4 md:mt-0 space-x-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/project/${project.id}/edit`}>
-                <Edit className="h-4 w-4 mr-1" />
-                Edit
-              </Link>
-            </Button>
-            <ShareTeamDialog
-              projectId={project.id}
-              projectName={project.name}
-              variant="outline"
-              size="sm"
-            />
           </div>
         </div>
 
