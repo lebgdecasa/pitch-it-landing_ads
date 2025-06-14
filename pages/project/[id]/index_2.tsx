@@ -4,16 +4,19 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ChevronLeft, Edit, Download, Users, AlertTriangle, Lightbulb, Briefcase, Swords, Sparkles, Megaphone } from 'lucide-react';
 import ProjectLayout from '@/components/layout/ProjectLayout_2';
+import dynamic from 'next/dynamic';
 
 // Component imports
-import ShareTeamDialog from '../../../components/project/ShareTeamDialog';
+// import ShareTeamDialog from '../../../components/project/ShareTeamDialog'; // Lazy loaded
+const ShareTeamDialog = dynamic(() => import('../../../components/project/ShareTeamDialog'), { ssr: false });
 import ActionButtons from '../../../components/project/ActionButtons_freemium_beta_';
 import { AnalysisSection } from '../../../components/project/dashboard/AnalysisSection';
 import { MetricsDisplay } from '../../../components/project/dashboard/MetricsDisplay';
 import { Button } from '../../../components/ui/button';
 import PersonaCard from '../../../components/client-components/persona/PersonaCard';
 import PersonaModal from '../../../components/client-components/persona/PersonaModal';
-import { GroupChat } from '../../../components/project/chat/GroupChat';
+// import { GroupChat } from '../../../components/project/chat/GroupChat'; // Lazy loaded
+const GroupChat = dynamic(() => import('../../../components/project/chat/GroupChat').then(mod => mod.GroupChat), { ssr: false });
 
 // Supabase imports
 import { useProjects, useProjectById } from '../../../supa_database/hooks/useProject';

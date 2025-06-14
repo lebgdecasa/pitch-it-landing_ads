@@ -1,7 +1,10 @@
 // supa_database/components/ProtectedRoute.tsx
 import React, { ReactNode } from 'react'
 import { useAuthContext } from './AuthProvider'
-import AuthModal from './AuthModal'
+// import AuthModal from './AuthModal' // Lazy loaded
+import dynamic from 'next/dynamic';
+
+const AuthModal = dynamic(() => import('./AuthModal'), { ssr: false });
 
 interface ProtectedRouteProps {
   children: ReactNode

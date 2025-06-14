@@ -66,10 +66,10 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
         <nav className="hidden md:flex items-center">
           {/* Nav links group */}
           <div className="flex space-x-2 sm:space-x-4">
-            <Link href="/features" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('features', '/features')}>
+            <Link href="/features" className={`text-sm sm:text-base font-medium transition-colors ${router.pathname === "/features" ? "text-blue-700 font-semibold" : "text-gray-600 hover:text-blue-600"}`} onClick={() => handleNavClick('features', '/features')}>
               {t('nav_features')}
             </Link>
-            <Link href="/why-us" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('why_us', '/why-us')}>
+            <Link href="/why-us" className={`text-sm sm:text-base font-medium transition-colors ${router.pathname === "/why-us" ? "text-blue-700 font-semibold" : "text-gray-600 hover:text-blue-600"}`} onClick={() => handleNavClick('why_us', '/why-us')}>
               {t('nav_why_us')}
             </Link>
           </div>
@@ -81,7 +81,7 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
               <div className="text-gray-500 text-sm">Loading...</div>
             ) : user ? (
               <>
-                <Link href="/dashboard" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('dashboard', '/dashboard')}>
+                <Link href="/dashboard" className={`text-sm sm:text-base font-medium transition-colors ${router.pathname.startsWith("/dashboard") ? "text-blue-700 font-semibold" : "text-gray-600 hover:text-blue-600"}`} onClick={() => handleNavClick('dashboard', '/dashboard')}>
                   {t('nav_dashboard', 'Dashboard')}
                 </Link>
                 <div className="border-l border-gray-200 h-8 mx-2"></div> {/* Divider */}
@@ -93,7 +93,7 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
                 </button>
               </>
             ) : (
-              <Link href="/auth" className="text-gray-600 hover:text-blue-600 text-sm sm:text-base font-medium transition-colors" onClick={() => handleNavClick('auth_desktop', '/auth')}>
+              <Link href="/auth" className={`text-sm sm:text-base font-medium transition-colors ${router.pathname === "/auth" ? "text-blue-700 font-semibold" : "text-gray-600 hover:text-blue-600"}`} onClick={() => handleNavClick('auth_desktop', '/auth')}>
                 {t('nav_sign_in_up', 'Sign In / Up')}
               </Link>
             )}
@@ -104,6 +104,7 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
             >
               {t('nav_book_demo')}
             </button>
+            {/* Language buttons are not navigation links, so no active state needed based on path */}
             <div className="ml-2 sm:ml-4 flex border border-gray-200 rounded-md">
               <button
                 onClick={() => handleLanguageChange('en')}
@@ -144,10 +145,10 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <Link href="/features" className="text-gray-700 text-lg font-medium" onClick={() => handleNavClick('features', '/features')}>
+        <Link href="/features" className={`block py-2 text-lg font-medium transition-colors ${router.pathname === "/features" ? "text-blue-700 font-semibold" : "text-gray-700 hover:text-blue-600"}`} onClick={() => handleNavClick('features', '/features')}>
               {t('nav_features')}
             </Link>
-            <Link href="/why-us" className="text-gray-700 text-lg font-medium" onClick={() => handleNavClick('why_us', '/why-us')}>
+        <Link href="/why-us" className={`block py-2 text-lg font-medium transition-colors ${router.pathname === "/why-us" ? "text-blue-700 font-semibold" : "text-gray-700 hover:text-blue-600"}`} onClick={() => handleNavClick('why_us', '/why-us')}>
               {t('nav_why_us')}
             </Link>
 
@@ -157,7 +158,7 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
               <p className="text-gray-500 text-lg">Loading...</p>
             ) : user ? (
               <>
-                <Link href="/dashboard" className="text-gray-700 text-lg font-medium hover:text-blue-600 transition-colors" onClick={() => handleNavClick('dashboard', '/dashboard')}>
+            <Link href="/dashboard" className={`block py-2 text-lg font-medium transition-colors ${router.pathname.startsWith("/dashboard") ? "text-blue-700 font-semibold" : "text-gray-700 hover:text-blue-600"}`} onClick={() => handleNavClick('dashboard', '/dashboard')}>
                   {t('nav_dashboard', 'Dashboard')}
                 </Link>
                 <button
@@ -168,7 +169,7 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
                 </button>
               </>
             ) : (
-              <Link href="/auth" className="text-gray-700 text-lg font-medium hover:text-blue-600 transition-colors" onClick={() => handleNavClick('auth_mobile', '/auth')}>
+          <Link href="/auth" className={`block py-2 text-lg font-medium transition-colors ${router.pathname === "/auth" ? "text-blue-700 font-semibold" : "text-gray-700 hover:text-blue-600"}`} onClick={() => handleNavClick('auth_mobile', '/auth')}>
                 {t('nav_sign_in_up', 'Sign In / Up')}
               </Link>
             )}
@@ -179,6 +180,7 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
             >
               {t('nav_book_demo')}
             </button>
+        {/* Language buttons are not navigation links, so no active state needed based on path */}
             <div className="flex border border-gray-200 rounded-md mt-4"> {/* Added mt-4 for spacing */}
               <button
                 onClick={() => handleLanguageChange('en')}

@@ -14,7 +14,11 @@ import { appWithTranslation } from 'next-i18next';
 
 import { AuthProvider, useAuthContext } from '@/supa_database/components/AuthProvider'; // Added useAuthContext
 // AuthModal import might be removed if /auth page is the sole auth mechanism now
-import AuthModal from '@/supa_database/components/AuthModal';
+// import AuthModal from '@/supa_database/components/AuthModal'; // Lazy loaded
+import dynamic from 'next/dynamic';
+// import { Toaster } from 'react-hot-toast'; // Assuming react-hot-toast is installed
+
+const AuthModal = dynamic(() => import('@/supa_database/components/AuthModal'), { ssr: false });
 
 // --- Route Guard Configuration ---
 const PROTECTED_ROUTES = ['/dashboard']; // Example, add actual protected routes
@@ -114,6 +118,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <ResourcePrefetcher />
 
       <AuthProvider>
+        {/* <Toaster position="top-center" reverseOrder={false} /> */} {/* Placeholder for react-hot-toast Toaster */}
         <RouteGuard>
           <LanguageProvider> {/* LanguageProvider now inside RouteGuard to access context if needed, or can be outside if independent */}
             <Component {...enhancedPageProps} />

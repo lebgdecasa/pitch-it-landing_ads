@@ -3,7 +3,10 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Button } from '../ui/button';
 import { Users, Activity, FileEdit, Video, Lock } from 'lucide-react'; // Added Lock icon
-import { UpgradeModal } from '../modals/UpgradeModal'; // Import the UpgradeModal
+// import { UpgradeModal } from '../modals/UpgradeModal'; // Lazy loaded
+import dynamic from 'next/dynamic';
+
+const UpgradeModal = dynamic(() => import('../modals/UpgradeModal').then(mod => mod.UpgradeModal), { ssr: false });
 
 interface ActionButtonConfig {
   icon: React.ReactNode;

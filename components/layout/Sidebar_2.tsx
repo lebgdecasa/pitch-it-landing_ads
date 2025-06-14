@@ -135,7 +135,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
         <nav className={`flex-1 ${collapsed ? 'px-2' : 'px-4'} space-y-1`}>
           {navItems.map((item, index) => {
             const Icon = item.icon;
-            const isActive = router.asPath === item.href;
+            // Check if the current path (without query parameters) matches the item's href
+            const currentPathname = router.asPath.split('?')[0];
+            const isActive = currentPathname === item.href;
             const canAccess = canAccessFeature(item.requiresPlan || 'free');
             const isLocked = !canAccess || !item.isImplemented;
 

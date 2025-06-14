@@ -135,7 +135,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
         <nav className={`flex-1 ${collapsed ? 'px-2' : 'px-4'} space-y-1`}>
           {navItems.map((item, index) => {
             const Icon = item.icon;
-            const isActive = router.asPath === item.href;
+            // Check if the current path (without query parameters) matches the item's href
+            // Also handle cases where item.href might be just "/" for a home/dashboard link
+            const currentPathname = router.asPath.split('?')[0];
+            let isActive = currentPathname === item.href;
+            // If item.href is a base path (e.g., /project/:id) and current path is a sub-route,
+            // consider it active if it's the overview/index page for that section.
+            // This needs careful handling if there are other links that might also startWith this.
+            // For this sidebar, exact match or specific logic for index might be better than general startsWith.
+            // Example: If item.href is '/project/123' and currentPathname is '/project/123', it's active.
+            // If item.href is '/project/123/index_2' (like in navigation_2.ts) this exact match is fine.
+
             const canAccess = canAccessFeature(item.requiresPlan || 'free');
             const isLocked = !canAccess || !item.isImplemented;
 

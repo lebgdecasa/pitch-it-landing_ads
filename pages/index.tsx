@@ -1,19 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Layout from '@/components/layout/Layout';
-import HeroSection from '@/components/sections/HeroSection';
-import WhyPitchItSection from '@/components/sections/WhyPitchItSection';
-import FeaturesSection from '@/components/sections/FeaturesSection';
-import MoreThanToolSection from '@/components/sections/MoreThanToolSection';
-import FinalCTASection from '@/components/sections/FinalCTASection';
+import HeroSection from '@/components/sections/HeroSection'; // Keep HeroSection eagerly loaded
+// import WhyPitchItSection from '@/components/sections/WhyPitchItSection'; // Lazy loaded
+// import FeaturesSection from '@/components/sections/FeaturesSection'; // Lazy loaded
+// import MoreThanToolSection from '@/components/sections/MoreThanToolSection'; // Lazy loaded
+// import FinalCTASection from '@/components/sections/FinalCTASection'; // Lazy loaded
 import Modal from '@/components/ui/Modal';
-import WaitlistModal from '@/components/modals/WaitlistModal';
-import DemoModal from '@/components/modals/DemoModal';
+// import WaitlistModal from '@/components/modals/WaitlistModal'; // Lazy loaded
+// import DemoModal from '@/components/modals/DemoModal'; // Lazy loaded
 import useScrollTracking from '@/hooks/useScrollTracking';
 import { trackButtonClick } from '@/utils/analytics';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
+import dynamic from 'next/dynamic';
 
+const WaitlistModal = dynamic(() => import('@/components/modals/WaitlistModal'), { ssr: false });
+const DemoModal = dynamic(() => import('@/components/modals/DemoModal'), { ssr: false });
+
+const WhyPitchItSection = dynamic(() => import('@/components/sections/WhyPitchItSection'), { ssr: false });
+const FeaturesSection = dynamic(() => import('@/components/sections/FeaturesSection'), { ssr: false });
+const MoreThanToolSection = dynamic(() => import('@/components/sections/MoreThanToolSection'), { ssr: false });
+const FinalCTASection = dynamic(() => import('@/components/sections/FinalCTASection'), { ssr: false });
 
 interface HomeProps {
   generatedAt?: string;

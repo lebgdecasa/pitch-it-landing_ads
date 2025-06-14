@@ -133,9 +133,11 @@ const AuthForm: React.FC = () => {
             type="email"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="your@email.com"
+            aria-invalid={errors.email ? "true" : "false"}
+            aria-describedby={errors.email ? "email-error" : undefined}
           />
           {errors.email && (
-            <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+            <p id="email-error" className="text-red-500 text-sm mt-1">{errors.email.message}</p>
           )}
         </div>
 
@@ -157,6 +159,8 @@ const AuthForm: React.FC = () => {
                 type={showPassword ? 'text' : 'password'}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10" // Added pr-10 for button spacing
                 placeholder="••••••••"
+                aria-invalid={errors.password ? "true" : "false"}
+                aria-describedby={errors.password ? "password-error" : undefined}
               />
               <button
                 type="button"
@@ -168,7 +172,7 @@ const AuthForm: React.FC = () => {
               </button>
             </div>
             {errors.password && (mode === 'signin' || mode === 'signup') && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              <p id="password-error" className="text-red-500 text-sm mt-1">{errors.password.message}</p>
             )}
           </div>
         )}
@@ -208,6 +212,8 @@ const AuthForm: React.FC = () => {
                   })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
                   placeholder="Re-enter your password"
+                  aria-invalid={errors.confirmPassword ? "true" : "false"}
+                  aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
                 />
                 <button
                   type="button"
@@ -219,7 +225,7 @@ const AuthForm: React.FC = () => {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
+                <p id="confirmPassword-error" className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
               )}
             </div>
 
@@ -235,9 +241,11 @@ const AuthForm: React.FC = () => {
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter your access code"
+                aria-invalid={errors.accessCode ? "true" : "false"}
+                aria-describedby={errors.accessCode ? "accessCode-error" : undefined}
               />
               {errors.accessCode && ( // Error shown if present
-                <p className="text-red-500 text-sm mt-1">{errors.accessCode.message}</p>
+                <p id="accessCode-error" className="text-red-500 text-sm mt-1">{errors.accessCode.message}</p>
               )}
               <p className="text-sm text-gray-500 mt-1">
                 A valid access code is required to sign up.
