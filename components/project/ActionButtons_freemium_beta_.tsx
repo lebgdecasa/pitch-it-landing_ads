@@ -1,8 +1,9 @@
 // components/project/ActionButtons.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { Button } from '../ui/button';
 import { Users, Activity, FileEdit, Video, Lock } from 'lucide-react'; // Added Lock icon
+import { UpgradeModal } from '../modals/UpgradeModal'; // Import the UpgradeModal
 
 interface ActionButtonConfig {
   icon: React.ReactNode;
@@ -18,6 +19,15 @@ interface ActionButtonsProps {
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({ projectId, buttonConfigs = {} }) => {
   const router = useRouter();
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false); // State for modal
+
+  const handleButtonClick = (config: ActionButtonConfig) => {
+    if (config.locked || buttonConfigs[config.label]?.locked) {
+      setIsUpgradeModalOpen(true);
+    } else {
+      router.push(config.redirectPath);
+    }
+  };
 
   const renderButton = (
     config: ActionButtonConfig
@@ -31,11 +41,10 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({ projectId, buttonC
         size="lg"
         className={`w-full mb-3 flex items-center justify-between space-x-3 h-14 ${
           isLocked
-            ? 'bg-gray-700 text-white cursor-not-allowed' // Locked style
+            ? 'bg-gray-700 text-white' // Keep locked style, remove cursor-not-allowed and disabled
             : 'bg-blue-500 text-white hover:bg-blue-600' // Default style
         }`}
-        onClick={() => !isLocked && router.push(redirectPath)}
-        disabled={isLocked}
+        onClick={() => handleButtonClick(config)} // Updated onClick handler
       >
         <div className="flex items-center space-x-3">
           {icon}
@@ -76,6 +85,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({ projectId, buttonC
   return (
     <div className="w-full space-y-2">
       {buttons.map(buttonConfig => renderButton(buttonConfig))}
+      <UpgradeModal isOpen={isUpgradeModalOpen} onClose={() => setIsUpgradeModalOpen(false)} />
     </div>
   );
 };
