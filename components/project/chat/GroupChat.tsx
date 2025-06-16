@@ -32,7 +32,7 @@ export const GroupChat: React.FC<GroupChatProps> = ({ projectId, projectName, pe
     if (!newMessage.trim()) return;
 
     // Send message through the hook
-    await sendMessage(newMessage, selectedPersona?.id);
+    await sendMessage(newMessage, selectedPersona?.id || null, 'user', 'You');
     setNewMessage('');
     setSelectedPersona(null);
   };
@@ -78,7 +78,7 @@ export const GroupChat: React.FC<GroupChatProps> = ({ projectId, projectName, pe
               <div className={`inline-block rounded-lg p-3 max-w-[80%] ${
                 isUser ? 'bg-indigo-600 text-white' : 'bg-gray-100'
               }`}>
-                <p className="text-sm">{message.message}</p>
+                <p className="text-sm">{message.content}</p>
               </div>
               <div className="mt-1 text-xs text-gray-500">
                 <span>{isUser ? 'You' : persona?.name || 'AI'}</span>
