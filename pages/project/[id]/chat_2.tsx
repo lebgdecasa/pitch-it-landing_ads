@@ -57,7 +57,14 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   }, [authLoading, profile, router, projectId]);
 
   const [personas, setPersonas] = useState<Persona[]>(initialPersonas);
-  const { messages: dbMessages, loading: messagesLoading, sendMessage } = useChatMessages(projectId as string);
+  const [page, setPage] = useState(1); // Add this line to define the page state
+  const { 
+    messages: dbMessages, 
+    loading: messagesLoading, 
+    hasMore, 
+    loadMore,
+    sendMessage 
+  } = useChatMessages(projectId as string);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -65,6 +72,7 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   const [currentUser] = useState('You'); // You can replace this with actual user context
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const messagesTopRef = useRef<HTMLDivElement>(null);
 
   if (authLoading || !profile) {
     return <div>Loading user information...</div>;
@@ -137,8 +145,9 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
     otherResponses: { persona: string; response: string }[] = []
   ): Promise<string> => {
     try {
-      // Build context from recent chat history
-      const recentHistory = chatHistory.slice(-10).map(msg =>
+      // Build context from all chat history
+      // Remove the slice(-10) to include all loaded messages
+      const recentHistory = chatHistory.map(msg =>
         `${msg.sender}: ${msg.content}`
       ).join('\n');
 
@@ -368,6 +377,35 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
     }
   }, [dbMessages]);
 
+  // Add an intersection observer to detect when the user scrolls to the top
+  useEffect(() => {
+    if (!messagesTopRef.current || !hasMore) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // When top is visible and we have more messages, show the load more button
+        if (entries[0].isIntersecting) {
+          // User has scrolled to the top
+          // We'll handle loading with a button click instead of auto-loading
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    observer.observe(messagesTopRef.current);
+    
+    return () => {
+      observer.disconnect();
+    };
+  }, [messagesTopRef, hasMore]);
+  
+  // Handle loading more messages
+  const handleLoadMore = () => {
+    if (hasMore) {
+      loadMore();
+    }
+  };
+
   return (
     <ProjectLayout>
     <div className="flex h-screen bg-gray-100">
@@ -423,7 +461,30 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messagesLoading ? (
+          {/* Reference to the top of messages for intersection observer */}
+          <div ref={messagesTopRef} />
+          
+          {/* Load More Button */}
+          {hasMore && (
+            <div className="flex justify-center my-2">
+              <button
+                onClick={handleLoadMore}
+                disabled={messagesLoading}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition-colors flex items-center"
+              >
+                {messagesLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-gray-400 border-t-gray-600 rounded-full animate-spin mr-2"></div>
+                    Loading...
+                  </>
+                ) : (
+                  'Load More Messages'
+                )}
+              </button>
+            </div>
+          )}
+          
+          {messagesLoading && page === 1 ? (
             <div className="flex justify-center items-center h-full">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
@@ -600,12 +661,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.error('Error fetching personas:', personasError);
   }
 
-  // Fetch initial chat messages
+  // Fetch initial chat messages - limit to most recent 50
   const { data: initialMessages, error: messagesError } = await supabase
     .from('chat_messages')
     .select('*')
     .eq('project_id', id)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true })
+    .limit(50); // Changed from 10 to 50
 
   if (messagesError) {
     console.error('Error fetching chat messages:', messagesError);

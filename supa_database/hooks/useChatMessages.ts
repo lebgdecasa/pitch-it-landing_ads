@@ -22,57 +22,91 @@ export interface DBChatMessage {
 export function useChatMessages(projectId: string | undefined) {
   const [messages, setMessages] = useState<DBChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!projectId) {
-      setLoading(false);
-      return;
-    }
-
-    // Fetch initial messages
-    const fetchMessages = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('chat_messages')
-          .select('*')
-          .eq('project_id', projectId)
-          .order('created_at', { ascending: true });
-
-        if (error) throw error;
-        setMessages(data || []);
-      } catch (err) {
-        console.error('Error fetching messages:', err);
-      } finally {
-        setLoading(false);
+  const [hasMore, setHasMore] = useState(false);
+  const initialLimit = 50; // Changed from 10 to 50
+  const [page, setPage] = useState(1);
+  
+  // Function to fetch messages with pagination
+  const fetchMessages = async (page = 1, limit = initialLimit) => {
+    if (!projectId) return;
+    
+    try {
+      setLoading(true);
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+      
+      // First, count total messages to determine if there are more
+      const { count } = await supabase
+        .from('chat_messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('project_id', projectId);
+      
+      // Then fetch the paginated messages
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('project_id', projectId)
+        .order('created_at', { ascending: false }) // Newest first for pagination
+        .range(from, to);
+        
+      if (error) throw error;
+      
+      const newMessages = data || [];
+      newMessages.reverse(); // Reverse to get chronological order
+      
+      // Update state based on whether it's the first page or loading more
+      if (page === 1) {
+        setMessages(newMessages);
+      } else {
+        setMessages(prev => [...newMessages, ...prev]);
       }
-    };
+      
+      // Check if there are more messages to load
+      setHasMore(count ? from + newMessages.length < count : false);
+    } catch (err) {
+      console.error('Error fetching messages:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchMessages();
+  // Initial load of messages
+  useEffect(() => {
+    if (projectId) {
+      setPage(1);
+      fetchMessages(1);
+      
+      // Set up real-time subscription for new messages
+      const channel = supabase
+        .channel(`public:chat_messages:project_id=eq.${projectId}`)
+        .on('postgres_changes', 
+          { 
+            event: 'INSERT', 
+            schema: 'public', 
+            table: 'chat_messages',
+            filter: `project_id=eq.${projectId}`
+          }, 
+          (payload) => {
+            setMessages(prev => [...prev, payload.new as DBChatMessage]);
+          }
+        )
+        .subscribe();
 
-    // Set up real-time subscription
-    const channel = supabase
-      .channel(`public:chat_messages:project_id=eq.${projectId}`)
-      .on('postgres_changes', 
-        { 
-          event: 'INSERT', 
-          schema: 'public', 
-          table: 'chat_messages',
-          filter: `project_id=eq.${projectId}`
-        }, 
-        (payload) => {
-          setMessages(prev => [...prev, payload.new as DBChatMessage]);
-        }
-      )
-      .subscribe();
-
-    // Clean up subscription
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      // Clean up subscription on unmount
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
   }, [projectId]);
+  
+  // Function to load more messages
+  const loadMore = async () => {
+    const nextPage = page + 1;
+    await fetchMessages(nextPage);
+    setPage(nextPage);
+  };
 
-  // Function to send a message with optimistic updates
+  // Function to send a message
   const sendMessage = async (
     content: string, 
     persona_id: string | null,
@@ -106,7 +140,7 @@ export function useChatMessages(projectId: string | undefined) {
         updated_at: new Date().toISOString()
       };
 
-      // Add the message to state immediately for a responsive UI
+      // Add the message to state immediately
       setMessages(prev => [...prev, optimisticMessage]);
 
       // Send to server
@@ -118,10 +152,6 @@ export function useChatMessages(projectId: string | undefined) {
 
       if (error) throw error;
 
-      // If successful server response and we're NOT using realtime, 
-      // replace the optimistic message with the actual one
-      // Note: With proper realtime setup, this replacement isn't necessary
-      // as the subscription will add the real message
       return { data };
     } catch (err) {
       console.error('Error sending message:', err);
@@ -129,5 +159,5 @@ export function useChatMessages(projectId: string | undefined) {
     }
   };
 
-  return { messages, loading, sendMessage };
+  return { messages, loading, hasMore, loadMore, sendMessage };
 }
