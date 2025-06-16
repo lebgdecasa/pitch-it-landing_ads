@@ -6,6 +6,7 @@ import { GetServerSideProps } from 'next';
 import { Send, AtSign, Users, Bot, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import ProjectLayout from '@/components/layout/ProjectLayout_2';
+import { useChatMessages } from '@/supa_database/hooks/useChatMessages'; // Add this import
 
 
 interface Persona {
@@ -56,6 +57,14 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   }, [authLoading, profile, router, projectId]);
 
   const [personas, setPersonas] = useState<Persona[]>(initialPersonas);
+  const [page, setPage] = useState(1); // Add this line to define the page state
+  const { 
+    messages: dbMessages, 
+    loading: messagesLoading, 
+    hasMore, 
+    loadMore,
+    sendMessage 
+  } = useChatMessages(projectId as string);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -63,6 +72,7 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   const [currentUser] = useState('You'); // You can replace this with actual user context
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const messagesTopRef = useRef<HTMLDivElement>(null);
 
   if (authLoading || !profile) {
     return <div>Loading user information...</div>;
@@ -95,20 +105,37 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Update the extractMentions function to match first names
   const extractMentions = (text: string): string[] => {
     const mentionRegex = /@(\w+)/g;
     const mentions = [];
     let match;
 
     while ((match = mentionRegex.exec(text)) !== null) {
-      mentions.push(match[1].toLowerCase());
+      // Get the mentioned name
+      const mentionedName = match[1].toLowerCase();
+      // Find personas whose name starts with the mentioned text
+      const matchingPersonas = personas.filter(p => 
+        p.name.toLowerCase().split(' ')[0] === mentionedName
+      );
+      
+      if (matchingPersonas.length > 0) {
+        // Add the full name of matching personas
+        mentions.push(matchingPersonas[0].name.toLowerCase());
+      }
     }
 
     return mentions;
   };
 
+
+
+  // Update the getPersonaByName function to match first names
   const getPersonaByName = (name: string): Persona | undefined => {
-    return personas.find(p => p.name.toLowerCase() === name.toLowerCase());
+    return personas.find(p => 
+      p.name.toLowerCase().split(' ')[0] === name.toLowerCase() || 
+      p.name.toLowerCase() === name.toLowerCase()
+    );
   };
 
   const generatePersonaResponse = async (
@@ -118,8 +145,9 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
     otherResponses: { persona: string; response: string }[] = []
   ): Promise<string> => {
     try {
-      // Build context from recent chat history
-      const recentHistory = chatHistory.slice(-10).map(msg =>
+      // Build context from all chat history
+      // Remove the slice(-10) to include all loaded messages
+      const recentHistory = chatHistory.map(msg =>
         `${msg.sender}: ${msg.content}`
       ).join('\n');
 
@@ -144,10 +172,28 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
       const demographicsText = persona.demographics && Object.keys(persona.demographics).length > 0
         ? `\nBackground: ${Object.entries(persona.demographics).map(([key, value]) => `${key}: ${value}`).join(', ')}`
         : '';
+      
+      // Project context - add project details to give personas more context
+      const projectContext = `
+Project Information:
+Name: ${project.name}
+Description: ${project.description || 'N/A'}
+Industry: ${project.industry || 'N/A'}
+Stage: ${project.stage || 'N/A'}
+${project.overview ? `
+Problem: ${project.overview.Problem || 'N/A'}
+Solution: ${project.overview.Solution || 'N/A'}
+Target Market: ${project.overview.Target_Market || 'N/A'}
+Business Model: ${project.overview.Business_Model || 'N/A'}
+Competition: ${project.overview.Competition || 'N/A'}
+Unique Selling Point: ${project.overview.Unique_selling_point || 'N/A'}
+Marketing Strategy: ${project.overview.Marketing_Strategy || 'N/A'}` : ''}`;
 
       const prompt = `You are ${persona.name}, a team member with the following characteristics:
 Role: ${persona.role}${companyText}
 Description: ${persona.description}${painPointsText}${goalsText}${demographicsText}
+
+You are working on the following project:${projectContext}
 
 Recent conversation history:
 ${recentHistory}
@@ -185,24 +231,30 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
     }
   };
 
+  // In your handleSendMessage function, update to show optimistic UI
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
     const mentions = extractMentions(inputMessage);
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      content: inputMessage,
-      sender: currentUser,
-      sender_type: 'user',
-      timestamp: new Date(),
-      mentions
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
     setIsLoading(true);
 
     try {
+      // Save user message to database - sendMessage now updates local state immediately
+      const { data: userMessageData, error: userMessageError } = await sendMessage(
+        inputMessage,
+        null,
+        'user',
+        currentUser,
+        mentions
+      );
+
+      if (userMessageError) {
+        console.error('Error saving user message:', userMessageError);
+        return;
+      }
+
+      setInputMessage('');
+
       let responsivePersonas: Persona[] = [];
 
       if (mentions.length > 0) {
@@ -227,22 +279,20 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
         const response = await generatePersonaResponse(
           persona,
           inputMessage,
-          [...messages, userMessage],
+          messages,
           personaResponses
         );
 
         personaResponses.push({ persona: persona.name, response });
 
-        const personaMessage: ChatMessage = {
-          id: `${Date.now()}-${persona.id}`,
-          content: response,
-          sender: persona.name,
-          sender_type: 'persona',
-          timestamp: new Date(),
-          persona_id: persona.id
-        };
-
-        setMessages(prev => [...prev, personaMessage]);
+        // Save persona message to database - sendMessage updates local state immediately
+        await sendMessage(
+          response,
+          persona.id,
+          'persona',
+          persona.name,
+          []
+        );
 
         // Small delay between responses for better UX
         if (responsivePersonas.length > 1) {
@@ -263,19 +313,97 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
     }
   };
 
+  // Update the insertMention function to use first names
   const insertMention = (personaName: string) => {
+    const firstName = personaName.split(' ')[0];
     const currentValue = inputMessage;
     const cursorPosition = inputRef.current?.selectionStart || 0;
     const beforeCursor = currentValue.substring(0, cursorPosition);
     const afterCursor = currentValue.substring(cursorPosition);
 
-    setInputMessage(`${beforeCursor}@${personaName} ${afterCursor}`);
+    setInputMessage(`${beforeCursor}@${firstName} ${afterCursor}`);
     setShowMentions(false);
     inputRef.current?.focus();
   };
 
   const formatTime = (timestamp: Date) => {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Update the message content display to highlight mentions
+  const renderMessageWithMentions = (content: string) => {
+    const mentionRegex = /@(\w+)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = mentionRegex.exec(content)) !== null) {
+      // Add text before the mention
+      if (match.index > lastIndex) {
+        parts.push(content.substring(lastIndex, match.index));
+      }
+      
+      // Add the mention with blue styling
+      parts.push(
+        <span key={match.index} className="text-blue-300 font-medium">
+          {match[0]}
+        </span>
+      );
+      
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Add remaining text after the last mention
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+    
+    return parts;
+  };
+
+  // Convert DB messages to your ChatMessage format
+  useEffect(() => {
+    if (dbMessages) {
+      const formattedMessages = dbMessages.map(dbMsg => ({
+        id: dbMsg.id,
+        content: dbMsg.content,
+        sender: dbMsg.sender,
+        sender_type: dbMsg.sender_type,
+        timestamp: new Date(dbMsg.created_at),
+        persona_id: dbMsg.persona_id,
+        mentions: dbMsg.mentions as string[] | undefined
+      }));
+      setMessages(formattedMessages);
+    }
+  }, [dbMessages]);
+
+  // Add an intersection observer to detect when the user scrolls to the top
+  useEffect(() => {
+    if (!messagesTopRef.current || !hasMore) return;
+    
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // When top is visible and we have more messages, show the load more button
+        if (entries[0].isIntersecting) {
+          // User has scrolled to the top
+          // We'll handle loading with a button click instead of auto-loading
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    observer.observe(messagesTopRef.current);
+    
+    return () => {
+      observer.disconnect();
+    };
+  }, [messagesTopRef, hasMore]);
+  
+  // Handle loading more messages
+  const handleLoadMore = () => {
+    if (hasMore) {
+      loadMore();
+    }
   };
 
   return (
@@ -333,7 +461,34 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.length === 0 && (
+          {/* Reference to the top of messages for intersection observer */}
+          <div ref={messagesTopRef} />
+          
+          {/* Load More Button */}
+          {hasMore && (
+            <div className="flex justify-center my-2">
+              <button
+                onClick={handleLoadMore}
+                disabled={messagesLoading}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition-colors flex items-center"
+              >
+                {messagesLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-gray-400 border-t-gray-600 rounded-full animate-spin mr-2"></div>
+                    Loading...
+                  </>
+                ) : (
+                  'Load More Messages'
+                )}
+              </button>
+            </div>
+          )}
+          
+          {messagesLoading && page === 1 ? (
+            <div className="flex justify-center items-center h-full">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : messages.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <div className="mb-4">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
@@ -346,46 +501,48 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                 {personas.length > 0 && " Use @name to mention specific team members."}
               </p>
             </div>
-          )}
+          ) : (
+            messages.map((message) => {
+              const persona = message.persona_id ? personas.find(p => p.id === message.persona_id) : null;
+              const isUser = message.sender_type === 'user';
 
-          {messages.map((message) => {
-            const persona = message.persona_id ? personas.find(p => p.id === message.persona_id) : null;
-            const isUser = message.sender_type === 'user';
-
-            return (
-              <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-                <div className={`flex max-w-xs lg:max-w-md xl:max-w-lg ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
-                  {!isUser && (
-                    <div className={`w-8 h-8 rounded-full ${persona?.avatar_color || 'bg-gray-400'} flex items-center justify-center text-white text-xs font-medium`}>
-                      {message.sender.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-
-                  <div className={`px-4 py-2 rounded-lg ${
-                    isUser
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white border border-gray-200 text-gray-900'
-                  }`}>
+              return (
+                <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`flex max-w-xs lg:max-w-md xl:max-w-lg ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
                     {!isUser && (
-                      <div className="text-xs font-medium text-gray-600 mb-1">{message.sender}</div>
+                      <div className={`w-8 h-8 rounded-full ${persona?.avatar_color || 'bg-gray-400'} flex items-center justify-center text-white text-xs font-medium`}>
+                        {message.sender.charAt(0).toUpperCase()}
+                      </div>
                     )}
-                    <div className="text-sm whitespace-pre-wrap">{message.content}</div>
-                    <div className={`text-xs mt-1 ${
-                      isUser ? 'text-blue-100' : 'text-gray-500'
-                    }`}>
-                      {formatTime(message.timestamp)}
-                    </div>
-                  </div>
 
-                  {isUser && (
-                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-medium">
-                      {currentUser.charAt(0).toUpperCase()}
+                    <div className={`px-4 py-2 rounded-lg ${
+                      isUser
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white border border-gray-200 text-gray-900'
+                    }`}>
+                      {!isUser && (
+                        <div className="text-xs font-medium text-gray-600 mb-1">{message.sender}</div>
+                      )}
+                      <div className="text-sm whitespace-pre-wrap">
+                        {message.sender_type === 'user' ? renderMessageWithMentions(message.content) : message.content}
+                      </div>
+                      <div className={`text-xs mt-1 ${
+                        isUser ? 'text-blue-100' : 'text-gray-500'
+                      }`}>
+                        {formatTime(message.timestamp)}
+                      </div>
                     </div>
-                  )}
+
+                    {isUser && (
+                      <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-medium">
+                        {currentUser.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
 
           {isLoading && (
             <div className="flex justify-start">
@@ -504,11 +661,24 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.error('Error fetching personas:', personasError);
   }
 
+  // Fetch initial chat messages - limit to most recent 50
+  const { data: initialMessages, error: messagesError } = await supabase
+    .from('chat_messages')
+    .select('*')
+    .eq('project_id', id)
+    .order('created_at', { ascending: true })
+    .limit(50); // Changed from 10 to 50
+
+  if (messagesError) {
+    console.error('Error fetching chat messages:', messagesError);
+  }
+
   return {
     props: {
       project,
       projectId: id as string,
-      initialPersonas: personas || []
+      initialPersonas: personas || [],
+      initialMessages: initialMessages || []
     }
   };
 };
