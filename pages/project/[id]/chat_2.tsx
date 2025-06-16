@@ -95,13 +95,24 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Update the extractMentions function to match first names
   const extractMentions = (text: string): string[] => {
     const mentionRegex = /@(\w+)/g;
     const mentions = [];
     let match;
 
     while ((match = mentionRegex.exec(text)) !== null) {
-      mentions.push(match[1].toLowerCase());
+      // Get the mentioned name
+      const mentionedName = match[1].toLowerCase();
+      // Find personas whose name starts with the mentioned text
+      const matchingPersonas = personas.filter(p => 
+        p.name.toLowerCase().split(' ')[0] === mentionedName
+      );
+      
+      if (matchingPersonas.length > 0) {
+        // Add the full name of matching personas
+        mentions.push(matchingPersonas[0].name.toLowerCase());
+      }
     }
 
     return mentions;
@@ -109,8 +120,12 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
 
 
 
+  // Update the getPersonaByName function to match first names
   const getPersonaByName = (name: string): Persona | undefined => {
-    return personas.find(p => p.name.toLowerCase() === name.toLowerCase());
+    return personas.find(p => 
+      p.name.toLowerCase().split(' ')[0] === name.toLowerCase() || 
+      p.name.toLowerCase() === name.toLowerCase()
+    );
   };
 
   const generatePersonaResponse = async (
@@ -283,19 +298,52 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
     }
   };
 
+  // Update the insertMention function to use first names
   const insertMention = (personaName: string) => {
+    const firstName = personaName.split(' ')[0];
     const currentValue = inputMessage;
     const cursorPosition = inputRef.current?.selectionStart || 0;
     const beforeCursor = currentValue.substring(0, cursorPosition);
     const afterCursor = currentValue.substring(cursorPosition);
 
-    setInputMessage(`${beforeCursor}@${personaName} ${afterCursor}`);
+    setInputMessage(`${beforeCursor}@${firstName} ${afterCursor}`);
     setShowMentions(false);
     inputRef.current?.focus();
   };
 
   const formatTime = (timestamp: Date) => {
     return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Update the message content display to highlight mentions
+  const renderMessageWithMentions = (content: string) => {
+    const mentionRegex = /@(\w+)/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+    
+    while ((match = mentionRegex.exec(content)) !== null) {
+      // Add text before the mention
+      if (match.index > lastIndex) {
+        parts.push(content.substring(lastIndex, match.index));
+      }
+      
+      // Add the mention with blue styling
+      parts.push(
+        <span key={match.index} className="text-blue-300 font-medium">
+          {match[0]}
+        </span>
+      );
+      
+      lastIndex = match.index + match[0].length;
+    }
+    
+    // Add remaining text after the last mention
+    if (lastIndex < content.length) {
+      parts.push(content.substring(lastIndex));
+    }
+    
+    return parts;
   };
 
   return (
@@ -389,7 +437,9 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                     {!isUser && (
                       <div className="text-xs font-medium text-gray-600 mb-1">{message.sender}</div>
                     )}
-                    <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+                    <div className="text-sm whitespace-pre-wrap">
+                      {message.sender_type === 'user' ? renderMessageWithMentions(message.content) : message.content}
+                    </div>
                     <div className={`text-xs mt-1 ${
                       isUser ? 'text-blue-100' : 'text-gray-500'
                     }`}>
