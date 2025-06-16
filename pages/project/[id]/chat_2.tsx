@@ -222,6 +222,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
     }
   };
 
+  // In your handleSendMessage function, update to show optimistic UI
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
 
@@ -229,7 +230,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
     setIsLoading(true);
 
     try {
-      // Save user message to database
+      // Save user message to database - sendMessage now updates local state immediately
       const { data: userMessageData, error: userMessageError } = await sendMessage(
         inputMessage,
         null,
@@ -275,7 +276,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
         personaResponses.push({ persona: persona.name, response });
 
-        // Save persona message to database
+        // Save persona message to database - sendMessage updates local state immediately
         await sendMessage(
           response,
           persona.id,

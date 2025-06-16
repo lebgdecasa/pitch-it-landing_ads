@@ -22,7 +22,6 @@ export interface DBChatMessage {
 export function useChatMessages(projectId: string | undefined) {
   const [messages, setMessages] = useState<DBChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!projectId) {
@@ -40,10 +39,9 @@ export function useChatMessages(projectId: string | undefined) {
           .eq('project_id', projectId)
           .order('created_at', { ascending: true });
 
-        if (error) throw new Error(error.message);
+        if (error) throw error;
         setMessages(data || []);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
         console.error('Error fetching messages:', err);
       } finally {
         setLoading(false);
@@ -52,30 +50,29 @@ export function useChatMessages(projectId: string | undefined) {
 
     fetchMessages();
 
-    // Set up real-time subscription for new messages
-    const subscription = supabase
-      .channel(`chat_messages:project_id=eq.${projectId}`)
+    // Set up real-time subscription
+    const channel = supabase
+      .channel(`public:chat_messages:project_id=eq.${projectId}`)
       .on('postgres_changes', 
         { 
           event: 'INSERT', 
           schema: 'public', 
           table: 'chat_messages',
-          filter: `project_id=eq.${projectId}` 
+          filter: `project_id=eq.${projectId}`
         }, 
         (payload) => {
-          // Add the new message to state
           setMessages(prev => [...prev, payload.new as DBChatMessage]);
         }
       )
       .subscribe();
 
-    // Cleanup subscription on unmount
+    // Clean up subscription
     return () => {
-      subscription.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [projectId]);
 
-  // Function to send a message
+  // Function to send a message with optimistic updates
   const sendMessage = async (
     content: string, 
     persona_id: string | null,
@@ -95,6 +92,24 @@ export function useChatMessages(projectId: string | undefined) {
         mentions: mentions || []
       };
 
+      // Create a temporary message for optimistic UI updates
+      const tempId = `temp-${Date.now()}`;
+      const optimisticMessage: DBChatMessage = {
+        id: tempId,
+        project_id: projectId,
+        content,
+        persona_id: persona_id || undefined,
+        sender_type,
+        sender,
+        mentions: mentions || [],
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      // Add the message to state immediately for a responsive UI
+      setMessages(prev => [...prev, optimisticMessage]);
+
+      // Send to server
       const { data, error } = await supabase
         .from('chat_messages')
         .insert(newMessage)
@@ -102,12 +117,17 @@ export function useChatMessages(projectId: string | undefined) {
         .single();
 
       if (error) throw error;
+
+      // If successful server response and we're NOT using realtime, 
+      // replace the optimistic message with the actual one
+      // Note: With proper realtime setup, this replacement isn't necessary
+      // as the subscription will add the real message
       return { data };
-    } catch (err: any) {
+    } catch (err) {
       console.error('Error sending message:', err);
-      return { error: err };
+      return { error: err as Error };
     }
   };
 
-  return { messages, loading, error, sendMessage };
+  return { messages, loading, sendMessage };
 }
