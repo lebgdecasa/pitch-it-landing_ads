@@ -107,6 +107,8 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
     return mentions;
   };
 
+
+
   const getPersonaByName = (name: string): Persona | undefined => {
     return personas.find(p => p.name.toLowerCase() === name.toLowerCase());
   };
@@ -144,10 +146,28 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
       const demographicsText = persona.demographics && Object.keys(persona.demographics).length > 0
         ? `\nBackground: ${Object.entries(persona.demographics).map(([key, value]) => `${key}: ${value}`).join(', ')}`
         : '';
+      
+      // Project context - add project details to give personas more context
+      const projectContext = `
+Project Information:
+Name: ${project.name}
+Description: ${project.description || 'N/A'}
+Industry: ${project.industry || 'N/A'}
+Stage: ${project.stage || 'N/A'}
+${project.overview ? `
+Problem: ${project.overview.Problem || 'N/A'}
+Solution: ${project.overview.Solution || 'N/A'}
+Target Market: ${project.overview.Target_Market || 'N/A'}
+Business Model: ${project.overview.Business_Model || 'N/A'}
+Competition: ${project.overview.Competition || 'N/A'}
+Unique Selling Point: ${project.overview.Unique_selling_point || 'N/A'}
+Marketing Strategy: ${project.overview.Marketing_Strategy || 'N/A'}` : ''}`;
 
       const prompt = `You are ${persona.name}, a team member with the following characteristics:
 Role: ${persona.role}${companyText}
 Description: ${persona.description}${painPointsText}${goalsText}${demographicsText}
+
+You are working on the following project:${projectContext}
 
 Recent conversation history:
 ${recentHistory}
