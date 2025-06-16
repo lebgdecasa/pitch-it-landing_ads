@@ -6,6 +6,7 @@ import { GetServerSideProps } from 'next';
 import { Send, AtSign, Users, Bot, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import ProjectLayout from '@/components/layout/ProjectLayout_2';
+import { useChatMessages } from '@/supa_database/hooks/useChatMessages'; // Add this import
 
 
 interface Persona {
@@ -56,6 +57,7 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   }, [authLoading, profile, router, projectId]);
 
   const [personas, setPersonas] = useState<Persona[]>(initialPersonas);
+  const { messages: dbMessages, loading: messagesLoading, sendMessage } = useChatMessages(projectId as string);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -224,20 +226,25 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
     if (!inputMessage.trim() || isLoading) return;
 
     const mentions = extractMentions(inputMessage);
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      content: inputMessage,
-      sender: currentUser,
-      sender_type: 'user',
-      timestamp: new Date(),
-      mentions
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
     setIsLoading(true);
 
     try {
+      // Save user message to database
+      const { data: userMessageData, error: userMessageError } = await sendMessage(
+        inputMessage,
+        null,
+        'user',
+        currentUser,
+        mentions
+      );
+
+      if (userMessageError) {
+        console.error('Error saving user message:', userMessageError);
+        return;
+      }
+
+      setInputMessage('');
+
       let responsivePersonas: Persona[] = [];
 
       if (mentions.length > 0) {
@@ -262,22 +269,20 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
         const response = await generatePersonaResponse(
           persona,
           inputMessage,
-          [...messages, userMessage],
+          messages,
           personaResponses
         );
 
         personaResponses.push({ persona: persona.name, response });
 
-        const personaMessage: ChatMessage = {
-          id: `${Date.now()}-${persona.id}`,
-          content: response,
-          sender: persona.name,
-          sender_type: 'persona',
-          timestamp: new Date(),
-          persona_id: persona.id
-        };
-
-        setMessages(prev => [...prev, personaMessage]);
+        // Save persona message to database
+        await sendMessage(
+          response,
+          persona.id,
+          'persona',
+          persona.name,
+          []
+        );
 
         // Small delay between responses for better UX
         if (responsivePersonas.length > 1) {
@@ -346,6 +351,22 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
     return parts;
   };
 
+  // Convert DB messages to your ChatMessage format
+  useEffect(() => {
+    if (dbMessages) {
+      const formattedMessages = dbMessages.map(dbMsg => ({
+        id: dbMsg.id,
+        content: dbMsg.content,
+        sender: dbMsg.sender,
+        sender_type: dbMsg.sender_type,
+        timestamp: new Date(dbMsg.created_at),
+        persona_id: dbMsg.persona_id,
+        mentions: dbMsg.mentions as string[] | undefined
+      }));
+      setMessages(formattedMessages);
+    }
+  }, [dbMessages]);
+
   return (
     <ProjectLayout>
     <div className="flex h-screen bg-gray-100">
@@ -401,7 +422,11 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.length === 0 && (
+          {messagesLoading ? (
+            <div className="flex justify-center items-center h-full">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : messages.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <div className="mb-4">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
@@ -414,48 +439,48 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                 {personas.length > 0 && " Use @name to mention specific team members."}
               </p>
             </div>
-          )}
+          ) : (
+            messages.map((message) => {
+              const persona = message.persona_id ? personas.find(p => p.id === message.persona_id) : null;
+              const isUser = message.sender_type === 'user';
 
-          {messages.map((message) => {
-            const persona = message.persona_id ? personas.find(p => p.id === message.persona_id) : null;
-            const isUser = message.sender_type === 'user';
-
-            return (
-              <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-                <div className={`flex max-w-xs lg:max-w-md xl:max-w-lg ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
-                  {!isUser && (
-                    <div className={`w-8 h-8 rounded-full ${persona?.avatar_color || 'bg-gray-400'} flex items-center justify-center text-white text-xs font-medium`}>
-                      {message.sender.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-
-                  <div className={`px-4 py-2 rounded-lg ${
-                    isUser
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white border border-gray-200 text-gray-900'
-                  }`}>
+              return (
+                <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`flex max-w-xs lg:max-w-md xl:max-w-lg ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
                     {!isUser && (
-                      <div className="text-xs font-medium text-gray-600 mb-1">{message.sender}</div>
+                      <div className={`w-8 h-8 rounded-full ${persona?.avatar_color || 'bg-gray-400'} flex items-center justify-center text-white text-xs font-medium`}>
+                        {message.sender.charAt(0).toUpperCase()}
+                      </div>
                     )}
-                    <div className="text-sm whitespace-pre-wrap">
-                      {message.sender_type === 'user' ? renderMessageWithMentions(message.content) : message.content}
-                    </div>
-                    <div className={`text-xs mt-1 ${
-                      isUser ? 'text-blue-100' : 'text-gray-500'
-                    }`}>
-                      {formatTime(message.timestamp)}
-                    </div>
-                  </div>
 
-                  {isUser && (
-                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-medium">
-                      {currentUser.charAt(0).toUpperCase()}
+                    <div className={`px-4 py-2 rounded-lg ${
+                      isUser
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white border border-gray-200 text-gray-900'
+                    }`}>
+                      {!isUser && (
+                        <div className="text-xs font-medium text-gray-600 mb-1">{message.sender}</div>
+                      )}
+                      <div className="text-sm whitespace-pre-wrap">
+                        {message.sender_type === 'user' ? renderMessageWithMentions(message.content) : message.content}
+                      </div>
+                      <div className={`text-xs mt-1 ${
+                        isUser ? 'text-blue-100' : 'text-gray-500'
+                      }`}>
+                        {formatTime(message.timestamp)}
+                      </div>
                     </div>
-                  )}
+
+                    {isUser && (
+                      <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-medium">
+                        {currentUser.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
 
           {isLoading && (
             <div className="flex justify-start">
@@ -574,11 +599,23 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.error('Error fetching personas:', personasError);
   }
 
+  // Fetch initial chat messages
+  const { data: initialMessages, error: messagesError } = await supabase
+    .from('chat_messages')
+    .select('*')
+    .eq('project_id', id)
+    .order('created_at', { ascending: true });
+
+  if (messagesError) {
+    console.error('Error fetching chat messages:', messagesError);
+  }
+
   return {
     props: {
       project,
       projectId: id as string,
-      initialPersonas: personas || []
+      initialPersonas: personas || [],
+      initialMessages: initialMessages || []
     }
   };
 };
