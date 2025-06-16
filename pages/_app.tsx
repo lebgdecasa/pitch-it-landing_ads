@@ -51,7 +51,8 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
     // No explicit 'else' needed here; if no redirect, component renders children.
   }, [user, loading, pathname, router]);
 
-  // Conditional rendering while loading or if a redirect is likely
+  // TO-DO: Consider adding a loading state to prevent flashing content
+  // while the authentication state is being determined.
   if (loading) {
     return <div>Loading authentication state...</div>; // Or a global spinner component
   }

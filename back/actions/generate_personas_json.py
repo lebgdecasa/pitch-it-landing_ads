@@ -1,0 +1,129 @@
+import os
+import json
+from google import genai
+from google.genai import types
+
+def generate_personas(product_description: str, final_analysis: str, number: int= 4, output_file: str = "personas_output.json"): # Here, instead of saving to a JSON maybe we can save it in a variable.
+    # Load analysis_final.md from the local directory
+    # with open("analysis_final.md", "r", encoding="utf-8") as file:
+    #     analysis_text = file.read()
+
+    # Format the prompt
+    prompt = f"""
+You are an AI trained to generate highly detailed, realistic consumer personas based on user-provided product descriptions and domain-specific market insights.
+
+Product Description:
+{product_description}
+
+Domain Insights (from netnographic research):
+{final_analysis}
+
+Your task is to generate {number} distinct personas representing potential target customers. Each persona must be derived from the product context and reflect actual market needs, frustrations, desires, and patterns observed in relevant online communities (e.g., Reddit, YouTube, HackerNews). The goal is to help an entrepreneur understand who their end-users could be, what they need, and how best to reach them.
+
+Output format: JSON array of {number} objects.
+Each object represents one persona and should include the following fields:
+
+{{
+  "name": "Persona Name",
+  "education": "e.g., Recent college graduate in communications",
+  "abilities_or_passions": "e.g., Sees beauty in storytelling, quick to adopt AI tools",
+  "hobbies": "e.g., Editing YouTube videos, browsing AI forums, watching Netflix in multiple languages",
+  "job": "e.g., Freelance voice actor, YouTuber, Localization Project Manager",
+  "why_important": "Explain why this persona is valuable to target, referencing trends like global content consumption, growing creator economy, etc.",
+  "needs": "Describe what this persona wants to achieve—functionally, emotionally, socially. Include references to goals like expanding global reach or improving workflow efficiency.",
+  "population_notes": "Estimate size, segment scope, or mention unknowns. Include relevance across markets or geographies, if known.",
+  "relationship_channels": "Where to find them or build trust (e.g., r/VoiceActing, YouTube creator Discords, localization Slack groups)",
+  "salary_range": "e.g., $35,000–$75,000 annually",
+  "demographics": "e.g., Age range 25–40, tech-savvy, mostly US/Europe-based",
+  "pain_points": "Top 2–3 frustrations (e.g., robotic AI output, loss of authenticity, workflow inefficiency)",
+  "jobs_to_be_done": "Summarize their primary 'Jobs to Be Done' (e.g., achieve high-quality multilingual content with minimal technical overhead)"
+}}
+
+Additional context:
+- Use social listening data to ensure authenticity.
+- Personas should reflect diversity in profession and user intent (e.g., influencer, voice actor, marketer, content creator).
+- Balance emotional, social, and functional motivations.
+- Connect their pain points and needs to trends from the domain (e.g., authenticity, ethical AI use, efficiency).
+"""
+
+    # Configure Gemini client
+    client = genai.Client(
+        api_key=os.environ.get("GEMINI_API_KEY"),
+    )
+
+    model = "gemini-2.0-flash"
+    contents = [
+        types.Content(
+            role="user",
+            parts=[types.Part.from_text(text=prompt)],
+        ),
+    ]
+
+    generate_content_config = types.GenerateContentConfig(
+    temperature=0,
+    response_mime_type="application/json",
+    response_schema=genai.types.Schema(
+        type=genai.types.Type.ARRAY,
+        items=genai.types.Schema(
+            type=genai.types.Type.OBJECT,
+            required=[
+                "name", "education", "abilities_or_passions", "hobbies", "job",
+                "why_important", "needs", "population_notes", "relationship_channels",
+                "salary_range", "demographics", "pain_points", "jobs_to_be_done"
+            ],
+            properties={
+                "name": genai.types.Schema(type=genai.types.Type.STRING),
+                "education": genai.types.Schema(type=genai.types.Type.STRING),
+                "abilities_or_passions": genai.types.Schema(type=genai.types.Type.STRING),
+                "hobbies": genai.types.Schema(type=genai.types.Type.STRING),
+                "job": genai.types.Schema(type=genai.types.Type.STRING),
+                "why_important": genai.types.Schema(type=genai.types.Type.STRING),
+                "needs": genai.types.Schema(type=genai.types.Type.STRING),
+                "population_notes": genai.types.Schema(type=genai.types.Type.STRING),
+                "relationship_channels": genai.types.Schema(type=genai.types.Type.STRING),
+                "salary_range": genai.types.Schema(type=genai.types.Type.STRING),
+                "demographics": genai.types.Schema(type=genai.types.Type.STRING),
+                "pain_points": genai.types.Schema(type=genai.types.Type.STRING),
+                "jobs_to_be_done": genai.types.Schema(type=genai.types.Type.STRING),
+            },
+        ),
+    )
+)
+
+    # Collect the full output text
+    json_output_string = ""
+    for chunk in client.models.generate_content_stream(
+        model=model,
+        contents=contents,
+        config=generate_content_config,
+    ):
+        json_output_string += chunk.text
+
+    # Attempt to parse JSON (Gemini might return array or object depending on response style)
+    try:
+        # Clean the output in case the LLM added markdown fences
+        if json_output_string.strip().startswith("```json"):
+            json_output_string = json_output_string.strip()[7:]
+            if json_output_string.endswith("```"):
+                json_output_string = json_output_string[:-3]
+        elif json_output_string.strip().startswith("```"):
+             json_output_string = json_output_string.strip()[3:]
+             if json_output_string.endswith("```"):
+                 json_output_string = json_output_string[:-3]
+
+
+        persona_data_list = json.loads(json_output_string.strip())
+        if not isinstance(persona_data_list, list):
+            print("ERROR: Generated persona data is not a JSON list.")
+            return []
+
+        print(f"Successfully generated and parsed {len(persona_data_list)} personas in memory.")
+        return persona_data_list
+
+    except json.JSONDecodeError as e:
+        print(f"ERROR: Failed to parse generated persona JSON: {e}")
+        print(f"LLM Output causing error:\n---\n{json_output_string}\n---")
+        return [] # Return empty list on failure
+    except Exception as e:
+        print(f"ERROR: An unexpected error occurred during persona generation: {e}")
+        return []

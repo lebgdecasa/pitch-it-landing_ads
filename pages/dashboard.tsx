@@ -213,7 +213,7 @@ export default function Dashboard() {
           </div>
           {projects.length > 0 && (
             <Button asChild size="lg" className="rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors">
-              <Link href="/project/new" className="flex items-center"> {/* Corrected link to /project/new */}
+              <Link href="/wizard" className="flex items-center">
                 <PlusCircle className="mr-2 h-5 w-5" />
                 New Project
               </Link>
@@ -227,7 +227,7 @@ export default function Dashboard() {
             <p className="text-gray-600 mb-8 max-w-md">Get started by creating your first project. Let's bring your idea to life.</p>
             <Button asChild size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
               {/* Assuming /project/creation/wizard is the correct path for the wizard */}
-              <Link href="/project/creation/wizard" className="flex items-center">
+              <Link href="/wizard" className="flex items-center">
                 <PlusCircle className="mr-2 h-5 w-5" />
                 Create Project
               </Link>
