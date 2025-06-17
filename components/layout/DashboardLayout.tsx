@@ -12,7 +12,7 @@ export default function DashboardLayout({
       <DashboardHeader />
       <div className="flex">
 
-        <main>
+        <main className="w-full">
           {children}
         </main>
       </div>

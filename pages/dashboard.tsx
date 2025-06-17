@@ -205,7 +205,7 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 md:p-6 max-w-7xl mx-auto">
+      <div className="mx-auto p-4 md:p-6 max-w-7xl">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">My Projects</h1>
@@ -222,7 +222,7 @@ export default function Dashboard() {
         </div>
 
         {projects.length === 0 ? (
-          <div className="mx-auto flex flex-col items-center justify-center text-center bg-gray-50 border border-gray-200 rounded-lg p-10 md:p-20 lg:p-40 min-h-[50vh] md:min-h-[60vh]">
+          <div className="w-fit mx-auto flex flex-col items-center justify-center text-center border-gray-200 rounded-lg p-10 md:p-20 lg:p-40 min-h-[50vh] md:min-h-[60vh]">
             <h3 className="font-semibold text-2xl md:text-3xl mb-4">No projects yet</h3>
             <p className="text-gray-600 mb-8 max-w-md">Get started by creating your first project. Let's bring your idea to life.</p>
             <Button asChild size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
