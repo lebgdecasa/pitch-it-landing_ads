@@ -222,7 +222,7 @@ export default function Dashboard() {
         </div>
 
         {projects.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center bg-gray-50 border border-gray-200 rounded-lg p-10 md:p-20 lg:p-40 min-h-[50vh] md:min-h-[60vh]">
+          <div className="mx-auto flex flex-col items-center justify-center text-center bg-gray-50 border border-gray-200 rounded-lg p-10 md:p-20 lg:p-40 min-h-[50vh] md:min-h-[60vh]">
             <h3 className="font-semibold text-2xl md:text-3xl mb-4">No projects yet</h3>
             <p className="text-gray-600 mb-8 max-w-md">Get started by creating your first project. Let's bring your idea to life.</p>
             <Button asChild size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
