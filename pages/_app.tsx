@@ -21,8 +21,17 @@ import dynamic from 'next/dynamic';
 const AuthModal = dynamic(() => import('@/supa_database/components/AuthModal'), { ssr: false });
 
 // --- Route Guard Configuration ---
-const PROTECTED_ROUTES = ['/dashboard']; // Example, add actual protected routes
+const PROTECTED_ROUTES = [
+  '/dashboard',
+  '/project',  // This will match /project/[id] routes
+  '/subscription',
+];
+
 const AUTH_PAGE_ROUTE = '/auth'; // The main authentication page
+
+const isPathProtected = (pathname: string): boolean => {
+  return PROTECTED_ROUTES.some(route => pathname.startsWith(route));
+};
 
 interface RouteGuardProps {
   children: React.ReactNode;
@@ -33,47 +42,74 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
   const router = useRouter();
   const { pathname } = router;
 
+  const isProtectedRoute = isPathProtected(pathname);
+  const isAuthPageRoute = pathname === AUTH_PAGE_ROUTE;
+
   useEffect(() => {
     if (loading) {
       return; // Do nothing while loading auth state
     }
 
-    const isProtectedRoute = PROTECTED_ROUTES.includes(pathname);
-    const isAuthPageRoute = pathname === AUTH_PAGE_ROUTE;
-
     if (!user && isProtectedRoute) {
       // If not authenticated and trying to access a protected route, redirect to auth page
       router.push(AUTH_PAGE_ROUTE);
     } else if (user && isAuthPageRoute) {
-      // If authenticated and trying to access the auth page, redirect to a default protected route (e.g., dashboard)
-      router.push(PROTECTED_ROUTES[0] || '/'); // Fallback to home if no protected routes defined
+      // If authenticated and trying to access the auth page, redirect to dashboard
+      router.push('/dashboard');
     }
-    // No explicit 'else' needed here; if no redirect, component renders children.
-  }, [user, loading, pathname, router]);
+  }, [user, loading, pathname, router, isProtectedRoute, isAuthPageRoute]);
 
-  // TO-DO: Consider adding a loading state to prevent flashing content
-  // while the authentication state is being determined.
-  if (loading) {
-    return <div>Loading authentication state...</div>; // Or a global spinner component
+  // For public routes (not protected and not auth page),
+  // always render content immediately, even if auth is still loading
+  if (!isProtectedRoute && !isAuthPageRoute) {
+    return <>{children}</>;
   }
 
-  const isProtectedRoute = PROTECTED_ROUTES.includes(pathname);
-  const isAuthPageRoute = pathname === AUTH_PAGE_ROUTE;
+  // For protected routes: show loading only if auth is loading
+  if (loading && isProtectedRoute) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
+  // For auth page: show loading if auth is loading
+  if (loading && isAuthPageRoute) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle cases where we're about to redirect
   if (!user && isProtectedRoute) {
-    // User is not authenticated and is on a protected route, redirect is imminent or happening.
-    // Render loading indicator to prevent flashing page content.
-    return <div>Redirecting to login...</div>; // Or a global spinner
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-gray-600">Redirecting to login...</p>
+      </div>
+    );
   }
 
   if (user && isAuthPageRoute) {
-    // User is authenticated and on the auth page, redirect is imminent or happening.
-    // Render loading indicator.
-    return <div>Redirecting to dashboard...</div>; // Or a global spinner
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-gray-600">Redirecting to dashboard...</p>
+      </div>
+    );
   }
 
-  return <>{children}</>; // Render the actual page content
+  // Render the actual page content
+  return <>{children}</>;
 };
+
 // --- End Route Guard ---
 
 

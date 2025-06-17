@@ -4,6 +4,8 @@ import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
 import { resetPassword } from '../auth' // signIn, signUp, validateAccessCode removed
 import { supabase } from '../config/supabase' // Import supabase directly from config
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'; // Assuming you use Heroicons
+import NoAccessCodeModal from '@/components/modals/NoAccessCodeModal'; // Import the new modal
 
 // Interface for form data
 interface AuthFormData {
@@ -14,7 +16,7 @@ interface AuthFormData {
 }
 
 const AuthForm: React.FC = () => {
-  const [mode, setMode] = useState<'signin' | 'signup' | 'resetPassword'>('signin') // Removed 'magic'
+  const [mode, setMode] = useState<'signin' | 'signup' | 'resetPassword'>('signup') // Removed 'magic'
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
@@ -22,6 +24,9 @@ const AuthForm: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true); // Added rememberMe state
   const router = useRouter();
+
+  // State for the "No Access Code" modal
+  const [showNoAccessCodeModal, setShowNoAccessCodeModal] = useState(false);
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm<AuthFormData>({
     defaultValues: {
@@ -31,9 +36,6 @@ const AuthForm: React.FC = () => {
       accessCode: '',
     }
   })
-
-  // We don't need to watch accessCode here anymore as conditional requirement is handled by register
-  // const accessCode = watch('accessCode')
 
   const onSubmit = async (data: AuthFormData) => {
     setLoading(true)
@@ -45,8 +47,6 @@ const AuthForm: React.FC = () => {
         const { error: resetError } = await resetPassword(data.email)
         if (resetError) throw resetError
         setMessage('If an account with that email exists, a password reset link has been sent. Please check your inbox.')
-        // Optionally, switch mode back to signin after a delay or keep user on this view with the message.
-        // For now, we'll keep them on the view.
         return;
       }
 
@@ -168,7 +168,11 @@ const AuthForm: React.FC = () => {
                 className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-800 focus:outline-none"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? 'Hide' : 'Show'}
+                {showPassword ? (
+                  <EyeSlashIcon className="h-5 w-5" />
+                ) : (
+                  <EyeIcon className="h-5 w-5" />
+                )}
               </button>
             </div>
             {errors.password && (mode === 'signin' || mode === 'signup') && (
@@ -197,21 +201,21 @@ const AuthForm: React.FC = () => {
 
         {mode === 'signup' && (
           <> {/* Use a fragment to group signup-specific fields */}
-            <div> {/* Confirm Password Field */}
+            <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
                 Confirm Password
               </label>
               <div className="relative">
                 <input
                   id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
                   {...register('confirmPassword', {
-                    required: 'Please confirm your password', // Always required in signup
+                    required: mode === 'signup' ? 'Confirm password is required' : false,
                     validate: value =>
                       value === watch('password') || 'Passwords do not match'
                   })}
+                  type={showConfirmPassword ? 'text' : 'password'}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-                  placeholder="Re-enter your password"
+                  placeholder="••••••••"
                   aria-invalid={errors.confirmPassword ? "true" : "false"}
                   aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
                 />
@@ -221,7 +225,11 @@ const AuthForm: React.FC = () => {
                   className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-800 focus:outline-none"
                   aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
                 >
-                  {showConfirmPassword ? 'Hide' : 'Show'}
+                  {showConfirmPassword ? (
+                    <EyeSlashIcon className="h-5 w-5" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" />
+                  )}
                 </button>
               </div>
               {errors.confirmPassword && (
@@ -229,27 +237,31 @@ const AuthForm: React.FC = () => {
               )}
             </div>
 
-            <div> {/* Access Code Field */}
-              <label htmlFor="accessCode" className="block text-sm font-medium text-gray-700 mb-1">
-                Access Code
-              </label>
+            <div className="mb-4">
+              <div className="flex justify-between items-center mb-1">
+                <label htmlFor="accessCode" className="block text-sm font-medium text-gray-700">
+                  Access Code
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowNoAccessCodeModal(true)}
+                  className="text-xs text-blue-600 hover:text-blue-700 hover:underline focus:outline-none"
+                >
+                  No access code?
+                </button>
+              </div>
               <input
                 id="accessCode"
-                {...register('accessCode', {
-                    required: 'Access code is required' // Always required in signup
-                })}
+                {...register('accessCode')}
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your access code"
+                placeholder="Enter your access code if you have one"
                 aria-invalid={errors.accessCode ? "true" : "false"}
                 aria-describedby={errors.accessCode ? "accessCode-error" : undefined}
               />
-              {errors.accessCode && ( // Error shown if present
+              {errors.accessCode && (
                 <p id="accessCode-error" className="text-red-500 text-sm mt-1">{errors.accessCode.message}</p>
               )}
-              <p className="text-sm text-gray-500 mt-1">
-                A valid access code is required to sign up.
-              </p>
             </div>
           </>
         )}
@@ -298,6 +310,12 @@ const AuthForm: React.FC = () => {
           </button>
         )}
       </div>
+
+      {/* "No Access Code" Modal Integration */}
+      <NoAccessCodeModal
+        isOpen={showNoAccessCodeModal}
+        onClose={() => setShowNoAccessCodeModal(false)}
+      />
     </div>
   )
 }
