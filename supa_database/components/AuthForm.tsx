@@ -306,7 +306,7 @@ const AuthForm: React.FC = () => {
             onClick={() => { setMode('signin'); setError(null); setMessage(null); }}
             className="w-full text-blue-600 hover:text-blue-700 text-sm py-1"
           >
-            Back to Sign In
+            Go to Sign In
           </button>
         )}
       </div>
