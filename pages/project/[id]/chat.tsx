@@ -6,6 +6,7 @@ import { GetServerSideProps } from 'next';
 import { Send, AtSign, Users, Bot, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import ProjectLayout from '@/components/layout/ProjectLayout';
+import { PersonaModal } from '@/components/client-components/persona/PersonaModal'; // Import PersonaModal
 
 
 interface Persona {
@@ -65,6 +66,16 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   const [currentUser] = useState('You'); // You can replace this with actual user context
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // State for Persona Details Modal
+  const [isPersonaModalOpen, setIsPersonaModalOpen] = useState(false);
+  const [selectedPersonaForModal, setSelectedPersonaForModal] = useState<Persona | null>(null);
+
+  // Function to open persona details modal
+  const handlePersonaClick = (persona: Persona) => {
+    setSelectedPersonaForModal(persona);
+    setIsPersonaModalOpen(true);
+  };
 
   if (authLoading || !profile) {
     return <div>Loading user information...</div>;
@@ -302,7 +313,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {personas.map((persona) => (
             <div key={persona.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                 onClick={() => insertMention(persona.name)}>
+                 onClick={() => handlePersonaClick(persona)}>
               <div className={`w-10 h-10 rounded-full ${persona.avatar_color} flex items-center justify-center text-white font-medium text-sm`}>
                 {persona.name.charAt(0).toUpperCase()}
               </div>
@@ -468,6 +479,30 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
           </div>
         )}
       </div>
+
+      {/* Persona Details Modal using imported component */}
+      {isPersonaModalOpen && selectedPersonaForModal && (
+        <PersonaModal
+          isOpen={isPersonaModalOpen}
+          onClose={() => setIsPersonaModalOpen(false)}
+          persona={{
+            id: selectedPersonaForModal.id,
+            name: selectedPersonaForModal.name,
+            role: 'user', // Provide a default valid role for ChatPersona.role tag
+            // avatarUrl can be omitted; PersonaModal handles placeholder if not present
+          }}
+          jobTitle={selectedPersonaForModal.role} // Use the actual role string for jobTitle
+          needsDetails={selectedPersonaForModal.description}
+          background={selectedPersonaForModal.demographics
+            ? Object.entries(selectedPersonaForModal.demographics)
+                .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}: ${String(value)}`)
+                .join('; ')
+            : undefined}
+          goals={selectedPersonaForModal.goals}
+          challenges={selectedPersonaForModal.pain_points} // Map pain_points to challenges
+          // preferredCommunication will use the default from PersonaModal
+        />
+      )}
     </div>
     </ProjectLayout>
   );

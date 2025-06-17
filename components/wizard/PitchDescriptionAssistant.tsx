@@ -124,12 +124,26 @@ function Button({ children, onClick, variant = 'default', className = '', disabl
 }
 
 function Textarea({ value, onChange, placeholder, className = '' }: TextareaProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      // Temporarily reset height to calculate the new scrollHeight accurately
+      textarea.style.height = 'auto';
+      // Set the height to the scrollHeight to fit the content
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [value]); // This effect runs whenever the text value changes
+
   return (
     <textarea
+      ref={textareaRef}
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className={`w-full p-3 border border-gray-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      rows={1} // Start with a single row
+      className={`w-full p-3 border border-gray-300 rounded resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
     />
   );
 }
@@ -139,65 +153,27 @@ function PitchAssistant({ coveredDimensions, onClose }: PitchAssistantProps) {
   const percentComplete = Math.floor((coveredDimensionsArray.length / PITCH_DIMENSIONS.length) * 100);
 
   return (
-    <div className="p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-lg text-gray-900 flex items-center">
-          <span className="text-indigo-600 mr-2">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M15.5 9L15.5 14M8.5 14V9M12 12V9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M22 12C22 16.714 22 19.071 20.535 20.535C19.072 22 16.714 22 12 22C7.286 22 4.929 22 3.464 20.535C2 19.072 2 16.714 2 12C2 7.286 2 4.929 3.464 3.464C4.93 2 7.286 2 12 2C16.714 2 19.071 2 20.535 3.464C21.509 4.438 21.863 5.807 21.95 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-          </span>
-          Pitch Assistant
-        </h3>
-        <button
-          onClick={onClose}
-          className="md:hidden p-1 rounded-full hover:bg-gray-100"
-          aria-label="Close assistant"
-        >
-
+    <div className="bg-gray-50 p-6 rounded-lg shadow h-full flex flex-col">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold text-gray-800">Pitch Assistant</h3>
+        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          {/* Heroicon name: x */}
+          <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
-
-      {/* Progress section */}
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-1 text-sm">
-          <span className="font-medium text-gray-700">Progress</span>
-          <span className="text-gray-600">{percentComplete}%</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div
-            className="bg-green-500 h-2 rounded-full transition-all duration-300 ease-in-out"
-            style={{ width: `${percentComplete}%` }}
-          ></div>
-        </div>
-      </div>
-
-      {/* Dimensions checklist */}
-      <div className="mb-6">
-        <h4 className="font-medium text-gray-700 mb-2 text-sm">Key Dimensions</h4>
-        <div className="space-y-2">
-          {PITCH_DIMENSIONS.map((dimension: PitchDimension) => {
-            const isCovered = coveredDimensions[dimension.id] || false;
-            return (
-              <div
-                key={dimension.id}
-                className={`p-2 rounded-md flex items-center justify-between ${
-                  isCovered ? 'bg-green-50' : 'bg-white'
-                }`}
-              >
-                <span className="text-sm">{dimension.name}</span>
-                <div
-                  className={`w-5 h-5 flex items-center justify-center rounded-full ${
-                    isCovered ? 'bg-green-500' : 'bg-gray-200'
-                  }`}
-                >
-
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      {/* <p className="text-sm text-gray-600 mb-1">Completeness: {percentComplete}%</p> */}
+      {/* <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4"> */}
+        {/* <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${percentComplete}%` }}></div> */}
+      {/* </div> */}
+      <p className="text-sm text-gray-700 font-medium mb-2">Key Dimensions:</p>
+      <div className="overflow-y-auto max-h-[400px] pr-2 space-y-2 custom-scrollbar"> {/* Added max-h and overflow for scroll */}
+        {PITCH_DIMENSIONS.map(dim => (
+          <div key={dim.id} className={`p-3 rounded-md text-sm ${coveredDimensions[dim.id] ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+            {dim.name}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -221,7 +197,7 @@ export default function PitchDescriptionAssistant({
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [projects, setProjects] = useState<any[]>([]);
   const [isStarting, setIsStarting] = useState(false);
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState(''); // This seems related to a different functionality, keeping it for now.
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isLoadingCheck, setIsLoadingCheck] = useState(false);
@@ -231,6 +207,8 @@ export default function PitchDescriptionAssistant({
     const fetchProjects = async () => {
       setIsLoadingProjects(true);
       setFetchError(null);
+      // TO-DO: change to actual URL when backend is ready
+      // Use environment variable for API URL or fallback to localhost
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       console.log(`Fetching projects from: ${apiUrl}/projects`); // Log endpoint
       try {
@@ -417,6 +395,7 @@ export default function PitchDescriptionAssistant({
   };
 
   const handleNext = () => {
+    // Potentially validate before calling onNext
     if (onNext) {
       onNext();
     }
@@ -431,100 +410,78 @@ export default function PitchDescriptionAssistant({
   const nextDimension = getNextDimension();
 
   return (
-    <div className="container mx-auto py-8 max-w-6xl space-y-12">
+    <div className="flex flex-col w-full max-w-10xl p-4 bg-white rounded-lg shadow-xl max-h-[100vh] overflow-hidden">
+      <div className="flex-grow flex flex-col md:flex-row gap-4 overflow-hidden"> {/* Handles layout and prevents its children from causing page scroll */}
+        {/* Left Panel: Prompt, Textarea, Feedback, Progress, Buttons */}
+        <div className="flex-1 flex flex-col space-y-4 overflow-y-auto custom-scrollbar pr-2"> {/* Made left panel scrollable */}
+          <h2 className="text-2xl font-semibold text-gray-800">Describe Your Pitch</h2>
 
-      {/* Section 1: Start New Analysis */}
-      <div>
-
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 space-y-6">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium">Project Description</h3>
-                </div>
-
-                {/* Show dimension prompt only when there's a next dimension */}
-                {nextDimension && (
-                  <div className="mt-4 mb-2 bg-gray-50 p-3 rounded-md">
-                    <h4 className="font-medium text-gray-700 mb-1 text-sm">Tell me more about:</h4>
-                    <p className="text-sm font-semibold text-blue-600">{nextDimension.name}</p>
-                    <p className="text-xs text-gray-600 mt-1">{nextDimension.description}</p>
-                    <PitchExample dimension={nextDimension} />
-                  </div>
-                )}
-
-                <textarea
-                  id="pitchDescription"
-                  ref={textareaRef}
-                  rows={10}
-                  value={value}
-                  onChange={(e) => onChange(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3"
-                  placeholder="Describe your project in detail. What problem does it solve? Who is it for? What makes it unique?"
-                />
-
-                {error && (
-                  <p className="text-sm text-red-500">{error}</p>
-                )}
-
-                {feedback && (
-                  <div className="mt-4 mb-6 border-l-4 border-indigo-500 bg-indigo-50 p-3 rounded-r-md">
-                    <p className="text-sm text-gray-800">{feedback}</p>
-                  </div>
-                )}
-
-                {/* Progress indicator */}
-                <div className="mt-4">
-                  <div className="flex justify-between text-sm text-gray-600 mb-1">
-                    <span>Progress</span>
-                    <span>{Math.round(calculateProgress())}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${calculateProgress()}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
+          {/* Current Dimension Prompt Area */}
+          {nextDimension && (
+            <div className="p-3 border border-gray-200 rounded-lg bg-gray-50 text-sm">
+              <h3 className="text-base font-semibold text-gray-700 mb-1">
+                Tell me more about: <span className="text-blue-600">{nextDimension.name}</span>
+              </h3>
+              <p className="text-gray-600">{nextDimension.description}</p>
+              <PitchExample dimension={nextDimension} />
             </div>
+          )}
 
-            {showAssistant && (
-              <div className="md:col-span-1 bg-white rounded-lg border shadow-sm">
-                <PitchAssistant
-                  coveredDimensions={coveredDimensions}
-                  onClose={() => setShowAssistant(false)}
-                />
-              </div>
-            )}
+          <div className="flex-grow flex flex-col"> {/* Wrapper for textarea to grow */}
+            <Textarea
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={nextDimension ? `Provide details for ${nextDimension.name} here...` : "Start describing your pitch..."}
+              className="flex-grow resize-text-base leading-relaxed w-full" // Ensure textarea grows and uses full width
+            />
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
 
-          <div className="mt-6 text-center">
-            <button
-              onClick={handleStartAnalysis}
-              disabled={isStarting || !value.trim()}
-              className={`px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white transition duration-150 ease-in-out
-                ${isStarting || !value.trim() ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}
-              `}
-            >
-              {isStarting ? 'Starting...' : 'Start Analysis'}
-            </button>
+          {feedback && (
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-md text-sm text-blue-700">
+              {feedback}
+            </div>
+          )}
+
+          {/* Progress Bar */}
+          <div className="pt-2"> {/* Adjusted padding */}
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+              <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${calculateProgress()}%` }}></div>
+            </div>
+            <p className="text-xs text-gray-500 text-center">
+              {Object.values(coveredDimensions).filter(Boolean).length} of {PITCH_DIMENSIONS.length} dimensions covered
+            </p>
+          </div>
+
+          {/* Action Buttons - Moved to the bottom of the left panel's content flow */}
+          <div className="mt-4 flex justify-between items-center">
+            <Button onClick={handleBack} variant="outline">
+              Back
+            </Button>
+            {!showAssistant && (
+              <Button onClick={() => setShowAssistant(true)} variant="outline" className="mx-2">
+                Show Assistant
+              </Button>
+            )}
+            {/* TO-DO change the value.length to 6 */}
+            <Button onClick={handleNext} disabled={isLoadingCheck || value.length < 0}>
+              {isLoadingCheck ? 'Analyzing...' : 'Next'}
+            </Button>
           </div>
         </div>
-      </div>
-{/* Navigation buttons */}
-<div className="flex justify-between">
-        <Button variant="outline" onClick={handleBack}>
-          Back
-        </Button>
-        <Button onClick={handleNext}>
-          Next
-        </Button>
-      </div>
 
-
+        {/* Right Panel: Pitch Assistant */}
+        {showAssistant && (
+          <div className="w-full md:w-1/3 flex flex-col"> {/* flex flex-col to allow PitchAssistant to take h-full */}
+            <PitchAssistant
+              coveredDimensions={coveredDimensions}
+              onClose={() => setShowAssistant(false)}
+              // PitchAssistant internal structure already handles its content scrolling and h-full
+            />
+          </div>
+        )}
       </div>
-
+      {/* Buttons were moved into the left panel */}
+    </div>
   );
 }

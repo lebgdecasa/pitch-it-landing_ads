@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
+import { useRouter } from 'next/router'; // Import useRouter
 
 interface BasicInfoStepProps {
   data: {
@@ -39,6 +40,7 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
     projectName: '',
     industry: ''
   });
+  const router = useRouter(); // Initialize useRouter
 
   const validate = (): boolean => {
     const newErrors = {
@@ -132,8 +134,17 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
         )}
       </div>
 
-      <div className="flex justify-end">
-        <Button onClick={handleNext}>
+      <div className="flex justify-between"> {/* Changed from justify-end to justify-between */}
+        <Button
+          variant="outline"
+          onClick={() => router.push('/dashboard')} // Add onClick handler to navigate
+        >
+          Back to Dashboard
+        </Button>
+        <Button
+          onClick={handleNext}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
           Next
         </Button>
       </div>

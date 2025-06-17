@@ -7,6 +7,7 @@ import { Send, AtSign, Users, Bot, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import ProjectLayout from '@/components/layout/ProjectLayout_2';
 import { useChatMessages } from '@/supa_database/hooks/useChatMessages'; // Add this import
+import { PersonaModal } from '@/components/client-components/persona/PersonaModal'; // Import PersonaModal
 
 
 interface Persona {
@@ -58,12 +59,12 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
 
   const [personas, setPersonas] = useState<Persona[]>(initialPersonas);
   const [page, setPage] = useState(1); // Add this line to define the page state
-  const { 
-    messages: dbMessages, 
-    loading: messagesLoading, 
-    hasMore, 
+  const {
+    messages: dbMessages,
+    loading: messagesLoading,
+    hasMore,
     loadMore,
-    sendMessage 
+    sendMessage
   } = useChatMessages(projectId as string);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
@@ -73,6 +74,16 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messagesTopRef = useRef<HTMLDivElement>(null);
+
+  // State for Persona Details Modal
+  const [isPersonaModalOpen, setIsPersonaModalOpen] = useState(false);
+  const [selectedPersonaForModal, setSelectedPersonaForModal] = useState<Persona | null>(null);
+
+  // Function to open persona details modal
+  const handlePersonaClick = (persona: Persona) => {
+    setSelectedPersonaForModal(persona);
+    setIsPersonaModalOpen(true);
+  };
 
   if (authLoading || !profile) {
     return <div>Loading user information...</div>;
@@ -115,10 +126,10 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
       // Get the mentioned name
       const mentionedName = match[1].toLowerCase();
       // Find personas whose name starts with the mentioned text
-      const matchingPersonas = personas.filter(p => 
+      const matchingPersonas = personas.filter(p =>
         p.name.toLowerCase().split(' ')[0] === mentionedName
       );
-      
+
       if (matchingPersonas.length > 0) {
         // Add the full name of matching personas
         mentions.push(matchingPersonas[0].name.toLowerCase());
@@ -132,8 +143,8 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
 
   // Update the getPersonaByName function to match first names
   const getPersonaByName = (name: string): Persona | undefined => {
-    return personas.find(p => 
-      p.name.toLowerCase().split(' ')[0] === name.toLowerCase() || 
+    return personas.find(p =>
+      p.name.toLowerCase().split(' ')[0] === name.toLowerCase() ||
       p.name.toLowerCase() === name.toLowerCase()
     );
   };
@@ -172,7 +183,7 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
       const demographicsText = persona.demographics && Object.keys(persona.demographics).length > 0
         ? `\nBackground: ${Object.entries(persona.demographics).map(([key, value]) => `${key}: ${value}`).join(', ')}`
         : '';
-      
+
       // Project context - add project details to give personas more context
       const projectContext = `
 Project Information:
@@ -336,28 +347,28 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
     const parts = [];
     let lastIndex = 0;
     let match;
-    
+
     while ((match = mentionRegex.exec(content)) !== null) {
       // Add text before the mention
       if (match.index > lastIndex) {
         parts.push(content.substring(lastIndex, match.index));
       }
-      
+
       // Add the mention with blue styling
       parts.push(
         <span key={match.index} className="text-blue-300 font-medium">
           {match[0]}
         </span>
       );
-      
+
       lastIndex = match.index + match[0].length;
     }
-    
+
     // Add remaining text after the last mention
     if (lastIndex < content.length) {
       parts.push(content.substring(lastIndex));
     }
-    
+
     return parts;
   };
 
@@ -380,7 +391,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
   // Add an intersection observer to detect when the user scrolls to the top
   useEffect(() => {
     if (!messagesTopRef.current || !hasMore) return;
-    
+
     const observer = new IntersectionObserver(
       (entries) => {
         // When top is visible and we have more messages, show the load more button
@@ -391,14 +402,14 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
       },
       { threshold: 0.1 }
     );
-    
+
     observer.observe(messagesTopRef.current);
-    
+
     return () => {
       observer.disconnect();
     };
   }, [messagesTopRef, hasMore]);
-  
+
   // Handle loading more messages
   const handleLoadMore = () => {
     if (hasMore) {
@@ -428,7 +439,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {personas.map((persona) => (
             <div key={persona.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                 onClick={() => insertMention(persona.name)}>
+                 onClick={() => handlePersonaClick(persona)}>
               <div className={`w-10 h-10 rounded-full ${persona.avatar_color} flex items-center justify-center text-white font-medium text-sm`}>
                 {persona.name.charAt(0).toUpperCase()}
               </div>
@@ -463,7 +474,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {/* Reference to the top of messages for intersection observer */}
           <div ref={messagesTopRef} />
-          
+
           {/* Load More Button */}
           {hasMore && (
             <div className="flex justify-center my-2">
@@ -483,7 +494,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
               </button>
             </div>
           )}
-          
+
           {messagesLoading && page === 1 ? (
             <div className="flex justify-center items-center h-full">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -623,6 +634,30 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
           </div>
         )}
       </div>
+
+      {/* Persona Details Modal using imported component */}
+      {isPersonaModalOpen && selectedPersonaForModal && (
+        <PersonaModal
+          isOpen={isPersonaModalOpen}
+          onClose={() => setIsPersonaModalOpen(false)}
+          persona={{
+            id: selectedPersonaForModal.id,
+            name: selectedPersonaForModal.name,
+            role: 'user', // Provide a default valid role for ChatPersona.role tag
+            // avatarUrl can be omitted; PersonaModal handles placeholder if not present
+          }}
+          jobTitle={selectedPersonaForModal.role} // Use the actual role string for jobTitle
+          needsDetails={selectedPersonaForModal.description}
+          background={selectedPersonaForModal.demographics
+            ? Object.entries(selectedPersonaForModal.demographics)
+                .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}: ${String(value)}`)
+                .join('; ')
+            : undefined}
+          goals={selectedPersonaForModal.goals}
+          challenges={selectedPersonaForModal.pain_points} // Map pain_points to challenges
+          // preferredCommunication will use the default from PersonaModal
+        />
+      )}
     </div>
     </ProjectLayout>
   );

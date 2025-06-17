@@ -31,13 +31,13 @@ const stages = [
 ];
 
 const stageDescriptions: { [key: string]: string } = {
-  Idea: "⚠️ You have a concept, but no product or business plan yet.",
-  Prototype: "⚠️ You have a basic working model of your product.",
-  MVP: "⚠️ You have a Minimum Viable Product with core features and some user traction.",
-  'Pre-seed': "⚠️ You're starting to build your team and refine your business model, seeking initial funding.",
-  Seed: "⚠️ You have a product, a team, and early market validation, seeking funding for growth.",
-  'Series A': "⚠️ You have a proven business model and significant traction, seeking funding to scale.",
-  'Later-stage': "⚠️ You are an established company looking for further expansion and market leadership."
+  Idea: "📌 You have a concept, but no product or business plan yet.",
+  Prototype: "📌 You have a basic working model of your product.",
+  MVP: "📌 You have a Minimum Viable Product with core features and some user traction.",
+  'Pre-seed': "📌 You're starting to build your team and refine your business model, seeking initial funding.",
+  Seed: "📌 You have a product, a team, and early market validation, seeking funding for growth.",
+  'Series A': "📌 You have a proven business model and significant traction, seeking funding to scale.",
+  'Later-stage': "📌 You are an established company looking for further expansion and market leadership."
 };
 
 export const StageUploadStep: React.FC<StageUploadStepProps> = ({
@@ -63,7 +63,7 @@ export const StageUploadStep: React.FC<StageUploadStepProps> = ({
     }
   };
 
-  const showUploadZone = !['Idea', 'Prototype'].includes(data.stage);
+  const showUploadZone = !['Idea', 'Prototype', 'MVP'].includes(data.stage);
 
   return (
     <div className="space-y-6">
@@ -98,7 +98,7 @@ export const StageUploadStep: React.FC<StageUploadStepProps> = ({
         {showUploadZone && (
           <div className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors">
             <div className="space-y-4">
-              <Upload className="mx-auto h-12 w-12 text-gray-400" />
+              {/* <Upload className="mx-auto h-12 w-12 text-gray-400" /> */}
               <div>
                 <p className="text-base font-medium">Upload project files</p>
                 <p className="text-sm text-gray-500">
@@ -114,7 +114,10 @@ export const StageUploadStep: React.FC<StageUploadStepProps> = ({
         <Button variant="outline" onClick={onBack}>
           Back
         </Button>
-        <Button onClick={handleNext}>
+        <Button
+          onClick={handleNext}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
           Create Project
         </Button>
       </div>
