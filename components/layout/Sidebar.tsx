@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { mainNavItems, backNavItem } from './navigation';
 import { useAuthContext } from '@/supa_database/components/AuthProvider';
-import { Lock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Lock, ChevronLeft, ChevronRight, LifeBuoy } from 'lucide-react';
 
 interface IconProps {
   className?: string;
@@ -209,6 +209,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
             <backNavItem.icon className={`h-5 w-5 ${collapsed ? '' : 'mr-3'} text-gray-500`} />
             {!collapsed && backNavItem.label}
           </Link>
+        </div>
+
+        {/* Feedback Section */}
+        <div className={`${collapsed ? 'px-2' : 'px-4'} py-2 border-t border-gray-200`}>
+          <a
+            href="mailto:feedback@nextraction.ai?subject=Feedback%20for%20NexTraction"
+            className={`flex items-center ${collapsed ? 'justify-center' : ''} px-2 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors`}
+            title="Provide Feedback"
+          >
+            <LifeBuoy className={`h-5 w-5 ${collapsed ? '' : 'mr-3'} text-gray-500`} />
+            {!collapsed && "Feedback"}
+          </a>
         </div>
       </aside>
 

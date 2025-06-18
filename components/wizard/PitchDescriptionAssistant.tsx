@@ -463,7 +463,7 @@ export default function PitchDescriptionAssistant({
                 Show Assistant
               </Button>
             )}
-            {/* TO-DO change the value.length to 6 */}
+            {/* TO-DO change the value length to 6 */}
             <Button onClick={handleNext} disabled={isLoadingCheck || value.length < 0}>
               {isLoadingCheck ? 'Analyzing...' : 'Next'}
             </Button>
