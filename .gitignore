@@ -40,3 +40,17 @@ next-env.d.ts
 *.*.swp
 *.*.swo
 .vercel
+
+/back/actions/__pycache__/
+/back/actions/*.pyc
+/back/actions/*.pyo
+/back/actions/*.pyd
+/back/actions/.mypy_cache/
+/back/actions/.pytest_cache/
+/back/actions/.coverage
+/back/actions/.mypy_cache/
+/back/actions/.pytest_cache/
+/back/main/__pycache__/
+/back/main/*.pyc
+/back/main/*.pyo
+/back/main/*.pyd

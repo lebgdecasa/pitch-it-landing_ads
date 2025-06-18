@@ -14,9 +14,12 @@ import json
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from the .env file
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
+# Load environment variables from the .env file in the project root
+# Get the project root directory (2 levels up from this file)
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env_path = os.path.join(project_root, '.env')
+load_dotenv(env_path)
+api_key = os.getenv("NEXT_PUBLIC_GEMINI_API_KEY")
 BASE_DATA_DIR = "task_data"
 
 # Define the main analysis function
@@ -45,28 +48,44 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         # Handle potential error during directory creation
         error_message = f"CRITICAL ERROR: Could not create task directory {task_dir}. Error: {e}"
         print(error_message)
-        safe_callback(log_callback(task_id, error_message))
-        safe_callback(update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
+        safe_callback(lambda: log_callback(task_id, error_message))
+        safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
         return # Stop execution if directory cannot be created
 
-    def safe_callback(coro):
-        """Helper to run callback coroutine thread-safely and log result/error."""
-        future = asyncio.run_coroutine_threadsafe(coro, loop)
+    def safe_callback(callback_func):
+        """Helper to run callback function safely."""
         try:
-            # Optional: Wait briefly for the result or log if needed,
-            # but be careful not to block the worker thread for too long.
-            # result = future.result(timeout=5) # Example: wait up to 5 seconds
-            # print(f"Callback {coro.__name__} completed with result: {result}") # For debugging
-             pass # Fire-and-forget for now is often sufficient for logs/status
+            # Check if the callback_func is already a coroutine object
+            if asyncio.iscoroutine(callback_func):
+                # If it's a coroutine object, run it directly
+                future = asyncio.run_coroutine_threadsafe(callback_func, loop)
+                pass
+            # Check if the callback is a coroutine function
+            elif asyncio.iscoroutinefunction(callback_func):
+                # If it's an async function, call it first to get the coroutine, then run it
+                coro = callback_func()
+                future = asyncio.run_coroutine_threadsafe(coro, loop)
+                pass
+            else:
+                # Check if callback_func is a lambda that returns a coroutine
+                try:
+                    result = callback_func()
+                    if asyncio.iscoroutine(result):
+                        # If calling the function returns a coroutine, run it
+                        future = asyncio.run_coroutine_threadsafe(result, loop)
+                        pass
+                    # If it's a regular function that doesn't return a coroutine, we're done
+                except Exception as e:
+                    print(f"Error calling callback for task {task_id}: {e}")
         except Exception as e:
-            # Log errors happening *during* the callback execution in the main thread
-            print(f"Error running callback {coro.__name__} for task {task_id} in event loop: {e}")
+            # Log errors happening during callback execution
+            print(f"Error running callback for task {task_id}: {e}")
 
     try:
         ## Create a deepresearch (Key Trends) ##
         time.sleep(5)
-        safe_callback(log_callback(task_id, "Starting Key Trends Analysis..."))
-        safe_callback(update_status_callback(task_id, status="running_key_trends"))
+        safe_callback(lambda: log_callback(task_id, "Starting Key Trends Analysis..."))
+        safe_callback(lambda: update_status_callback(task_id, status="running_key_trends"))
 
         key_trend_prompt_generator = f'''
         I need you to adapt the following generic prompt to the project description. Do not output anything else but the modified prompt.
@@ -94,53 +113,51 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         report = back.actions.call_deep_research_api.run_research_api(key_trend_prompt, 6, 4)
         print(f"TASK {task_id}: ----> AFTER call_deep_research_api.run_research_api <----")
 
-        safe_callback(log_callback(task_id, "Key Trends Analysis complete."))
+        safe_callback(lambda: log_callback(task_id, "Key Trends Analysis complete."))
 
         ## Generate Keywords ##
-        safe_callback(log_callback(task_id, "Starting keywords generation..."))
-        safe_callback(update_status_callback(task_id, status="generating_keywords"))
-        query = back.actions.scrape_and_filter_posts.generate_broad_keywords(product_description,
-                                                                            api_key)
-        safe_callback(log_callback(task_id, f"Generated keywords: {query}"))
+        safe_callback(lambda: log_callback(task_id, "Starting keywords generation..."))
+        safe_callback(lambda: update_status_callback(task_id, status="generating_keywords"))
+        query = back.actions.scrape_and_filter_posts.generate_broad_keywords(product_description)
+        safe_callback(lambda: log_callback(task_id, f"Generated keywords: {query}"))
 
         ## Find subreddits based on keywords ##
-        safe_callback(log_callback(task_id, "Finding subreddits..."))
-        safe_callback(update_status_callback(task_id, status="finding_subreddits"))
+        safe_callback(lambda: log_callback(task_id, "Finding subreddits..."))
+        safe_callback(lambda: update_status_callback(task_id, status="finding_subreddits"))
         found_subreddits = back.actions.scrape_and_filter_posts.search_subreddits(query)
-        safe_callback(log_callback(task_id, f"Found {len(found_subreddits)} potential subreddits."))
+        safe_callback(lambda: log_callback(task_id, f"Found {len(found_subreddits)} potential subreddits."))
 
         ## Filtering Found subreddits ##
-        safe_callback(log_callback(task_id, "Filtering subreddits..."))
-        safe_callback(update_status_callback(task_id, status="filtering_subreddits"))
+        safe_callback(lambda: log_callback(task_id, "Filtering subreddits..."))
+        safe_callback(lambda: update_status_callback(task_id, status="filtering_subreddits"))
         filtered = back.actions.scrape_and_filter_posts.filter_subreddits_with_llm(found_subreddits,
                                                                                    product_description,
-                                                                                   query,
-                                                                                   api_key)
-        safe_callback(log_callback(task_id, f"Filtered subreddits: {[sub.display_name for sub in filtered]}"))
+                                                                                   query)
+        safe_callback(lambda: log_callback(task_id, f"Filtered subreddits: {[sub.display_name for sub in filtered]}"))
 
         ## Scrape the subreddits ##
-        safe_callback(log_callback(task_id, "Starting Scraping..."))
-        safe_callback(update_status_callback(task_id, status="scraping_subreddits"))
+        safe_callback(lambda: log_callback(task_id, "Starting Scraping..."))
+        safe_callback(lambda: update_status_callback(task_id, status="scraping_subreddits"))
         for i, sub in enumerate(filtered):
-            safe_callback(log_callback(task_id, f"Scraping subreddit {sub.display_name} ({i+1}/{len(filtered)})..."))
+            safe_callback(lambda i=i, sub=sub: log_callback(task_id, f"Scraping subreddit {sub.display_name} ({i+1}/{len(filtered)})..."))
             back.actions.scrape_and_filter_posts.scrape_subreddit(sub,
-                                                                  num_posts=10,
+                                                                  num_posts=4,
                                                                   task_dir=task_dir)
             time.sleep(random.choice([2, 4]))
-        safe_callback(log_callback(task_id, "Scraping done!"))
+        safe_callback(lambda: log_callback(task_id, "Scraping done!"))
 
         ## Filter the scraped posts ##
-        safe_callback(update_status_callback(task_id, status="filtering_posts"))
+        safe_callback(lambda: update_status_callback(task_id, status="filtering_posts"))
         back.actions.scrape_and_filter_posts.filter_scraped_posts_with_llm(product_description=product_description,
                                                                         api_key = api_key,
                                                                            task_dir=task_dir)
-        safe_callback(log_callback(task_id, "All Irrelevant posts have been removed."))
+        safe_callback(lambda: log_callback(task_id, "All Irrelevant posts have been removed."))
 
         task_filtered_posts_file = os.path.join(task_dir, "filtered_posts.json")
 
         ## Analysis ##
-        safe_callback(log_callback(task_id, "🔍 Starting Prompt 1 (Jobs to Be Done)..."))
-        safe_callback(update_status_callback(task_id, status="analyzing_jtbd"))
+        safe_callback(lambda: log_callback(task_id, "🔍 Starting Prompt 1 (Jobs to Be Done)..."))
+        safe_callback(lambda: update_status_callback(task_id, status="analyzing_jtbd"))
         jtbd_prompt = f"""You are a netnographic researcher studying user discussions. Here is data containing subreddit posts, comments, and scores, as well as a report. Your task is to discover the primary ‘Jobs to Be Done’ that emerge from this data.
             Here are specific trigger questions to consider:
             1. What is one thing your customer couldn't live without accomplishing? What stepping stones help your customer achieve this key job?
@@ -166,13 +183,13 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             # No need to save to file here unless you specifically want it
             # with open("analysis_JTBD.md", "w", encoding="utf-8") as md_file:
             #     md_file.write(jtbd)
-            safe_callback(log_callback(task_id, "JTBD Analysis complete."))
+            safe_callback(lambda: log_callback(task_id, "JTBD Analysis complete."))
         else:
-            safe_callback(log_callback(task_id, "LLM returned no response for JTBD."))
+            safe_callback(lambda: log_callback(task_id, "LLM returned no response for JTBD."))
             # Potentially raise an error or handle this case
 
-        safe_callback(log_callback(task_id, "🔍 Starting Prompt 2 (Pains)..."))
-        safe_callback(update_status_callback(task_id, status="analyzing_pains"))
+        safe_callback(lambda: log_callback(task_id, "🔍 Starting Prompt 2 (Pains)..."))
+        safe_callback(lambda: update_status_callback(task_id, status="analyzing_pains"))
         pains_prompt = """You are a netnographic researcher studying user discussions from Reddit. Here is data containing subreddit posts, comments, and scores, as well as a report. Your task is to discover the primary ‘Pains’ that emerge from this data.
             Here are specific trigger questions to consider:
             1. How do these users define ‘too costly’? Is it time, money, effort, or something else?
@@ -195,13 +212,13 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
                 user_prompt=pains_prompt,
             )
         if pains is not None:
-            safe_callback(log_callback(task_id, "Pains Analysis complete."))
+            safe_callback(lambda: log_callback(task_id, "Pains Analysis complete."))
         else:
-            safe_callback(log_callback(task_id, "LLM returned no response for Pains."))
+            safe_callback(lambda: log_callback(task_id, "LLM returned no response for Pains."))
             # Handle error
 
-        safe_callback(log_callback(task_id, "🔍 Starting Prompt 3 (Gains)..."))
-        safe_callback(update_status_callback(task_id, status="analyzing_gains"))
+        safe_callback(lambda: log_callback(task_id, "🔍 Starting Prompt 3 (Gains)..."))
+        safe_callback(lambda: update_status_callback(task_id, status="analyzing_gains"))
         gains_prompt = """You are a netnographic researcher studying user discussions from Reddit. Below is data containing subreddit posts, comments, and scores, as well as a report. Your task is to discover the primary ‘Gains’ that emerge from this data.
             Here are specific trigger questions to consider:
             1. What savings (time, money, effort) would make users especially happy?
@@ -223,13 +240,13 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
                 user_prompt=gains_prompt,
             )
         if gains is not None:
-            safe_callback(log_callback(task_id, "Gains Analysis complete."))
+            safe_callback(lambda: log_callback(task_id, "Gains Analysis complete."))
         else:
-            safe_callback(log_callback(task_id, "LLM returned no response for Gains."))
+            safe_callback(lambda: log_callback(task_id, "LLM returned no response for Gains."))
             # Handle error
 
-        safe_callback(log_callback(task_id, "🔍 Starting Prompt 4 (Recap)..."))
-        safe_callback(update_status_callback(task_id, status="analyzing_recap"))
+        safe_callback(lambda: log_callback(task_id, "🔍 Starting Prompt 4 (Recap)..."))
+        safe_callback(lambda: update_status_callback(task_id, status="analyzing_recap"))
         recap_prompt = f"""You are a netnographic researcher. After identifying the Jobs, Pains, and Gains, please rank them as follows:
             1. List each Job from the data, giving it an Importance score from ‘insignificant’ to ‘important.
             2. List each Pain, giving it a Severity score from ‘moderate’ to ‘extreme.
@@ -242,9 +259,9 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             """
         recap_analysis = back.actions.gemini_api.generate(recap_prompt)
         if recap_analysis is not None:
-            safe_callback(log_callback(task_id, "Recap Analysis complete."))
+            safe_callback(lambda: log_callback(task_id, "Recap Analysis complete."))
         else:
-            safe_callback(log_callback(task_id, "LLM returned no response for Recap."))
+            safe_callback(lambda: log_callback(task_id, "LLM returned no response for Recap."))
             # Handle error
 
         safe_callback(log_callback(task_id, "🔍 Starting Prompt 5 (Final Analysis)..."))
@@ -281,9 +298,9 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
 
         if final_analysis_result is not None:
             # Save the result to the task state
-            safe_callback(update_status_callback(task_id, data_key="final_analysis", data_value=final_analysis_result))
-            safe_callback(update_status_callback(task_id, status="final_analysis_ready")) # Signal Phase 3 readiness
-            safe_callback(log_callback(task_id, "Final Analysis complete. Ready for Phase 3."))
+            safe_callback(lambda: update_status_callback(task_id, data_key="final_analysis", data_value=final_analysis_result))
+            safe_callback(lambda: update_status_callback(task_id, status="final_analysis_ready")) # Signal Phase 3 readiness
+            safe_callback(lambda: log_callback(task_id, "Final Analysis complete. Ready for Phase 3."))
             # Optional: Save to file if needed for debugging/persistence
             # with open(f"analysis_final_{task_id}.md", "w", encoding="utf-8") as md_file:
             #     md_file.write(final_analysis_result)
@@ -291,17 +308,17 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             try:
                 with open(final_analysis_file_path, "w", encoding="utf-8") as md_file:
                     md_file.write(final_analysis_result)
-                safe_callback(log_callback(task_id, f"Final analysis saved to {final_analysis_file_path}"))
+                safe_callback(lambda: log_callback(task_id, f"Final analysis saved to {final_analysis_file_path}"))
             except Exception as e:
-                safe_callback(log_callback(task_id, f"Warning: Could not save final analysis to file: {e}"))
+                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save final analysis to file: {e}"))
 
         else:
-            safe_callback(log_callback(task_id, "LLM returned no response for Final Analysis."))
-            safe_callback(update_status_callback(task_id, status="failed", data_key="error", data_value="Final Analysis generation failed"))
+            safe_callback(lambda: log_callback(task_id, "LLM returned no response for Final Analysis."))
+            safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value="Final Analysis generation failed"))
             return # Stop execution if final analysis failed
 
-        safe_callback(log_callback(task_id, "Generating personas..."))
-        safe_callback(update_status_callback(task_id, status="generating_personas"))
+        safe_callback(lambda: log_callback(task_id, "Generating personas..."))
+        safe_callback(lambda: update_status_callback(task_id, status="generating_personas"))
         number = 4
         # Assuming generate_personas_json creates 'personas.json' which we need to read
         generated_persona_data = back.actions.generate_personas_json.generate_personas(
@@ -309,11 +326,11 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         )
 
         if not generated_persona_data:
-             safe_callback(log_callback(task_id, "Persona generation failed or returned empty list."))
-             safe_callback(update_status_callback(task_id, status="failed", data_key="error", data_value="Persona generation failed"))
+             safe_callback(lambda: log_callback(task_id, "Persona generation failed or returned empty list."))
+             safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value="Persona generation failed"))
              return # Stop if persona generation fails
 
-        safe_callback(log_callback(task_id, f"Generated {len(generated_persona_data)} personas structure in memory."))
+        safe_callback(lambda: log_callback(task_id, f"Generated {len(generated_persona_data)} personas structure in memory."))
 
         # Call the modified function to create prompts and extract card details
         detailed_persona_info = back.actions.create_personas.generate_persona_prompts_and_details(
@@ -325,32 +342,61 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         try:
             with open(persona_details_file_path, "w", encoding="utf-8") as json_file:
                 json.dump(detailed_persona_info, json_file, indent=4)
-            safe_callback(log_callback(task_id, f"Persona details saved to {persona_details_file_path}"))
+            safe_callback(lambda: log_callback(task_id, f"Persona details saved to {persona_details_file_path}"))
         except Exception as e:
-            safe_callback(log_callback(task_id, f"Warning: Could not save persona details to file: {e}"))
+            safe_callback(lambda: log_callback(task_id, f"Warning: Could not save persona details to file: {e}"))
 
         if not detailed_persona_info:
-             safe_callback(log_callback(task_id, "Persona prompt/details generation failed."))
-             safe_callback(update_status_callback(task_id, status="failed", data_key="error", data_value="Persona prompt/details generation failed"))
+             safe_callback(lambda: log_callback(task_id, "Persona prompt/details generation failed."))
+             safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value="Persona prompt/details generation failed"))
              return # Stop if this step fails
 
         # Store the detailed info (name, prompt, card_details)
         # This structure is now richer than just names/prompts
-        safe_callback(update_status_callback(task_id, data_key="persona_details", data_value=detailed_persona_info))
-        safe_callback(update_status_callback(task_id, status="personas_ready")) # Signal Phase 4 readiness
+        safe_callback(lambda: update_status_callback(task_id, data_key="persona_details", data_value=detailed_persona_info))
+        safe_callback(lambda: update_status_callback(task_id, status="personas_ready")) # Signal Phase 4 readiness
         persona_names_for_log = [p.get('name', 'Unknown') for p in detailed_persona_info]
-        safe_callback(log_callback(task_id, f"Personas ready with details: {persona_names_for_log}"))
+        safe_callback(lambda: log_callback(task_id, f"Personas ready with details: {persona_names_for_log}"))
 
         # --- End of Background Task ---
-        safe_callback(log_callback(task_id, "Analysis pipeline completed. Waiting for persona selection."))
-        safe_callback(update_status_callback(task_id, status="completed")) # Or 'personas_ready' if 'completed' implies chat done
+        safe_callback(lambda: log_callback(task_id, "Analysis pipeline completed. Waiting for persona selection."))
+        safe_callback(lambda: update_status_callback(task_id, status="completed")) # Or 'personas_ready' if 'completed' implies chat done
 
 
     except Exception as e:
         # ... (Existing error handling remains the same) ...
         error_message = f"CRITICAL ERROR in run_analysis_job task {task_id}: {str(e)}\n{traceback.format_exc()}"
         print(error_message)
-        safe_callback(log_callback(task_id, f"A critical error occurred in the background task: {str(e)}"))
-        safe_callback(update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
+        safe_callback(lambda: log_callback(task_id, f"A critical error occurred in the background task: {str(e)}"))
+        safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
 # Note: The chat_with_persona part is removed from this worker function.
 # It needs to be triggered by the '/select_persona' endpoint after the user makes a choice.
+
+if __name__ == "__main__":
+    # Example usage for testing purposes
+    async def main():
+        # Create async versions of the callback functions
+        async def async_update_status_callback(task_id, status=None, data_key=None, data_value=None):
+            print(f"Status update for {task_id}: {status}, {data_key}={data_value}")
+
+        async def async_log_callback(task_id, message):
+            print(f"Log for {task_id}: {message}")
+
+        # Get the current event loop
+        loop = asyncio.get_running_loop()
+
+        # Run the analysis job in a thread executor since it's a synchronous function
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            await loop.run_in_executor(
+                executor,
+                run_analysis_job,
+                "A platform that leverages generative AI to help creators produce high-quality, emotionally resonant podcasts with unique voices, reducing production time and cost.",
+                "test_task_123",
+                async_update_status_callback,
+                async_log_callback,
+                loop
+            )
+
+    # Run the async main function
+    asyncio.run(main())

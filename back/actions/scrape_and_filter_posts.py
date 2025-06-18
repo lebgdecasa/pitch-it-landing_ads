@@ -6,18 +6,22 @@ import json
 import random
 import time
 from dotenv import load_dotenv
+from back.actions.gemini_api import generate
 import os
 
-# Load environment variables from the .env file
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
+# Load environment variables from the .env file in the project root
+# Get the project root directory (3 levels up from this file)
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env_path = os.path.join(project_root, '.env')
+load_dotenv(env_path)
+api_key = os.getenv("NEXT_PUBLIC_GEMINI_API_KEY")
 reddit = praw.Reddit(
     client_id="ivjgOjD6WCmaxNuK61E81w",
     client_secret="syrgn5BfXNHZdFn3m2f6w58i_m7Tbw",
     user_agent="Pitch !t",
 )
 
-def analyze_with_llm(prompt, api_key):
+def analyze_with_llm(prompt):
     """
     Uses LM Studio to analyze a prompt.
     """
@@ -55,10 +59,11 @@ def analyze_with_llm(prompt, api_key):
         print(f"An unexpected error occurred: {e}")
         return None
 
-def generate_broad_keywords(product_description, api_key):
+def generate_broad_keywords(product_description):
     """
     Generates broad keywords for initial subreddit search.
     """
+    print(f"[LOG] Product Description passed to generate_broad_keywords: {product_description}")
     prompt = f"""
     Given the following product description, respond with only a comma-separated list of broad keywords that might match relevant Reddit subreddits.
     We intend to use these subreddits to explore user interest, gather feedback, and potentially market this product. Do not include any other text, introductions, or explanations, only a list of comma-separated keywords.
@@ -66,13 +71,15 @@ def generate_broad_keywords(product_description, api_key):
     {product_description}
     Broad Keywords:
     """
-    keywords_str = analyze_with_llm(prompt, api_key)
+    keywords_str = generate(prompt)
     if keywords_str:
         # remove extra whitespace and possible leading/trailing punctuation
         raw_keywords = [k.strip().strip('.') for k in keywords_str.split(',')]
         # remove duplicates and empty items
         unique_keywords = list({kw for kw in raw_keywords if kw})
+        print(f"[LOG] Keywords generated: {unique_keywords}")
         return unique_keywords
+    print("[LOG] No keywords generated.")
     return []
 
 def search_subreddits(keywords, subreddits_per_keyword=10):
@@ -97,7 +104,7 @@ def search_subreddits(keywords, subreddits_per_keyword=10):
         time.sleep(random.choice([4, 5]))
     return subreddits
 
-def filter_subreddits_with_llm(subreddits, product_description, specific_keywords, api_key):
+def filter_subreddits_with_llm(subreddits, product_description, specific_keywords):
     """
     Filters subreddits using the LLM and specific keywords.
     """
@@ -106,8 +113,9 @@ def filter_subreddits_with_llm(subreddits, product_description, specific_keyword
     for subreddit in subreddits:
         try:
             prompt = f"""You are tasked with determining the relevance of a Reddit subreddit to a specific product.
-            Consider the product description and specific keywords.
-            Respond with 'Relevant' if the subreddit is likely to contain discussions related to the product, or 'Irrelevant' if it is not.
+Consider the product description and specific keywords.
+Respond ONLY with 'Relevant' or 'Irrelevant' (no explanation, no extra text, just one word).
+If you understand, reply with only one word: Relevant or Irrelevant.
 
 Product Description:
 {product_description}
@@ -122,9 +130,14 @@ Subscribers: {subreddit.subscribers}
 Is NSFW?: {subreddit.over18}
 
 Relevance (Relevant/Irrelevant):"""
-            relevance = analyze_with_llm(prompt, api_key)
-            if relevance and relevance.strip().lower() == "relevant":
-                relevant_subreddits.append(subreddit)
+            print(f"[LOG] LLM Query (filter_subreddits_with_llm):\n{prompt}\n---")
+            relevance = generate(prompt)
+            print(f"[LOG] LLM Raw Response: {relevance}\n===")
+            # Parse response: only accept if first word is 'relevant' (case-insensitive, ignore extra text)
+            if relevance:
+                first_word = relevance.strip().split()[0].lower()
+                if first_word == "relevant":
+                    relevant_subreddits.append(subreddit)
         except Exception as e:
             print(f"Error in filter_subreddits_with_llm for {subreddit.display_name}: {e}")
             continue
@@ -241,7 +254,7 @@ def filter_scraped_posts_with_llm(
 
                                 Relevance (Relevant/Irrelevant):"""
 
-                relevance = analyze_with_llm(prompt, api_key)
+                relevance = generate(prompt)
                 if relevance and relevance.strip().lower() == "relevant":
                     # If relevant, store in final combined list
                     filtered_posts.append({

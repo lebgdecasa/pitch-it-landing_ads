@@ -11,8 +11,11 @@ import re
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from the .env file
-load_dotenv()
+# Load environment variables from the .env file in the project root
+# Get the project root directory (3 levels up from this file)
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env_path = os.path.join(project_root, '.env')
+load_dotenv(env_path)
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
@@ -85,9 +88,9 @@ Required output format: A JSON array of objects like the examples above.
 """
 
     # --- 2) Initialize the Gemini client ---
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("NEXT_PUBLIC_GEMINI_API_KEY")
     if not api_key:
-        log.error("GEMINI_API_KEY environment variable not set.")
+        log.error("NEXT_PUBLIC_GEMINI_API_KEY environment variable not set.")
         return results # Return defaults on API key error
 
     try:

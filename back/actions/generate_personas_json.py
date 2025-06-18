@@ -2,6 +2,13 @@ import os
 import json
 from google import genai
 from google.genai import types
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file in the project root
+# Get the project root directory (3 levels up from this file)
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env_path = os.path.join(project_root, '.env')
+load_dotenv(env_path)
 
 def generate_personas(product_description: str, final_analysis: str, number: int= 4, output_file: str = "personas_output.json"): # Here, instead of saving to a JSON maybe we can save it in a variable.
     # Load analysis_final.md from the local directory
@@ -48,7 +55,7 @@ Additional context:
 
     # Configure Gemini client
     client = genai.Client(
-        api_key=os.environ.get("GEMINI_API_KEY"),
+        api_key=os.environ.get("NEXT_PUBLIC_GEMINI_API_KEY"),
     )
 
     model = "gemini-2.0-flash"

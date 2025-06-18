@@ -3,12 +3,19 @@ import os
 import traceback
 from google import genai
 from google.genai import types
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file in the project root
+# Get the project root directory (3 levels up from this file)
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env_path = os.path.join(project_root, '.env')
+load_dotenv(env_path)
 
 def setup_gemini_client():
     """Initialise et retourne le client Gemini."""
-    api_key = os.environ.get("GEMINI_API_KEY")
+    api_key = os.environ.get("NEXT_PUBLIC_GEMINI_API_KEY")
     if not api_key:
-        print("ERREUR CRITIQUE: La variable d'environnement GEMINI_API_KEY n'est pas définie.")
+        print("ERREUR CRITIQUE: La variable d'environnement NEXT_PUBLIC_GEMINI_API_KEY n'est pas définie.")
         # Dans un contexte API, il serait mieux de lever une exception ou de gérer ça autrement
         return None
     try:

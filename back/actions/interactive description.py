@@ -4,6 +4,13 @@ import json
 from typing import List, Dict
 from google import genai
 from google.genai import types
+from dotenv import load_dotenv
+
+# Load environment variables from the .env file in the project root
+# Get the project root directory (3 levels up from this file)
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+env_path = os.path.join(project_root, '.env')
+load_dotenv(env_path)
 
 class QuestionField:
     def __init__(self, question_id: str, question_text: str):
@@ -53,7 +60,7 @@ IMPORTANT:
 
     # --- 2) Initialize the Gemini client ---
     client = genai.Client(
-        api_key=os.environ.get("GEMINI_API_KEY"),
+        api_key=os.environ.get("NEXT_PUBLIC_GEMINI_API_KEY"),
     )
 
     # --- 3) Prepare the request content ---
