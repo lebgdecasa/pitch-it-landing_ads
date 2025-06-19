@@ -32,8 +32,8 @@ const ProjectCard = ({
 }) => {
   // Get stage color and label, aligned with project/[id]/index.tsx
   const stageInfo: Record<ProjectStage, { color: string; label: string; }> = {
-    [ProjectStage.IDEA]: { color: 'bg-blue-100 text-blue-800', label: 'IDEA' },
-    [ProjectStage.PROTOTYPE]: { color: 'bg-purple-100 text-purple-800', label: 'PROTOTYPE' },
+    [ProjectStage.IDEA]: { color: 'bg-blue-100 text-blue-800', label: 'Idea' },
+    [ProjectStage.PROTOTYPE]: { color: 'bg-purple-100 text-purple-800', label: 'Prototype' },
     [ProjectStage.MVP]: { color: 'bg-green-100 text-green-800', label: 'MVP' },
     [ProjectStage.PRE_SEED]: { color: 'bg-red-100 text-gray-800', label: 'PRE SEED' }, // Kept from original dashboard as not in project page
     [ProjectStage.SEED]: { color: 'bg-yellow-100 text-yellow-800', label: 'SEED' }, // Kept from original dashboard as not in project page

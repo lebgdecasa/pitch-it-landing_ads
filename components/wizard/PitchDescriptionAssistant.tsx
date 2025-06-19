@@ -185,8 +185,12 @@ export default function PitchDescriptionAssistant({
   onChange,
   onNext,
   onBack,
-  error
-}: PitchDescriptionAssistantProps) {
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onNext: () => void;
+  onBack: () => void;
+}) {
   const [coveredDimensions, setCoveredDimensions] = useState<Record<string, boolean>>({});
   const [feedback, setFeedback] = useState<string | null>(null);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -395,7 +399,10 @@ export default function PitchDescriptionAssistant({
   };
 
   const handleNext = () => {
-    // Potentially validate before calling onNext
+    if (value.trim().length < 50) {
+      alert("Please provide a more detailed description (at least 50 characters).");
+      return;
+    }
     if (onNext) {
       onNext();
     }
@@ -434,7 +441,7 @@ export default function PitchDescriptionAssistant({
               placeholder={nextDimension ? `Provide details for ${nextDimension.name} here...` : "Start describing your pitch..."}
               className="flex-grow resize-text-base leading-relaxed w-full" // Ensure textarea grows and uses full width
             />
-            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+            {/* {error && <p className="text-red-500 text-sm mt-1">{error}</p>} */}
           </div>
 
           {feedback && (

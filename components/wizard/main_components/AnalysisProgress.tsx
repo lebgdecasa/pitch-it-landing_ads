@@ -3,6 +3,8 @@ import { Circle, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Card } from '../ui/card';
 import axios from 'axios';
+// TO-DO: Replace with your actual API endpoint and adjust the logic as needed
+// import { startAnalysis } from '@/lib/api';
 const TOTAL_DURATION = 8000; // 8 seconds total
 const MOCK_PROJECT_ID = '123';
 

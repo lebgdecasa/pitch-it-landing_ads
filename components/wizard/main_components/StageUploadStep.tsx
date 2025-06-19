@@ -18,6 +18,8 @@ interface StageUploadStepProps {
   onDataChange: (data: { stage: string; hasFiles?: boolean }) => void;
   onNext: () => void;
   onBack: () => void;
+  isSubmitting: boolean;
+  submitError: string | null;
 }
 
 const stages = [
@@ -31,9 +33,9 @@ const stages = [
 ];
 
 const stageDescriptions: { [key: string]: string } = {
-  Idea: "📌 You have a concept, but no product or business plan yet.",
-  Prototype: "📌 You have a basic working model of your product.",
-  MVP: "📌 You have a Minimum Viable Product with core features and some user traction.",
+  'idea': "📌 You have a concept, but no product or business plan yet.",
+  'prototype': "📌 You have a basic working model of your product.",
+  'mvp': "📌 You have a Minimum Viable Product with core features and some user traction.",
   'Pre-seed': "📌 You're starting to build your team and refine your business model, seeking initial funding.",
   Seed: "📌 You have a product, a team, and early market validation, seeking funding for growth.",
   'Series A': "📌 You have a proven business model and significant traction, seeking funding to scale.",
@@ -44,7 +46,9 @@ export const StageUploadStep: React.FC<StageUploadStepProps> = ({
   data,
   onDataChange,
   onNext,
-  onBack
+  onBack,
+  isSubmitting,
+  submitError,
 }) => {
   const [error, setError] = React.useState('');
 
@@ -63,7 +67,7 @@ export const StageUploadStep: React.FC<StageUploadStepProps> = ({
     }
   };
 
-  const showUploadZone = !['Idea', 'Prototype', 'MVP'].includes(data.stage);
+  const showUploadZone = !['idea', 'prototype', 'mvp'].includes(data.stage);
 
   return (
     <div className="space-y-6">
@@ -81,7 +85,7 @@ export const StageUploadStep: React.FC<StageUploadStepProps> = ({
               <SelectGroup>
                 {stages.map((stage) => (
                   <SelectItem key={stage} value={stage}>
-                    {stage}
+                    {stage.charAt(0).toUpperCase() + stage.slice(1)}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -111,15 +115,19 @@ export const StageUploadStep: React.FC<StageUploadStepProps> = ({
       </div>
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
+        <Button variant="outline" onClick={onBack} disabled={isSubmitting}>
           Back
         </Button>
-        <Button
-          onClick={handleNext}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          Create Project
-        </Button>
+        <div className="flex items-center space-x-4">
+          {submitError && <p className="text-sm text-red-500">{submitError}</p>}
+          <Button
+            onClick={handleNext}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Creating...' : 'Create Project'}
+          </Button>
+        </div>
       </div>
     </div>
   );
