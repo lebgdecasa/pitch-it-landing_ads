@@ -82,8 +82,8 @@ def generate_broad_keywords(product_description):
     print("[LOG] No keywords generated.")
     return []
 
-#TO-DO: Add a function to generate specific keywords from the product description, and modify the subreddits_per_keyword parameter
-def search_subreddits(keywords, subreddits_per_keyword=10):
+## TO-DO change number to 10
+def search_subreddits(keywords, subreddits_per_keyword=3):
     """
     Searches for subreddits across multiple keywords,
     returning up to subreddits_per_keyword for each keyword.
@@ -169,16 +169,13 @@ Relevant subreddits:"""
 
     return relevant_subreddits
 
-def scrape_subreddit(subreddit, num_posts=0, task_dir="."):
+# MODIFIED: Removed the 'task_dir' parameter and all file-writing logic.
+def scrape_subreddit(subreddit, num_posts=50):
     """
     Scrapes the top 'num_posts' submissions from the subreddit,
     capturing each post's title, selftext, score, and top 5 comments.
-    Saves the results to a JSON file named after the subreddit.
+    Returns the scraped data as a dictionary instead of writing to a file.
     """
-
-    scraped_folder = os.path.join(task_dir, "scraped_subreddits")
-    folder = "scraped_subreddits"
-    os.makedirs(scraped_folder, exist_ok=True)
     top_posts = []
 
     try:
@@ -212,92 +209,61 @@ def scrape_subreddit(subreddit, num_posts=0, task_dir="."):
         data["posts"].append({
             "title": post.title,
             "selftext": post.selftext,
-            "score": post.score,     # <-- include the post score
+            "score": post.score,
             "top_comments": getattr(post, 'top_comments', [])
         })
 
-    # Save to a JSON file named after the subreddit
-    filename = os.path.join(scraped_folder, f"{subreddit.display_name}.json")
-    try:
-        with open(filename, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-        print(f"Data saved to {filename}")
-    except Exception as e:
-        print(f"Error writing JSON file for {subreddit.display_name}: {e}")
+    # MODIFIED: Return the structured data directly.
+    return data
 
-    return top_posts
-
+# MODIFIED: Changed function to accept 'scraped_data' variable instead of reading from disk.
 def filter_scraped_posts_with_llm(
-    task_dir=".",
-    product_description="",
-    posts_per_batch=40
+    scraped_data: list,
+    product_description: str = "",
+    posts_per_batch: int = 40
 ):
     """
-    Reads each JSON file in `folder`, filters posts with the LLM using chunked batch processing,
-    and saves all relevant posts (with subreddit, title, selftext, comments)
-    into one combined JSON file called `filtered_posts.json` (by default).
+    Filters a list of scraped posts with the LLM using chunked batch processing,
+    and returns a list of relevant posts.
 
     Args:
-        posts_per_batch: Number of posts to process in each batch (default: 40)
+        scraped_data: A list of dictionaries, where each contains scraped posts from a subreddit.
+        product_description: The product description to filter against.
+        posts_per_batch: Number of posts to process in each batch.
     """
-    # Ensure we have a place to store final results
     filtered_posts = []
-    input_folder = os.path.join(task_dir, "scraped_subreddits")
-    output_filename = os.path.join(task_dir, "filtered_posts.json")
 
-    if not os.path.isdir(input_folder):
-        print(f"Warning: Scraped subreddits folder not found at {input_folder}. Skipping filtering.")
-        # Save an empty file to prevent errors downstream
-        try:
-            with open(output_filename, "w", encoding="utf-8") as out:
-                json.dump({"filtered_posts": []}, out, indent=2)
-            print(f"Created empty filtered posts file at {output_filename}")
-        except Exception as e:
-            print(f"Error writing empty filtered posts file: {e}")
+    # MODIFIED: Removed check for input folder, as we now receive data directly.
+    if not scraped_data:
+        print("Warning: No scraped data provided to filter_scraped_posts_with_llm.")
         return []
 
     # Collect all posts from all subreddits for batch processing
     all_posts = []
     post_counter = 0
 
-    for file in os.listdir(input_folder):
-        if file.endswith(".json"):
-            path = os.path.join(input_folder, file)
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    subreddit_data = json.load(f)
+    # MODIFIED: Iterate over the 'scraped_data' variable instead of reading files.
+    for subreddit_data in scraped_data:
+        subreddit_name = subreddit_data.get("subreddit_name", "Unknown")
+        posts = subreddit_data.get("posts", [])
 
-                subreddit_name = subreddit_data.get("subreddit_name", "Unknown")
-                posts = subreddit_data.get("posts", [])
-
-                for post in posts:
-                    post_counter += 1
-                    all_posts.append({
-                        "id": post_counter,
-                        "subreddit": subreddit_name,
-                        "title": post.get("title", ""),
-                        "selftext": post.get("selftext", ""),
-                        "top_comments": post.get("top_comments", []),
-                        "score": post.get("score", 0)
-                    })
-
-            except json.JSONDecodeError:
-                print(f"Warning: Skipping invalid JSON file {path}")
-            except Exception as e:
-                print(f"Error processing file {path}: {e}")
+        for post in posts:
+            post_counter += 1
+            all_posts.append({
+                "id": post_counter,
+                "subreddit": subreddit_name,
+                "title": post.get("title", ""),
+                "selftext": post.get("selftext", ""),
+                "top_comments": post.get("top_comments", []),
+                "score": post.get("score", 0)
+            })
 
     if not all_posts:
         print("No posts found to filter.")
-        try:
-            with open(output_filename, "w", encoding="utf-8") as out:
-                json.dump({"filtered_posts": []}, out, indent=2)
-        except Exception as e:
-            print(f"Error writing empty filtered posts file: {e}")
         return []
 
     # Split posts into chunks for batch processing
     def chunk_posts(posts, chunk_size):
-        """Split posts into chunks of specified size."""
         for i in range(0, len(posts), chunk_size):
             yield posts[i:i + chunk_size]
 
@@ -306,40 +272,32 @@ def filter_scraped_posts_with_llm(
 
     print(f"[LOG] Processing {len(all_posts)} posts in {total_chunks} batches of {posts_per_batch} posts each")
 
-    # Process each chunk
+    # Process each chunk (this logic remains the same)
     for chunk_idx, chunk in enumerate(post_chunks, 1):
         print(f"[LOG] Processing batch {chunk_idx}/{total_chunks} ({len(chunk)} posts)")
 
-        # Create batch prompt for this chunk (preserve full content)
         posts_text = []
         for post in chunk:
             post_summary = f"{post['id']}. [{post['subreddit']}] Title: {post['title']}"
-
             if post['selftext'].strip():
                 post_summary += f"\nText: {post['selftext']}"
-
             if post['top_comments']:
                 comments_str = "\n".join([f"- {comment}" for comment in post['top_comments'][:5]])
                 post_summary += f"\nTop Comments:\n{comments_str}"
             else:
                 post_summary += f"\nComments: No comments"
-
             post_summary += f"\nScore: {post['score']}\n"
             posts_text.append(post_summary)
 
         batch_posts_text = "\n---\n".join(posts_text)
 
         prompt = f"""You are tasked with filtering Reddit posts based on their relevance to a specific product description.
-
 Product Description:
 {product_description}
-
 --------
 Below is a batch of Reddit posts from various subreddits. Each post has an ID number at the beginning and is separated by "---".
-
 Posts to evaluate:
 {batch_posts_text}
-
 --------
 Instructions:
 - Analyze each post's title, content, comments, and context thoroughly
@@ -348,22 +306,14 @@ Instructions:
 - Respond ONLY with a comma-separated list of the ID numbers of relevant posts
 - Do not include explanations, post titles, or any other text
 - If no posts in this batch are relevant, respond with "NONE"
-
 Example response format: 1, 5, 12, 23
-
 Relevant post IDs:"""
 
         try:
-            print(f"[LOG] LLM Batch Query for chunk {chunk_idx} (IDs {chunk[0]['id']}-{chunk[-1]['id']})")
             relevance_response = generate(prompt)
-            print(f"[LOG] LLM Raw Response for chunk {chunk_idx}: {relevance_response}")
-
             if relevance_response and relevance_response.strip().upper() != "NONE":
-                # Parse the comma-separated response of IDs
                 try:
                     relevant_ids = [int(id_str.strip()) for id_str in relevance_response.split(',') if id_str.strip().isdigit()]
-
-                    # Match the returned IDs with the original posts in this chunk
                     chunk_filtered = 0
                     for post in chunk:
                         if post["id"] in relevant_ids:
@@ -374,74 +324,19 @@ Relevant post IDs:"""
                                 "top_comments": post["top_comments"]
                             })
                             chunk_filtered += 1
-
                     print(f"[LOG] Found {chunk_filtered} relevant posts in chunk {chunk_idx}")
-
                 except ValueError as e:
                     print(f"Error parsing LLM response IDs for chunk {chunk_idx}: {e}")
-                    print(f"Raw response was: {relevance_response}")
             else:
                 print(f"[LOG] No relevant posts found in chunk {chunk_idx}")
-
         except Exception as e:
             print(f"Error processing chunk {chunk_idx}: {e}")
-            # Continue with next chunk rather than crashing
             continue
 
-        # Small delay between API calls to be respectful
         if chunk_idx < total_chunks:
             time.sleep(1)
 
     print(f"[LOG] Total relevant posts found: {len(filtered_posts)} out of {len(all_posts)} total posts")
 
-    # Write all filtered posts to the task-specific output JSON
-    try:
-        with open(output_filename, "w", encoding="utf-8") as out:
-            json.dump({"filtered_posts": filtered_posts}, out, indent=2)
-        print(f"All filtered posts saved to {output_filename}")
-    except Exception as e:
-        print(f"Error writing filtered posts file: {e}")
+    # MODIFIED: Removed the final file writing part and just return the list.
     return filtered_posts
-
-# def send_report_and_filtered_posts_with_gemini(
-#     report_file="report.md",
-#     filtered_posts_file="filtered_posts.json",
-#     user_prompt="Give me an analysis of these findings.",
-# ):
-#     """
-#     Reads a markdown report and a JSON file of filtered Reddit posts, then
-#     sends them (plus a user prompt) to the LLM for analysis.
-#     """
-#     # 1. Read the markdown report
-#     try:
-#         with open(report_file, "r", encoding="utf-8") as rf:
-#             report_content = rf.read()
-#     except Exception as e:
-#         print(f"Error reading {report_file}: {e}")
-#         return None
-
-#     # 2. Read the filtered JSON file
-#     try:
-#         with open(filtered_posts_file, "r", encoding="utf-8") as ff:
-#             filtered_data = json.load(ff)
-#     except Exception as e:
-#         print(f"Error reading {filtered_posts_file}: {e}")
-#         return None
-
-#     # 3. Build a single prompt
-#     prompt = f"""You are given:
-#     1. A markdown report.
-#     2. A list of filtered Reddit posts.
-#     3. A user prompt requesting additional analysis.
-#     \n\n--- START OF MARKDOWN REPORT ---
-#     \n{report_content}\n
-#     --- END OF MARKDOWN REPORT ---
-#     \n\n--- START OF FILTERED POSTS ---
-#     \n{json.dumps(filtered_data, indent=2)}\n
-#     --- END OF FILTERED POSTS ---
-#     \n\nUSER PROMPT:\n{user_prompt}\n\n
-#     Please provide your best possible response."""
-
-#     # 4. Call the LLM
-#     response = generate(prompt)
-#     return response

@@ -228,6 +228,7 @@ async def log_to_websocket(task_id: str, log_message: str):
 # --- Pydantic Models ---
 class StartAnalysisRequest(BaseModel):
     product_description: str
+    project_id: Optional[str] = None  # Optional project ID for tracking, can be used to link to existing projects
 
 class StartAnalysisResponse(BaseModel):
     task_id: str
@@ -337,6 +338,7 @@ async def get_project_details(task_id: str = Path(...)):
         chat_history=chat_history
     )
 
+## works don't touch
 @app.post("/check_description_completeness", response_model=CheckDescriptionResponse)
 async def check_description_completeness(request: CheckDescriptionRequest):
     """
@@ -358,8 +360,10 @@ async def check_description_completeness(request: CheckDescriptionRequest):
         print(f"ERROR during description check: {e}\n{traceback.format_exc()}") # Or use proper logging
         raise HTTPException(status_code=500, detail=f"Failed to analyze description: {e}")
 
+## added project_id, still need to see if it works once connected to frontend
+## we still need to modify this endpoint to handle project_id correctly and save to DB instead of just returning task_id
 @app.post("/start_analysis", response_model=StartAnalysisResponse, status_code=202)
-async def start_analysis(request: StartAnalysisRequest, background_tasks: BackgroundTasks):
+async def start_analysis(request: StartAnalysisRequest, background_tasks: BackgroundTasks, project_id: Optional[str] = None):
     """
     Phase 1: Receives product description, starts the analysis job in the background,
     and returns a unique task ID.

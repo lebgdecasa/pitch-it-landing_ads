@@ -46,7 +46,6 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
     Additional data files saved:
     - persona_details_{task_id}.json: Generated persona data and prompts
     - timing_report_{task_id}.json: Detailed timing breakdown
-    - filtered_posts.json: LLM-filtered Reddit posts
 
     Args:
         product_description: The product description input by the user.
@@ -70,21 +69,21 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         print(f"[TIMING] {step_name}: {elapsed_str}")
 
     final_analysis_result = None
-    persona_details = None # To store both names and prompts
 
-    task_dir = os.path.join(BASE_DATA_DIR, task_id)
-    try:
-        os.makedirs(task_dir, exist_ok=True)
-        # Create subdirectory for scraped posts as well
-        os.makedirs(os.path.join(task_dir, "scraped_subreddits"), exist_ok=True)
-        print(f"Ensured task directory exists: {task_dir}")
-    except OSError as e:
-        # Handle potential error during directory creation
-        error_message = f"CRITICAL ERROR: Could not create task directory {task_dir}. Error: {e}"
-        print(error_message)
-        safe_callback(lambda: log_callback(task_id, error_message))
-        safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
-        return # Stop execution if directory cannot be created
+
+    # task_dir = os.path.join(BASE_DATA_DIR, task_id)
+    # try:
+    #     os.makedirs(task_dir, exist_ok=True)
+    #     # Create subdirectory for scraped posts as well
+    #     os.makedirs(os.path.join(task_dir, "scraped_subreddits"), exist_ok=True)
+    #     print(f"Ensured task directory exists: {task_dir}")
+    # except OSError as e:
+    #     # Handle potential error during directory creation
+    #     error_message = f"CRITICAL ERROR: Could not create task directory {task_dir}. Error: {e}"
+    #     print(error_message)
+    #     safe_callback(lambda: log_callback(task_id, error_message))
+    #     safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
+    #     return # Stop execution if directory cannot be created
 
     def safe_callback(callback_func):
         """Helper to run callback function safely."""
@@ -145,19 +144,20 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         print(f"TASK {task_id}: ----> AFTER gemini_api.generate <----")
 
         print(f"TASK {task_id}: ----> BEFORE call_deep_research_api.run_research_api <----")
-        report = back.actions.call_deep_research_api.run_research_api(key_trend_prompt, 6, 4)
+        #TO-DO CHANGE VALUES TO 6 and 4
+        report = back.actions.call_deep_research_api.run_research_api(key_trend_prompt, 1, 1)
 
         print(f"TASK {task_id}: ----> AFTER call_deep_research_api.run_research_api <----")
 
-        # Save key trends report to markdown file
-        if report:
-            key_trends_file_path = os.path.join(task_dir, f"key_trends_report_{task_id}.md")
-            try:
-                with open(key_trends_file_path, "w", encoding="utf-8") as md_file:
-                    md_file.write(report)
-                safe_callback(lambda: log_callback(task_id, f"Key trends report saved to {key_trends_file_path}"))
-            except Exception as e:
-                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save key trends report to file: {e}"))
+        #Save key trends report to markdown file
+                # if report:
+                #     key_trends_file_path = os.path.join(task_dir, f"key_trends_report_{task_id}.md")
+                #     try:
+                #         with open(key_trends_file_path, "w", encoding="utf-8") as md_file:
+                #             md_file.write(report)
+                #         safe_callback(lambda: log_callback(task_id, f"Key trends report saved to {key_trends_file_path}"))
+                #     except Exception as e:
+                #         safe_callback(lambda: log_callback(task_id, f"Warning: Could not save key trends report to file: {e}"))
 
         safe_callback(lambda: log_callback(task_id, "Key Trends Analysis complete."))
         log_step_time("Key Trends Analysis", step_start)
@@ -185,21 +185,20 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         ## Scrape the subreddits ##
         safe_callback(lambda: log_callback(task_id, "Starting Scraping..."))
         safe_callback(lambda: update_status_callback(task_id, status="scraping_subreddits"))
+        scraped_data_list = []
         for i, sub in enumerate(filtered):
             safe_callback(lambda i=i, sub=sub: log_callback(task_id, f"Scraping subreddit {sub.display_name} ({i+1}/{len(filtered)})..."))
-            back.actions.scrape_and_filter_posts.scrape_subreddit(sub,
-                                                                  num_posts=50,
-                                                                  task_dir=task_dir)
+            scraped_data = back.actions.scrape_and_filter_posts.scrape_subreddit(sub,
+                                                                  num_posts=4)
+            scraped_data_list.append(scraped_data)
             time.sleep(random.choice([2, 4]))
         safe_callback(lambda: log_callback(task_id, "Scraping done!"))
 
         ## Filter the scraped posts ##
         safe_callback(lambda: update_status_callback(task_id, status="filtering_posts"))
-        back.actions.scrape_and_filter_posts.filter_scraped_posts_with_llm(product_description=product_description,
-                                                            task_dir=task_dir)
+        filtered_posts = back.actions.scrape_and_filter_posts.filter_scraped_posts_with_llm(scraped_data=scraped_data_list,
+                                                                                product_description=product_description)
         safe_callback(lambda: log_callback(task_id, "All Irrelevant posts have been removed."))
-
-        task_filtered_posts_file = os.path.join(task_dir, "filtered_posts.json")
 
         ## Analysis ##
         safe_callback(lambda: log_callback(task_id, "🔍 Starting Prompt 1 (Jobs to Be Done)..."))
@@ -220,20 +219,21 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
                 - Describe whether each job is mainly functional, social, or emotional.
                 - Back up your findings with specific references or patterns in the data.
                 """
+        # MODIFIED: Pass the filtered_posts variable directly
         jtbd = back.actions.generate_analysis.send_report_and_filtered_posts_with_gemini(
-                report_content= report,
-                filtered_posts_file=task_filtered_posts_file,
+                report_content=report,
+                filtered_posts_data=filtered_posts,
                 user_prompt=jtbd_prompt,
             )
         if jtbd is not None:
             # Save JTBD analysis to markdown file
-            jtbd_file_path = os.path.join(task_dir, f"jtbd_analysis_{task_id}.md")
-            try:
-                with open(jtbd_file_path, "w", encoding="utf-8") as md_file:
-                    md_file.write(jtbd)
-                safe_callback(lambda: log_callback(task_id, f"JTBD analysis saved to {jtbd_file_path}"))
-            except Exception as e:
-                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save JTBD analysis to file: {e}"))
+            # jtbd_file_path = os.path.join(task_dir, f"jtbd_analysis_{task_id}.md")
+            # try:
+            #     with open(jtbd_file_path, "w", encoding="utf-8") as md_file:
+            #         md_file.write(jtbd)
+            #     safe_callback(lambda: log_callback(task_id, f"JTBD analysis saved to {jtbd_file_path}"))
+            # except Exception as e:
+            #     safe_callback(lambda: log_callback(task_id, f"Warning: Could not save JTBD analysis to file: {e}"))
 
             safe_callback(lambda: log_callback(task_id, "JTBD Analysis complete."))
         else:
@@ -260,20 +260,21 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             - Note underlying causes and potential severity of each pain.
             - Reference any direct quotes or repeated themes from the subreddit data.
             """
+        # MODIFIED: Pass the filtered_posts variable directly
         pains = back.actions.generate_analysis.send_report_and_filtered_posts_with_gemini(
                 report_content=report,
-                filtered_posts_file=task_filtered_posts_file,
+                filtered_posts_data=filtered_posts,
                 user_prompt=pains_prompt,
             )
         if pains is not None:
             # Save Pains analysis to markdown file
-            pains_file_path = os.path.join(task_dir, f"pains_analysis_{task_id}.md")
-            try:
-                with open(pains_file_path, "w", encoding="utf-8") as md_file:
-                    md_file.write(pains)
-                safe_callback(lambda: log_callback(task_id, f"Pains analysis saved to {pains_file_path}"))
-            except Exception as e:
-                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save Pains analysis to file: {e}"))
+            # pains_file_path = os.path.join(task_dir, f"pains_analysis_{task_id}.md")
+            # try:
+            #     with open(pains_file_path, "w", encoding="utf-8") as md_file:
+            #         md_file.write(pains)
+            #     safe_callback(lambda: log_callback(task_id, f"Pains analysis saved to {pains_file_path}"))
+            # except Exception as e:
+            #     safe_callback(lambda: log_callback(task_id, f"Warning: Could not save Pains analysis to file: {e}"))
 
             safe_callback(lambda: log_callback(task_id, "Pains Analysis complete."))
         else:
@@ -299,20 +300,21 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             - Identify explicit or implicit desires, benefits, or positive outcomes that users seek.
             - Consider how relevant each gain is to users’ real-world context.
             - Reference direct statements or recurring points from the subreddit data."""
+        # MODIFIED: Pass the filtered_posts variable directly
         gains = back.actions.generate_analysis.send_report_and_filtered_posts_with_gemini(
-                report_content= report,
-                filtered_posts_file=task_filtered_posts_file,
+                report_content=report,
+                filtered_posts_data=filtered_posts,
                 user_prompt=gains_prompt,
             )
         if gains is not None:
             # Save Gains analysis to markdown file
-            gains_file_path = os.path.join(task_dir, f"gains_analysis_{task_id}.md")
-            try:
-                with open(gains_file_path, "w", encoding="utf-8") as md_file:
-                    md_file.write(gains)
-                safe_callback(lambda: log_callback(task_id, f"Gains analysis saved to {gains_file_path}"))
-            except Exception as e:
-                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save Gains analysis to file: {e}"))
+            # gains_file_path = os.path.join(task_dir, f"gains_analysis_{task_id}.md")
+            # try:
+            #     with open(gains_file_path, "w", encoding="utf-8") as md_file:
+            #         md_file.write(gains)
+            #     safe_callback(lambda: log_callback(task_id, f"Gains analysis saved to {gains_file_path}"))
+            # except Exception as e:
+            #     safe_callback(lambda: log_callback(task_id, f"Warning: Could not save Gains analysis to file: {e}"))
 
             safe_callback(lambda: log_callback(task_id, "Gains Analysis complete."))
         else:
@@ -336,13 +338,13 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         recap_analysis = back.actions.gemini_api.generate(recap_prompt)
         if recap_analysis is not None:
             # Save Recap analysis to markdown file
-            recap_file_path = os.path.join(task_dir, f"recap_analysis_{task_id}.md")
-            try:
-                with open(recap_file_path, "w", encoding="utf-8") as md_file:
-                    md_file.write(recap_analysis)
-                safe_callback(lambda: log_callback(task_id, f"Recap analysis saved to {recap_file_path}"))
-            except Exception as e:
-                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save Recap analysis to file: {e}"))
+            # recap_file_path = os.path.join(task_dir, f"recap_analysis_{task_id}.md")
+            # try:
+            #     with open(recap_file_path, "w", encoding="utf-8") as md_file:
+            #         md_file.write(recap_analysis)
+            #     safe_callback(lambda: log_callback(task_id, f"Recap analysis saved to {recap_file_path}"))
+            # except Exception as e:
+            #     safe_callback(lambda: log_callback(task_id, f"Warning: Could not save Recap analysis to file: {e}"))
 
             safe_callback(lambda: log_callback(task_id, "Recap Analysis complete."))
         else:
@@ -391,13 +393,13 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             # Optional: Save to file if needed for debugging/persistence
             # with open(f"analysis_final_{task_id}.md", "w", encoding="utf-8") as md_file:
             #     md_file.write(final_analysis_result)
-            final_analysis_file_path = os.path.join(task_dir, f"analysis_final_{task_id}.md")
-            try:
-                with open(final_analysis_file_path, "w", encoding="utf-8") as md_file:
-                    md_file.write(final_analysis_result)
-                safe_callback(lambda: log_callback(task_id, f"Final analysis saved to {final_analysis_file_path}"))
-            except Exception as e:
-                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save final analysis to file: {e}"))
+            # final_analysis_file_path = os.path.join(task_dir, f"analysis_final_{task_id}.md")
+            # try:
+            #     with open(final_analysis_file_path, "w", encoding="utf-8") as md_file:
+            #         md_file.write(final_analysis_result)
+            #     safe_callback(lambda: log_callback(task_id, f"Final analysis saved to {final_analysis_file_path}"))
+            # except Exception as e:
+            #     safe_callback(lambda: log_callback(task_id, f"Warning: Could not save final analysis to file: {e}"))
 
         else:
             safe_callback(lambda: log_callback(task_id, "LLM returned no response for Final Analysis."))
@@ -427,13 +429,13 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             product_description=product_description
         )
 
-        persona_details_file_path = os.path.join(task_dir, f"persona_details_{task_id}.json")
-        try:
-            with open(persona_details_file_path, "w", encoding="utf-8") as json_file:
-                json.dump(detailed_persona_info, json_file, indent=4)
-            safe_callback(lambda: log_callback(task_id, f"Persona details saved to {persona_details_file_path}"))
-        except Exception as e:
-            safe_callback(lambda: log_callback(task_id, f"Warning: Could not save persona details to file: {e}"))
+        #persona_details_file_path = os.path.join(task_dir, f"persona_details_{task_id}.json")
+        # try:
+        #     with open(persona_details_file_path, "w", encoding="utf-8") as json_file:
+        #         json.dump(detailed_persona_info, json_file, indent=4)
+        #     safe_callback(lambda: log_callback(task_id, f"Persona details saved to {persona_details_file_path}"))
+        # except Exception as e:
+        #     safe_callback(lambda: log_callback(task_id, f"Warning: Could not save persona details to file: {e}"))
 
         if not detailed_persona_info:
              safe_callback(lambda: log_callback(task_id, "Persona prompt/details generation failed."))
@@ -475,18 +477,17 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             "timestamp": datetime.now().isoformat()
         }
 
-        timing_file_path = os.path.join(task_dir, f"timing_report_{task_id}.json")
-        try:
-            with open(timing_file_path, "w", encoding="utf-8") as timing_file:
-                json.dump(timing_data, timing_file, indent=4)
-            safe_callback(lambda: log_callback(task_id, f"⏱️ Timing report saved to {timing_file_path}"))
-        except Exception as e:
-            safe_callback(lambda: log_callback(task_id, f"Warning: Could not save timing report: {e}"))
+        # timing_file_path = os.path.join(task_dir, f"timing_report_{task_id}.json")
+        # try:
+        #     with open(timing_file_path, "w", encoding="utf-8") as timing_file:
+        #         json.dump(timing_data, timing_file, indent=4)
+        #     safe_callback(lambda: log_callback(task_id, f"⏱️ Timing report saved to {timing_file_path}"))
+        # except Exception as e:
+        #     safe_callback(lambda: log_callback(task_id, f"Warning: Could not save timing report: {e}"))
 
         # Log summary of all saved analysis files
         saved_files_summary = []
         saved_files_summary.append(f"📁 **SAVED FILES SUMMARY for Task {task_id}:**")
-        saved_files_summary.append(f"📂 All files saved to: {task_dir}")
         saved_files_summary.append("")
         saved_files_summary.append("📄 **Analysis outputs:**")
         saved_files_summary.append(f"  • Key Trends Report: key_trends_report_{task_id}.md")
@@ -499,7 +500,6 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         saved_files_summary.append("📊 **Data files:**")
         saved_files_summary.append(f"  • Persona Details: persona_details_{task_id}.json")
         saved_files_summary.append(f"  • Timing Report: timing_report_{task_id}.json")
-        saved_files_summary.append(f"  • Filtered Posts: filtered_posts.json")
 
         saved_files_summary_str = "\n".join(saved_files_summary)
         safe_callback(lambda: log_callback(task_id, saved_files_summary_str))
