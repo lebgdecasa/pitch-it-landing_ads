@@ -15,10 +15,10 @@ interface AnalysisStep {
 export const AnalysisProgress: React.FC = () => {
   const router = useRouter();
   const [steps, setSteps] = useState<AnalysisStep[]>([
-    { id: 1, label: 'Reading documents', completed: false },
-    { id: 2, label: 'Running key-trend analysis', completed: false },
-    { id: 3, label: 'Running netnographic analysis', completed: false },
-    { id: 4, label: 'Generating personas', completed: false },
+    //{ id: 1, label: 'Reading documents', completed: false },
+    { id: 1, label: 'Running key-trend analysis', completed: false },
+    { id: 2, label: 'Running netnographic analysis', completed: false },
+    { id: 3, label: 'Generating personas', completed: false },
   ]);
   const [taskId, setTaskId] = useState<string | null>(null);
 

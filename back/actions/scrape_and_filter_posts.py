@@ -82,6 +82,7 @@ def generate_broad_keywords(product_description):
     print("[LOG] No keywords generated.")
     return []
 
+#TO-DO: Add a function to generate specific keywords from the product description, and modify the subreddits_per_keyword parameter
 def search_subreddits(keywords, subreddits_per_keyword=10):
     """
     Searches for subreddits across multiple keywords,
@@ -106,16 +107,23 @@ def search_subreddits(keywords, subreddits_per_keyword=10):
 
 def filter_subreddits_with_llm(subreddits, product_description, specific_keywords):
     """
-    Filters subreddits using the LLM and specific keywords.
+    Filters subreddits using the LLM and specific keywords in a single batch API call.
     """
+    if not subreddits:
+        return []
+
     relevant_subreddits = []
     specific_keywords_str = ", ".join(specific_keywords)
-    for subreddit in subreddits:
-        try:
-            prompt = f"""You are tasked with determining the relevance of a Reddit subreddit to a specific product.
-Consider the product description and specific keywords.
-Respond ONLY with 'Relevant' or 'Irrelevant' (no explanation, no extra text, just one word).
-If you understand, reply with only one word: Relevant or Irrelevant.
+
+    # Create a formatted list of all subreddits for batch processing
+    subreddit_list = []
+    for i, subreddit in enumerate(subreddits, 1):
+        subreddit_info = f"{i}. {subreddit.display_name} - Description: {subreddit.public_description or 'No description'} - Subscribers: {subreddit.subscribers} - NSFW: {subreddit.over18}"
+        subreddit_list.append(subreddit_info)
+
+    subreddits_text = "\n".join(subreddit_list)
+
+    prompt = f"""You are tasked with filtering Reddit subreddits based on their relevance to a specific product.
 
 Product Description:
 {product_description}
@@ -123,24 +131,42 @@ Product Description:
 Specific Keywords:
 {specific_keywords_str}
 
-Subreddit Information:
-Name: {subreddit.display_name}
-Description: {subreddit.public_description}
-Subscribers: {subreddit.subscribers}
-Is NSFW?: {subreddit.over18}
+Here is the list of subreddits to evaluate:
+{subreddits_text}
 
-Relevance (Relevant/Irrelevant):"""
-            print(f"[LOG] LLM Query (filter_subreddits_with_llm):\n{prompt}\n---")
-            relevance = generate(prompt)
-            print(f"[LOG] LLM Raw Response: {relevance}\n===")
-            # Parse response: only accept if first word is 'relevant' (case-insensitive, ignore extra text)
-            if relevance:
-                first_word = relevance.strip().split()[0].lower()
-                if first_word == "relevant":
+Instructions:
+- Analyze each subreddit's name, description, and context
+- Determine which subreddits are relevant to the product description and keywords
+- Respond ONLY with a comma-separated list of the EXACT subreddit names that are relevant
+- Do not include numbers, explanations, or any other text
+- If no subreddits are relevant, respond with "NONE"
+
+Example response format: subredditname1, subredditname2, subredditname3
+
+Relevant subreddits:"""
+
+    try:
+        print(f"[LOG] LLM Batch Query (filter_subreddits_with_llm):\n{prompt}\n---")
+        relevance_response = generate(prompt)
+        print(f"[LOG] LLM Raw Response: {relevance_response}\n===")
+
+        if relevance_response and relevance_response.strip().upper() != "NONE":
+            # Parse the comma-separated response
+            relevant_names = [name.strip() for name in relevance_response.split(',')]
+            relevant_names = [name for name in relevant_names if name]  # Remove empty strings
+
+            # Match the returned names with the original subreddit objects
+            for subreddit in subreddits:
+                if subreddit.display_name in relevant_names:
                     relevant_subreddits.append(subreddit)
-        except Exception as e:
-            print(f"Error in filter_subreddits_with_llm for {subreddit.display_name}: {e}")
-            continue
+
+            print(f"[LOG] Found {len(relevant_subreddits)} relevant subreddits out of {len(subreddits)} total")
+
+    except Exception as e:
+        print(f"Error in batch filter_subreddits_with_llm: {e}")
+        # Fallback: return empty list instead of crashing
+        return []
+
     return relevant_subreddits
 
 def scrape_subreddit(subreddit, num_posts=0, task_dir="."):
@@ -204,12 +230,15 @@ def scrape_subreddit(subreddit, num_posts=0, task_dir="."):
 def filter_scraped_posts_with_llm(
     task_dir=".",
     product_description="",
-    api_key=""
+    posts_per_batch=40
 ):
     """
-    Reads each JSON file in `folder`, filters posts with the LLM,
+    Reads each JSON file in `folder`, filters posts with the LLM using chunked batch processing,
     and saves all relevant posts (with subreddit, title, selftext, comments)
     into one combined JSON file called `filtered_posts.json` (by default).
+
+    Args:
+        posts_per_batch: Number of posts to process in each batch (default: 40)
     """
     # Ensure we have a place to store final results
     filtered_posts = []
@@ -227,7 +256,10 @@ def filter_scraped_posts_with_llm(
             print(f"Error writing empty filtered posts file: {e}")
         return []
 
-    # Iterate over each JSON file in the folder
+    # Collect all posts from all subreddits for batch processing
+    all_posts = []
+    post_counter = 0
+
     for file in os.listdir(input_folder):
         if file.endswith(".json"):
             path = os.path.join(input_folder, file)
@@ -239,35 +271,128 @@ def filter_scraped_posts_with_llm(
                 posts = subreddit_data.get("posts", [])
 
                 for post in posts:
-                # Build your prompt for each post
-                    prompt = f"""Determine if this Reddit post is relevant to the following product description.
-                                Respond with 'Relevant' or 'Irrelevant'.
-
-                                Product Description:
-                                {product_description}
-
-                                Subreddit: {subreddit_name}
-                                Post Title: {post.get("title", "")}
-                                Post Text: {post.get("selftext", "")}
-                                Top Comments: {post.get("top_comments", [])}
-                                Score: {post.get('score')},
-
-                                Relevance (Relevant/Irrelevant):"""
-
-                relevance = generate(prompt)
-                if relevance and relevance.strip().lower() == "relevant":
-                    # If relevant, store in final combined list
-                    filtered_posts.append({
-                        "subreddit":  subreddit_name,
-                        "title":      post.get("title", ""),
-                        "selftext":   post.get("selftext", ""),
-                        "top_comments": post.get("top_comments", [])
+                    post_counter += 1
+                    all_posts.append({
+                        "id": post_counter,
+                        "subreddit": subreddit_name,
+                        "title": post.get("title", ""),
+                        "selftext": post.get("selftext", ""),
+                        "top_comments": post.get("top_comments", []),
+                        "score": post.get("score", 0)
                     })
+
             except json.JSONDecodeError:
                 print(f"Warning: Skipping invalid JSON file {path}")
             except Exception as e:
-                 print(f"Error processing file {path}: {e}")
+                print(f"Error processing file {path}: {e}")
 
+    if not all_posts:
+        print("No posts found to filter.")
+        try:
+            with open(output_filename, "w", encoding="utf-8") as out:
+                json.dump({"filtered_posts": []}, out, indent=2)
+        except Exception as e:
+            print(f"Error writing empty filtered posts file: {e}")
+        return []
+
+    # Split posts into chunks for batch processing
+    def chunk_posts(posts, chunk_size):
+        """Split posts into chunks of specified size."""
+        for i in range(0, len(posts), chunk_size):
+            yield posts[i:i + chunk_size]
+
+    post_chunks = list(chunk_posts(all_posts, posts_per_batch))
+    total_chunks = len(post_chunks)
+
+    print(f"[LOG] Processing {len(all_posts)} posts in {total_chunks} batches of {posts_per_batch} posts each")
+
+    # Process each chunk
+    for chunk_idx, chunk in enumerate(post_chunks, 1):
+        print(f"[LOG] Processing batch {chunk_idx}/{total_chunks} ({len(chunk)} posts)")
+
+        # Create batch prompt for this chunk (preserve full content)
+        posts_text = []
+        for post in chunk:
+            post_summary = f"{post['id']}. [{post['subreddit']}] Title: {post['title']}"
+
+            if post['selftext'].strip():
+                post_summary += f"\nText: {post['selftext']}"
+
+            if post['top_comments']:
+                comments_str = "\n".join([f"- {comment}" for comment in post['top_comments'][:5]])
+                post_summary += f"\nTop Comments:\n{comments_str}"
+            else:
+                post_summary += f"\nComments: No comments"
+
+            post_summary += f"\nScore: {post['score']}\n"
+            posts_text.append(post_summary)
+
+        batch_posts_text = "\n---\n".join(posts_text)
+
+        prompt = f"""You are tasked with filtering Reddit posts based on their relevance to a specific product description.
+
+Product Description:
+{product_description}
+
+--------
+Below is a batch of Reddit posts from various subreddits. Each post has an ID number at the beginning and is separated by "---".
+
+Posts to evaluate:
+{batch_posts_text}
+
+--------
+Instructions:
+- Analyze each post's title, content, comments, and context thoroughly
+- Determine which posts are relevant to the product description
+- Consider posts relevant if they discuss related problems, solutions, user needs, or market segments
+- Respond ONLY with a comma-separated list of the ID numbers of relevant posts
+- Do not include explanations, post titles, or any other text
+- If no posts in this batch are relevant, respond with "NONE"
+
+Example response format: 1, 5, 12, 23
+
+Relevant post IDs:"""
+
+        try:
+            print(f"[LOG] LLM Batch Query for chunk {chunk_idx} (IDs {chunk[0]['id']}-{chunk[-1]['id']})")
+            relevance_response = generate(prompt)
+            print(f"[LOG] LLM Raw Response for chunk {chunk_idx}: {relevance_response}")
+
+            if relevance_response and relevance_response.strip().upper() != "NONE":
+                # Parse the comma-separated response of IDs
+                try:
+                    relevant_ids = [int(id_str.strip()) for id_str in relevance_response.split(',') if id_str.strip().isdigit()]
+
+                    # Match the returned IDs with the original posts in this chunk
+                    chunk_filtered = 0
+                    for post in chunk:
+                        if post["id"] in relevant_ids:
+                            filtered_posts.append({
+                                "subreddit": post["subreddit"],
+                                "title": post["title"],
+                                "selftext": post["selftext"],
+                                "top_comments": post["top_comments"]
+                            })
+                            chunk_filtered += 1
+
+                    print(f"[LOG] Found {chunk_filtered} relevant posts in chunk {chunk_idx}")
+
+                except ValueError as e:
+                    print(f"Error parsing LLM response IDs for chunk {chunk_idx}: {e}")
+                    print(f"Raw response was: {relevance_response}")
+            else:
+                print(f"[LOG] No relevant posts found in chunk {chunk_idx}")
+
+        except Exception as e:
+            print(f"Error processing chunk {chunk_idx}: {e}")
+            # Continue with next chunk rather than crashing
+            continue
+
+        # Small delay between API calls to be respectful
+        if chunk_idx < total_chunks:
+            time.sleep(1)
+
+    print(f"[LOG] Total relevant posts found: {len(filtered_posts)} out of {len(all_posts)} total posts")
 
     # Write all filtered posts to the task-specific output JSON
     try:

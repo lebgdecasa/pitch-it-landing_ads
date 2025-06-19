@@ -13,6 +13,7 @@ import os
 import json
 from dotenv import load_dotenv
 import os
+from datetime import datetime
 
 # Load environment variables from the .env file in the project root
 # Get the project root directory (2 levels up from this file)
@@ -25,7 +26,27 @@ BASE_DATA_DIR = "task_data"
 # Define the main analysis function
 def run_analysis_job(product_description: str, task_id: str, update_status_callback, log_callback, loop: asyncio.AbstractEventLoop):
     """
-    Runs the full analysis pipeline as a background job.
+    Runs the full analysis pipeline as a background job with comprehensive file saving.
+
+    This function performs a complete netnographic analysis pipeline including:
+    1. Key trends analysis via deep research API
+    2. Reddit subreddit discovery and filtering
+    3. Post scraping and LLM-based filtering
+    4. Multi-stage analysis (JTBD, Pains, Gains, Recap)
+    5. Final synthesis and persona generation
+
+    All major analysis outputs are automatically saved as markdown files in the task directory:
+    - key_trends_report_{task_id}.md: Deep research trends analysis
+    - jtbd_analysis_{task_id}.md: Jobs-to-be-Done analysis
+    - pains_analysis_{task_id}.md: User pains and frustrations analysis
+    - gains_analysis_{task_id}.md: User gains and desired outcomes analysis
+    - recap_analysis_{task_id}.md: Ranked summary of Jobs, Pains, and Gains
+    - analysis_final_{task_id}.md: Comprehensive synthesis report
+
+    Additional data files saved:
+    - persona_details_{task_id}.json: Generated persona data and prompts
+    - timing_report_{task_id}.json: Detailed timing breakdown
+    - filtered_posts.json: LLM-filtered Reddit posts
 
     Args:
         product_description: The product description input by the user.
@@ -34,7 +55,20 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
                                  Expected signature: update_status_callback(task_id, status=None, data_key=None, data_value=None)
         log_callback: A function to call to send log messages.
                       Expected signature: log_callback(task_id, message)
+        loop: The asyncio event loop for handling async callbacks.
     """
+    # Start overall timing
+    overall_start_time = time.time()
+    step_timings = {}
+
+    def log_step_time(step_name, start_time):
+        """Helper to log and store step timing."""
+        elapsed = time.time() - start_time
+        step_timings[step_name] = elapsed
+        elapsed_str = f"{elapsed:.2f}s"
+        safe_callback(lambda: log_callback(task_id, f"⏱️ {step_name} completed in {elapsed_str}"))
+        print(f"[TIMING] {step_name}: {elapsed_str}")
+
     final_analysis_result = None
     persona_details = None # To store both names and prompts
 
@@ -83,6 +117,7 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
 
     try:
         ## Create a deepresearch (Key Trends) ##
+        step_start = time.time()
         time.sleep(5)
         safe_callback(lambda: log_callback(task_id, "Starting Key Trends Analysis..."))
         safe_callback(lambda: update_status_callback(task_id, status="running_key_trends"))
@@ -111,9 +146,21 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
 
         print(f"TASK {task_id}: ----> BEFORE call_deep_research_api.run_research_api <----")
         report = back.actions.call_deep_research_api.run_research_api(key_trend_prompt, 6, 4)
+
         print(f"TASK {task_id}: ----> AFTER call_deep_research_api.run_research_api <----")
 
+        # Save key trends report to markdown file
+        if report:
+            key_trends_file_path = os.path.join(task_dir, f"key_trends_report_{task_id}.md")
+            try:
+                with open(key_trends_file_path, "w", encoding="utf-8") as md_file:
+                    md_file.write(report)
+                safe_callback(lambda: log_callback(task_id, f"Key trends report saved to {key_trends_file_path}"))
+            except Exception as e:
+                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save key trends report to file: {e}"))
+
         safe_callback(lambda: log_callback(task_id, "Key Trends Analysis complete."))
+        log_step_time("Key Trends Analysis", step_start)
 
         ## Generate Keywords ##
         safe_callback(lambda: log_callback(task_id, "Starting keywords generation..."))
@@ -141,7 +188,7 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         for i, sub in enumerate(filtered):
             safe_callback(lambda i=i, sub=sub: log_callback(task_id, f"Scraping subreddit {sub.display_name} ({i+1}/{len(filtered)})..."))
             back.actions.scrape_and_filter_posts.scrape_subreddit(sub,
-                                                                  num_posts=4,
+                                                                  num_posts=50,
                                                                   task_dir=task_dir)
             time.sleep(random.choice([2, 4]))
         safe_callback(lambda: log_callback(task_id, "Scraping done!"))
@@ -149,8 +196,7 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         ## Filter the scraped posts ##
         safe_callback(lambda: update_status_callback(task_id, status="filtering_posts"))
         back.actions.scrape_and_filter_posts.filter_scraped_posts_with_llm(product_description=product_description,
-                                                                        api_key = api_key,
-                                                                           task_dir=task_dir)
+                                                            task_dir=task_dir)
         safe_callback(lambda: log_callback(task_id, "All Irrelevant posts have been removed."))
 
         task_filtered_posts_file = os.path.join(task_dir, "filtered_posts.json")
@@ -180,14 +226,22 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
                 user_prompt=jtbd_prompt,
             )
         if jtbd is not None:
-            # No need to save to file here unless you specifically want it
-            # with open("analysis_JTBD.md", "w", encoding="utf-8") as md_file:
-            #     md_file.write(jtbd)
+            # Save JTBD analysis to markdown file
+            jtbd_file_path = os.path.join(task_dir, f"jtbd_analysis_{task_id}.md")
+            try:
+                with open(jtbd_file_path, "w", encoding="utf-8") as md_file:
+                    md_file.write(jtbd)
+                safe_callback(lambda: log_callback(task_id, f"JTBD analysis saved to {jtbd_file_path}"))
+            except Exception as e:
+                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save JTBD analysis to file: {e}"))
+
             safe_callback(lambda: log_callback(task_id, "JTBD Analysis complete."))
         else:
             safe_callback(lambda: log_callback(task_id, "LLM returned no response for JTBD."))
             # Potentially raise an error or handle this case
+        log_step_time("JTBD Analysis", step_start)
 
+        step_start = time.time()
         safe_callback(lambda: log_callback(task_id, "🔍 Starting Prompt 2 (Pains)..."))
         safe_callback(lambda: update_status_callback(task_id, status="analyzing_pains"))
         pains_prompt = """You are a netnographic researcher studying user discussions from Reddit. Here is data containing subreddit posts, comments, and scores, as well as a report. Your task is to discover the primary ‘Pains’ that emerge from this data.
@@ -212,11 +266,22 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
                 user_prompt=pains_prompt,
             )
         if pains is not None:
+            # Save Pains analysis to markdown file
+            pains_file_path = os.path.join(task_dir, f"pains_analysis_{task_id}.md")
+            try:
+                with open(pains_file_path, "w", encoding="utf-8") as md_file:
+                    md_file.write(pains)
+                safe_callback(lambda: log_callback(task_id, f"Pains analysis saved to {pains_file_path}"))
+            except Exception as e:
+                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save Pains analysis to file: {e}"))
+
             safe_callback(lambda: log_callback(task_id, "Pains Analysis complete."))
         else:
             safe_callback(lambda: log_callback(task_id, "LLM returned no response for Pains."))
             # Handle error
+        log_step_time("Pains Analysis", step_start)
 
+        step_start = time.time()
         safe_callback(lambda: log_callback(task_id, "🔍 Starting Prompt 3 (Gains)..."))
         safe_callback(lambda: update_status_callback(task_id, status="analyzing_gains"))
         gains_prompt = """You are a netnographic researcher studying user discussions from Reddit. Below is data containing subreddit posts, comments, and scores, as well as a report. Your task is to discover the primary ‘Gains’ that emerge from this data.
@@ -240,11 +305,22 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
                 user_prompt=gains_prompt,
             )
         if gains is not None:
+            # Save Gains analysis to markdown file
+            gains_file_path = os.path.join(task_dir, f"gains_analysis_{task_id}.md")
+            try:
+                with open(gains_file_path, "w", encoding="utf-8") as md_file:
+                    md_file.write(gains)
+                safe_callback(lambda: log_callback(task_id, f"Gains analysis saved to {gains_file_path}"))
+            except Exception as e:
+                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save Gains analysis to file: {e}"))
+
             safe_callback(lambda: log_callback(task_id, "Gains Analysis complete."))
         else:
             safe_callback(lambda: log_callback(task_id, "LLM returned no response for Gains."))
             # Handle error
+        log_step_time("Gains Analysis", step_start)
 
+        step_start = time.time()
         safe_callback(lambda: log_callback(task_id, "🔍 Starting Prompt 4 (Recap)..."))
         safe_callback(lambda: update_status_callback(task_id, status="analyzing_recap"))
         recap_prompt = f"""You are a netnographic researcher. After identifying the Jobs, Pains, and Gains, please rank them as follows:
@@ -259,11 +335,22 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             """
         recap_analysis = back.actions.gemini_api.generate(recap_prompt)
         if recap_analysis is not None:
+            # Save Recap analysis to markdown file
+            recap_file_path = os.path.join(task_dir, f"recap_analysis_{task_id}.md")
+            try:
+                with open(recap_file_path, "w", encoding="utf-8") as md_file:
+                    md_file.write(recap_analysis)
+                safe_callback(lambda: log_callback(task_id, f"Recap analysis saved to {recap_file_path}"))
+            except Exception as e:
+                safe_callback(lambda: log_callback(task_id, f"Warning: Could not save Recap analysis to file: {e}"))
+
             safe_callback(lambda: log_callback(task_id, "Recap Analysis complete."))
         else:
             safe_callback(lambda: log_callback(task_id, "LLM returned no response for Recap."))
             # Handle error
+        log_step_time("Recap Analysis", step_start)
 
+        step_start = time.time()
         safe_callback(log_callback(task_id, "🔍 Starting Prompt 5 (Final Analysis)..."))
         safe_callback(update_status_callback(task_id, status="analyzing_final"))
         final_analysis_prompt = f"""You are a netnographic researcher. Below are four sets of analyses from the same Reddit data:
@@ -316,7 +403,9 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             safe_callback(lambda: log_callback(task_id, "LLM returned no response for Final Analysis."))
             safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value="Final Analysis generation failed"))
             return # Stop execution if final analysis failed
+        log_step_time("Final Analysis", step_start)
 
+        step_start = time.time()
         safe_callback(lambda: log_callback(task_id, "Generating personas..."))
         safe_callback(lambda: update_status_callback(task_id, status="generating_personas"))
         number = 4
@@ -357,8 +446,65 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         safe_callback(lambda: update_status_callback(task_id, status="personas_ready")) # Signal Phase 4 readiness
         persona_names_for_log = [p.get('name', 'Unknown') for p in detailed_persona_info]
         safe_callback(lambda: log_callback(task_id, f"Personas ready with details: {persona_names_for_log}"))
+        log_step_time("Persona Generation", step_start)
 
         # --- End of Background Task ---
+        overall_time = time.time() - overall_start_time
+
+        # Create timing summary
+        timing_summary = []
+        timing_summary.append(f"📊 **TIMING SUMMARY for Task {task_id}:**")
+        timing_summary.append(f"🕐 **Total Time: {overall_time:.2f}s ({overall_time/60:.1f} minutes)**")
+        timing_summary.append("")
+        timing_summary.append("📋 **Step-by-step breakdown:**")
+
+        for step, duration in step_timings.items():
+            percentage = (duration / overall_time) * 100
+            timing_summary.append(f"  • {step}: {duration:.2f}s ({percentage:.1f}%)")
+
+        timing_summary_str = "\n".join(timing_summary)
+        safe_callback(lambda: log_callback(task_id, timing_summary_str))
+        print(f"\n{timing_summary_str}\n")
+
+        # Save timing data to file
+        timing_data = {
+            "task_id": task_id,
+            "total_time_seconds": overall_time,
+            "total_time_minutes": overall_time / 60,
+            "step_timings": step_timings,
+            "timestamp": datetime.now().isoformat()
+        }
+
+        timing_file_path = os.path.join(task_dir, f"timing_report_{task_id}.json")
+        try:
+            with open(timing_file_path, "w", encoding="utf-8") as timing_file:
+                json.dump(timing_data, timing_file, indent=4)
+            safe_callback(lambda: log_callback(task_id, f"⏱️ Timing report saved to {timing_file_path}"))
+        except Exception as e:
+            safe_callback(lambda: log_callback(task_id, f"Warning: Could not save timing report: {e}"))
+
+        # Log summary of all saved analysis files
+        saved_files_summary = []
+        saved_files_summary.append(f"📁 **SAVED FILES SUMMARY for Task {task_id}:**")
+        saved_files_summary.append(f"📂 All files saved to: {task_dir}")
+        saved_files_summary.append("")
+        saved_files_summary.append("📄 **Analysis outputs:**")
+        saved_files_summary.append(f"  • Key Trends Report: key_trends_report_{task_id}.md")
+        saved_files_summary.append(f"  • JTBD Analysis: jtbd_analysis_{task_id}.md")
+        saved_files_summary.append(f"  • Pains Analysis: pains_analysis_{task_id}.md")
+        saved_files_summary.append(f"  • Gains Analysis: gains_analysis_{task_id}.md")
+        saved_files_summary.append(f"  • Recap Analysis: recap_analysis_{task_id}.md")
+        saved_files_summary.append(f"  • Final Analysis: analysis_final_{task_id}.md")
+        saved_files_summary.append("")
+        saved_files_summary.append("📊 **Data files:**")
+        saved_files_summary.append(f"  • Persona Details: persona_details_{task_id}.json")
+        saved_files_summary.append(f"  • Timing Report: timing_report_{task_id}.json")
+        saved_files_summary.append(f"  • Filtered Posts: filtered_posts.json")
+
+        saved_files_summary_str = "\n".join(saved_files_summary)
+        safe_callback(lambda: log_callback(task_id, saved_files_summary_str))
+        print(f"\n{saved_files_summary_str}\n")
+
         safe_callback(lambda: log_callback(task_id, "Analysis pipeline completed. Waiting for persona selection."))
         safe_callback(lambda: update_status_callback(task_id, status="completed")) # Or 'personas_ready' if 'completed' implies chat done
 
@@ -391,8 +537,8 @@ if __name__ == "__main__":
             await loop.run_in_executor(
                 executor,
                 run_analysis_job,
-                "A platform that leverages generative AI to help creators produce high-quality, emotionally resonant podcasts with unique voices, reducing production time and cost.",
-                "test_task_123",
+                "EpiDub is an AI-powered dubbing solution designed for influencers, content creators, and wellness educators looking to expand their reach while maintaining authenticity. Unlike traditional dubbing tools that replace voices or create robotic speech, our technology enhances the creator’s original voice, preserving its natural tone and emotion across multiple languages. Users simply upload their video, and our AI analyzes speech patterns to recreate their voice authentically, ensuring a natural and engaging multilingual experience. With just a few clicks, creators can make their content accessible to global audiences without the need for re-recording or generic voiceovers. By preserving their unique voice and emotions, our AI-powered dubbing ensures a more authentic and engaging experience, strengthening audience connections.The streamlined process eliminates the need for expensive voice actors or manual adjustments, making high-quality dubbing both time- and cost-effective. Whether for YouTube, Instagram, TikTok, or wellness platforms, creators can effortlessly scale their content and expand their reach with minimal effort.",
+                "timing_task",
                 async_update_status_callback,
                 async_log_callback,
                 loop
