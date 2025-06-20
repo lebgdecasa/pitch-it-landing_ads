@@ -16,6 +16,10 @@ from back.actions.chat_with_persona import get_persona_response
 from back.actions.llm_checks import check_pitch_dimensions_with_llm, DimensionInfo
 import back.main.database as db
 import logging as log
+import sys
+from back.supabase import supabase
+print("Python executable:", sys.executable)
+print("Python sys.path:", sys.path)
 
 db.init_db()
 
@@ -226,10 +230,12 @@ async def log_to_websocket(task_id: str, log_message: str):
 
 
 # --- Pydantic Models ---
+
 class StartAnalysisRequest(BaseModel):
+    user_id: str
+    name: str
+    industry: str
     product_description: str
-    user_id: Optional[str] = None  # Optional user ID for tracking, can be used to link to existing users
-    project_id: Optional[str] = None  # Optional project ID for tracking, can be used to link to existing projects
 
 class StartAnalysisResponse(BaseModel):
     task_id: str
@@ -370,7 +376,21 @@ async def start_analysis(request: StartAnalysisRequest, background_tasks: Backgr
     and returns a unique task ID.
     """
     task_id = str(uuid.uuid4())
+    project_id = str(uuid.uuid4())  # Supabase project ID
 
+    try:
+        # Save project info to Supabase
+        supabase.table("projects").insert({
+            "id": project_id,
+            "user_id": request.user_id,
+            "name": request.name,
+            "industry": request.industry,
+            "description": request.product_description,
+            "status": "pending"
+        }).execute()
+    except Exception as e:
+        print(f"CRITICAL: Failed to insert into Supabase: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create project.")
     try:
         db.add_project(task_id, request.product_description)
     except Exception as e:
@@ -381,6 +401,7 @@ async def start_analysis(request: StartAnalysisRequest, background_tasks: Backgr
 
     tasks[task_id] = {
         "status": "pending",
+        "project_id": project_id,
         "product_description": request.product_description,
         "task_dir": db.get_project(task_id)['task_dir'],
         "logs": [],
@@ -407,6 +428,7 @@ async def start_analysis(request: StartAnalysisRequest, background_tasks: Backgr
         analysis_worker.run_analysis_job,
         product_description=request.product_description,
         task_id=task_id,
+        project_id=project_id,
         update_status_callback=update_task_status,
         log_callback=log_to_websocket,
         loop=loop
