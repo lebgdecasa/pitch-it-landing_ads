@@ -206,43 +206,7 @@ export default function PitchDescriptionAssistant({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isLoadingCheck, setIsLoadingCheck] = useState(false);
 
-  // Added useEffect from the first code block for fetching projects
-  useEffect(() => {
-    const fetchProjects = async () => {
-      setIsLoadingProjects(true);
-      setFetchError(null);
-      // TO-DO: change to actual URL when backend is ready
-      // Use environment variable for API URL or fallback to localhost
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      console.log(`Fetching projects from: ${apiUrl}/projects`); // Log endpoint
-      try {
-        const response = await fetch(`${apiUrl}/projects`);
-        if (!response.ok) {
-          let errorDetail = `HTTP error ${response.status}`;
-          try {
-              const errorData = await response.json();
-              errorDetail = errorData.detail || errorDetail;
-          } catch (jsonError) {
-              // If response is not JSON, use statusText
-              errorDetail = response.statusText || errorDetail;
-          }
-          throw new Error(`Failed to fetch projects: ${errorDetail}`);
-        }
-        const data: { projects: any[] } = await response.json();
-        console.log("Fetched projects:", data.projects); // Log fetched data
-        setProjects(data.projects || []);
-      } catch (error: any) {
-        console.error("Failed to fetch projects:", error);
-        setFetchError(error.message || "Could not load project list.");
-        toast.error(`Error loading projects: ${error.message}`);
-      } finally {
-        setIsLoadingProjects(false);
-      }
-    };
-
-    fetchProjects();
-  }, []);
-
+ 
   // Added function from the first code block
   const handleStartAnalysis = async () => {
     if (!description.trim()) {

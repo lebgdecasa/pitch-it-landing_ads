@@ -1,9 +1,12 @@
 # back/main/analysis_worker.py
+import back.actions.generate_project_overview
 import back.actions.scrape_and_filter_posts
 import back.actions.generate_analysis
 import back.actions.call_deep_research_api
 import back.actions.generate_personas_json
 import back.actions.gemini_api
+import back.actions.markdown_to_json
+import back.actions.generate_project_overview
 import time
 import random
 import back.actions.create_personas
@@ -71,19 +74,19 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
     final_analysis_result = None
 
 
-    # task_dir = os.path.join(BASE_DATA_DIR, task_id)
-    # try:
-    #     os.makedirs(task_dir, exist_ok=True)
-    #     # Create subdirectory for scraped posts as well
-    #     os.makedirs(os.path.join(task_dir, "scraped_subreddits"), exist_ok=True)
-    #     print(f"Ensured task directory exists: {task_dir}")
-    # except OSError as e:
-    #     # Handle potential error during directory creation
-    #     error_message = f"CRITICAL ERROR: Could not create task directory {task_dir}. Error: {e}"
-    #     print(error_message)
-    #     safe_callback(lambda: log_callback(task_id, error_message))
-    #     safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
-    #     return # Stop execution if directory cannot be created
+    task_dir = os.path.join(BASE_DATA_DIR, task_id)
+    try:
+        os.makedirs(task_dir, exist_ok=True)
+        # Create subdirectory for scraped posts as well
+        os.makedirs(os.path.join(task_dir, "scraped_subreddits"), exist_ok=True)
+        print(f"Ensured task directory exists: {task_dir}")
+    except OSError as e:
+        # Handle potential error during directory creation
+        error_message = f"CRITICAL ERROR: Could not create task directory {task_dir}. Error: {e}"
+        print(error_message)
+        safe_callback(lambda: log_callback(task_id, error_message))
+        safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
+        return # Stop execution if directory cannot be created
 
     def safe_callback(callback_func):
         """Helper to run callback function safely."""
@@ -148,16 +151,16 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         report = back.actions.call_deep_research_api.run_research_api(key_trend_prompt, 1, 1)
 
         print(f"TASK {task_id}: ----> AFTER call_deep_research_api.run_research_api <----")
-
+        report_to_json = back.actions.markdown_to_json.parse_markdown_to_json(report)
         #Save key trends report to markdown file
-                # if report:
-                #     key_trends_file_path = os.path.join(task_dir, f"key_trends_report_{task_id}.md")
-                #     try:
-                #         with open(key_trends_file_path, "w", encoding="utf-8") as md_file:
-                #             md_file.write(report)
-                #         safe_callback(lambda: log_callback(task_id, f"Key trends report saved to {key_trends_file_path}"))
-                #     except Exception as e:
-                #         safe_callback(lambda: log_callback(task_id, f"Warning: Could not save key trends report to file: {e}"))
+        # if report:
+        #     key_trends_file_path = os.path.join(task_dir, f"key_trends_report_{task_id}.md")
+        #     try:
+        #         with open(key_trends_file_path, "w", encoding="utf-8") as md_file:
+        #             md_file.write(report)
+        #         safe_callback(lambda: log_callback(task_id, f"Key trends report saved to {key_trends_file_path}"))
+        #     except Exception as e:
+        #         safe_callback(lambda: log_callback(task_id, f"Warning: Could not save key trends report to file: {e}"))
 
         safe_callback(lambda: log_callback(task_id, "Key Trends Analysis complete."))
         log_step_time("Key Trends Analysis", step_start)
@@ -384,7 +387,7 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         """
 
         final_analysis_result = back.actions.gemini_api.generate(final_analysis_prompt) # Assign to variable
-
+        final_analysis_result_json = back.actions.markdown_to_json.parse_final_analysis(final_analysis_result)
         if final_analysis_result is not None:
             # Save the result to the task state
             safe_callback(lambda: update_status_callback(task_id, data_key="final_analysis", data_value=final_analysis_result))
@@ -429,7 +432,7 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             product_description=product_description
         )
 
-        #persona_details_file_path = os.path.join(task_dir, f"persona_details_{task_id}.json")
+        # persona_details_file_path = os.path.join(task_dir, f"persona_details_{task_id}.json")
         # try:
         #     with open(persona_details_file_path, "w", encoding="utf-8") as json_file:
         #         json.dump(detailed_persona_info, json_file, indent=4)
@@ -441,6 +444,14 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
              safe_callback(lambda: log_callback(task_id, "Persona prompt/details generation failed."))
              safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value="Persona prompt/details generation failed"))
              return # Stop if this step fails
+
+        product_overview_prompt = back.actions.generate_project_overview.create_overview_prompt(
+            key_trends=report,
+            description=product_description,
+            final_analysis= final_analysis_result
+        )
+
+        product_overview_json = back.actions.generate_project_overview.generate_project_overview(product_overview_prompt)
 
         # Store the detailed info (name, prompt, card_details)
         # This structure is now richer than just names/prompts
@@ -485,29 +496,13 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
         # except Exception as e:
         #     safe_callback(lambda: log_callback(task_id, f"Warning: Could not save timing report: {e}"))
 
-        # Log summary of all saved analysis files
-        saved_files_summary = []
-        saved_files_summary.append(f"📁 **SAVED FILES SUMMARY for Task {task_id}:**")
-        saved_files_summary.append("")
-        saved_files_summary.append("📄 **Analysis outputs:**")
-        saved_files_summary.append(f"  • Key Trends Report: key_trends_report_{task_id}.md")
-        saved_files_summary.append(f"  • JTBD Analysis: jtbd_analysis_{task_id}.md")
-        saved_files_summary.append(f"  • Pains Analysis: pains_analysis_{task_id}.md")
-        saved_files_summary.append(f"  • Gains Analysis: gains_analysis_{task_id}.md")
-        saved_files_summary.append(f"  • Recap Analysis: recap_analysis_{task_id}.md")
-        saved_files_summary.append(f"  • Final Analysis: analysis_final_{task_id}.md")
-        saved_files_summary.append("")
-        saved_files_summary.append("📊 **Data files:**")
-        saved_files_summary.append(f"  • Persona Details: persona_details_{task_id}.json")
-        saved_files_summary.append(f"  • Timing Report: timing_report_{task_id}.json")
-
-        saved_files_summary_str = "\n".join(saved_files_summary)
-        safe_callback(lambda: log_callback(task_id, saved_files_summary_str))
-        print(f"\n{saved_files_summary_str}\n")
-
-        safe_callback(lambda: log_callback(task_id, "Analysis pipeline completed. Waiting for persona selection."))
-        safe_callback(lambda: update_status_callback(task_id, status="completed")) # Or 'personas_ready' if 'completed' implies chat done
-
+        # Return all the generated analysis artifacts
+        return {
+            "report_json": report_to_json, # JSON representation of the key trends report
+            "final_analysis_json": final_analysis_result_json, # JSON representation of the final analysis),
+            "persona_details": detailed_persona_info,
+            "project_overview": product_overview_json
+        }
 
     except Exception as e:
         # ... (Existing error handling remains the same) ...
@@ -534,15 +529,21 @@ if __name__ == "__main__":
         # Run the analysis job in a thread executor since it's a synchronous function
         import concurrent.futures
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            await loop.run_in_executor(
-                executor,
-                run_analysis_job,
-                "EpiDub is an AI-powered dubbing solution designed for influencers, content creators, and wellness educators looking to expand their reach while maintaining authenticity. Unlike traditional dubbing tools that replace voices or create robotic speech, our technology enhances the creator’s original voice, preserving its natural tone and emotion across multiple languages. Users simply upload their video, and our AI analyzes speech patterns to recreate their voice authentically, ensuring a natural and engaging multilingual experience. With just a few clicks, creators can make their content accessible to global audiences without the need for re-recording or generic voiceovers. By preserving their unique voice and emotions, our AI-powered dubbing ensures a more authentic and engaging experience, strengthening audience connections.The streamlined process eliminates the need for expensive voice actors or manual adjustments, making high-quality dubbing both time- and cost-effective. Whether for YouTube, Instagram, TikTok, or wellness platforms, creators can effortlessly scale their content and expand their reach with minimal effort.",
-                "timing_task",
-                async_update_status_callback,
-                async_log_callback,
-                loop
+            result = await loop.run_in_executor(
+            executor,
+            run_analysis_job,
+            "EpiDub is an AI-powered dubbing solution designed for influencers, content creators, and wellness educators looking to expand their reach while maintaining authenticity. Unlike traditional dubbing tools that replace voices or create robotic speech, our technology enhances the creator’s original voice, preserving its natural tone and emotion across multiple languages. Users simply upload their video, and our AI analyzes speech patterns to recreate their voice authentically, ensuring a natural and engaging multilingual experience. With just a few clicks, creators can make their content accessible to global audiences without the need for re-recording or generic voiceovers. By preserving their unique voice and emotions, our AI-powered dubbing ensures a more authentic and engaging experience, strengthening audience connections.The streamlined process eliminates the need for expensive voice actors or manual adjustments, making high-quality dubbing both time- and cost-effective. Whether for YouTube, Instagram, TikTok, or wellness platforms, creators can effortlessly scale their content and expand their reach with minimal effort.",
+            "timing_task",
+            async_update_status_callback,
+            async_log_callback,
+            loop
             )
+            # Save result to 'test_json' in the root directory
+            root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            test_json_path = os.path.join(root_dir, "test_json")
+            with open(test_json_path, "w", encoding="utf-8") as f:
+                json.dump(result, f, indent=4)
+            print(f"Result saved to {test_json_path}")
 
     # Run the async main function
     asyncio.run(main())

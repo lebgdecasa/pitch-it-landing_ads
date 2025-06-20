@@ -228,6 +228,7 @@ async def log_to_websocket(task_id: str, log_message: str):
 # --- Pydantic Models ---
 class StartAnalysisRequest(BaseModel):
     product_description: str
+    user_id: Optional[str] = None  # Optional user ID for tracking, can be used to link to existing users
     project_id: Optional[str] = None  # Optional project ID for tracking, can be used to link to existing projects
 
 class StartAnalysisResponse(BaseModel):
@@ -363,7 +364,7 @@ async def check_description_completeness(request: CheckDescriptionRequest):
 ## added project_id, still need to see if it works once connected to frontend
 ## we still need to modify this endpoint to handle project_id correctly and save to DB instead of just returning task_id
 @app.post("/start_analysis", response_model=StartAnalysisResponse, status_code=202)
-async def start_analysis(request: StartAnalysisRequest, background_tasks: BackgroundTasks, project_id: Optional[str] = None):
+async def start_analysis(request: StartAnalysisRequest, background_tasks: BackgroundTasks):
     """
     Phase 1: Receives product description, starts the analysis job in the background,
     and returns a unique task ID.
