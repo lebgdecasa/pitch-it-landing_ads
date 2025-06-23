@@ -28,7 +28,7 @@ api_key = os.getenv("NEXT_PUBLIC_GEMINI_API_KEY")
 BASE_DATA_DIR = "task_data"
 
 # Define the main analysis function
-def run_analysis_job(product_description: str, task_id: str, project_id: str, update_status_callback, log_callback, loop: asyncio.AbstractEventLoop):
+def run_analysis_job(product_description: str, task_id: str, project_id: str,name: str, update_status_callback, log_callback, loop: asyncio.AbstractEventLoop):
     """
     Runs the full analysis pipeline as a background job with comprehensive file saving.
 
@@ -130,10 +130,10 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, up
         You must not add anything else to the adapted prompt.
         Here is the original prompt:
         ---
-        [Project Name] is a [concise description of the concept or product], not yet launched.
-        Please conduct a broad netnography analysis by exploring social media, online forums, subreddits, blogs, and other relevant digital channels to identify emerging trends, user sentiments, pain points, and competitive benchmarks in the [project’s] domain.
-        The goal is to understand current market conditions, uncover user expectations, and gather insights from diverse demographics and regions so that [Project Name] can effectively refine its value proposition and strategy before launch.
-        As part of this study, please discover and examine any existing platforms or solutions that may be considered competitors, and provide a synthesized report on how [Project Name] can uniquely position itself based on your findings.
+        {name} is a [concise description of the concept or product], not yet launched.
+        Please conduct a broad netnography analysis by exploring social media, online forums, subreddits, blogs, and other relevant digital channels to identify emerging trends, user sentiments, pain points, and competitive benchmarks in the {name} domain.
+        The goal is to understand current market conditions, uncover user expectations, and gather insights from diverse demographics and regions so that {name} can effectively refine its value proposition and strategy before launch.
+        As part of this study, please discover and examine any existing platforms or solutions that may be considered competitors, and provide a synthesized report on how {name} can uniquely position itself based on your findings.
         ---
         here is the project description:
         ---
@@ -505,25 +505,25 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, up
                 # Access both card_details and original_data
                 card_data = persona.get("card_details", {})
                 original_data = persona.get("original_data", {})
-    
+
     # Extract pain points - convert string to array if needed
                 pain_points_str = original_data.get("pain_points", "")
                 pain_points_array = []
                 if pain_points_str:
         # Split by common delimiters and clean up
                     pain_points_array = [p.strip() for p in pain_points_str.replace(';', ',').split(',') if p.strip()]
-    
-    # Extract needs/goals - convert string to array if needed  
+
+    # Extract needs/goals - convert string to array if needed
                 needs_str = original_data.get("needs", "")
                 goals_array = []
                 if needs_str:
                     goals_array = [g.strip() for g in needs_str.replace(';', ',').split(',') if g.strip()]
-    
+
     # Extract jobs_to_be_done for additional context
                 jobs_str = original_data.get("jobs_to_be_done", "")
                 if jobs_str and not goals_array:
                     goals_array = [jobs_str]
-    
+
                 supabase.table("personas").insert({
                     "project_id": project_id,
                     "name": persona.get("name", "Unknown"),
