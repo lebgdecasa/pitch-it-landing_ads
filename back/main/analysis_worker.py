@@ -16,6 +16,7 @@ import os
 import json
 from dotenv import load_dotenv
 import os
+from back.supabase import supabase
 from datetime import datetime
 
 # Load environment variables from the .env file in the project root
@@ -27,7 +28,7 @@ api_key = os.getenv("NEXT_PUBLIC_GEMINI_API_KEY")
 BASE_DATA_DIR = "task_data"
 
 # Define the main analysis function
-def run_analysis_job(product_description: str, task_id: str, update_status_callback, log_callback, loop: asyncio.AbstractEventLoop):
+def run_analysis_job(product_description: str, task_id: str, project_id: str, update_status_callback, log_callback, loop: asyncio.AbstractEventLoop):
     """
     Runs the full analysis pipeline as a background job with comprehensive file saving.
 
@@ -487,6 +488,39 @@ def run_analysis_job(product_description: str, task_id: str, update_status_callb
             "step_timings": step_timings,
             "timestamp": datetime.now().isoformat()
         }
+
+        try:
+            supabase.table("projects").update({
+                "overview": product_overview_json,
+                "analysis": {
+                    "key_trends": report_to_json,
+                    "final": final_analysis_result_json
+                },
+                "status": "personas_ready"
+            }).eq("id", project_id).execute()
+
+            for persona in detailed_persona_info:
+                # Get card data with safe defaults
+                card_data = persona.get("card", {})
+    
+                supabase.table("personas").insert({
+                    "project_id": project_id,
+                    "name": persona.get("name", "Unknown"),
+                    "role": card_data.get("role", "Not specified"),  # Provide default value
+                    "company": card_data.get("company", "Not specified"),  # Provide default value
+                    "description": persona.get("description", ""),
+                    "pain_points": card_data.get("pains", []),
+                    "goals": card_data.get("goals", []),
+                    "demographics": card_data.get("demographics", {}),
+                    "ai_generated": True
+                }).execute()
+
+            print(f"✅ Project data and {len(detailed_persona_info)} personas saved to Supabase.")
+        except Exception as e:
+            error_msg = f"❌ Failed to save analysis results or personas to Supabase: {e}"
+            print(error_msg)
+            safe_callback(lambda: log_callback(task_id, error_msg))
+
 
         # timing_file_path = os.path.join(task_dir, f"timing_report_{task_id}.json")
         # try:
