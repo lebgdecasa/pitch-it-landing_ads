@@ -55,3 +55,5 @@ next-env.d.ts
 /back/main/*.pyo
 /back/main/*.pyd
 /task_data/
+/back/.mypy_cache/
+/back/__pycache__/
