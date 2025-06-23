@@ -499,22 +499,50 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, up
                 "status": "personas_ready"
             }).eq("id", project_id).execute()
 
+           # Replace the persona insertion section in run_analysis_job with this:
+
             for persona in detailed_persona_info:
-                # Get card data with safe defaults
-                card_data = persona.get("card", {})
+                # Access both card_details and original_data
+                card_data = persona.get("card_details", {})
+                original_data = persona.get("original_data", {})
+    
+    # Extract pain points - convert string to array if needed
+                pain_points_str = original_data.get("pain_points", "")
+                pain_points_array = []
+                if pain_points_str:
+        # Split by common delimiters and clean up
+                    pain_points_array = [p.strip() for p in pain_points_str.replace(';', ',').split(',') if p.strip()]
+    
+    # Extract needs/goals - convert string to array if needed  
+                needs_str = original_data.get("needs", "")
+                goals_array = []
+                if needs_str:
+                    goals_array = [g.strip() for g in needs_str.replace(';', ',').split(',') if g.strip()]
+    
+    # Extract jobs_to_be_done for additional context
+                jobs_str = original_data.get("jobs_to_be_done", "")
+                if jobs_str and not goals_array:
+                    goals_array = [jobs_str]
     
                 supabase.table("personas").insert({
                     "project_id": project_id,
                     "name": persona.get("name", "Unknown"),
-                    "role": card_data.get("role", "Not specified"),  # Provide default value
-                    "company": card_data.get("company", "Not specified"),  # Provide default value
-                    "description": persona.get("description", ""),
-                    "pain_points": card_data.get("pains", []),
-                    "goals": card_data.get("goals", []),
-                    "demographics": card_data.get("demographics", {}),
+                    "role": original_data.get("job", "Not specified"),
+                    "company": "Not specified",  # This field wasn't in your original schema
+                    "description": original_data.get("why_important", ""),
+                    "pain_points": pain_points_array,
+                    "goals": goals_array,
+                    "demographics": {
+                        "education": original_data.get("education", "N/A"),
+                        "salary_range": original_data.get("salary_range", "N/A"),
+                        "hobbies": original_data.get("hobbies", "N/A"),
+                        "demographics": original_data.get("demographics", "N/A"),
+                        "abilities_or_passions": original_data.get("abilities_or_passions", "N/A"),
+                        "population_notes": original_data.get("population_notes", "N/A"),
+                        "relationship_channels": original_data.get("relationship_channels", "N/A"),
+                    },
                     "ai_generated": True
                 }).execute()
-
             print(f"✅ Project data and {len(detailed_persona_info)} personas saved to Supabase.")
         except Exception as e:
             error_msg = f"❌ Failed to save analysis results or personas to Supabase: {e}"

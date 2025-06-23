@@ -236,7 +236,7 @@ class StartAnalysisRequest(BaseModel):
     name: str
     industry: str
     product_description: str
-    stage: str = "Idea" | "Prototype" | "MVP"
+    stage: str = "Idea" or "Prototype" or "MVP"
 
 class StartAnalysisResponse(BaseModel):
     task_id: str
