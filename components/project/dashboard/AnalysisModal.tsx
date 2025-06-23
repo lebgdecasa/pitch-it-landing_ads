@@ -27,7 +27,7 @@ export const AnalysisModal: React.FC<AnalysisModalProps> = ({
     }
 
     // Render based on type
-    if (analysis.type === 'key-trend' && analysis.data.sections) {
+    if (analysis.type === 'key_trends' && analysis.data.sections) {
       return (
         <div className="space-y-4">
           <p className="text-gray-700">{analysis.data.summary}</p>

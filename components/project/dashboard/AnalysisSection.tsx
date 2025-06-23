@@ -9,7 +9,7 @@ const AnalysisModal = dynamic(() => import('./AnalysisModal'), { ssr: false });
 interface Report {
   id: string;
   title: string;
-  type: 'key-trend' | 'netnographic' | 'final-report';
+  type: 'key_trends' | 'netnographic' | 'final';
   date: string;
   data: any;
 }
@@ -21,11 +21,11 @@ interface AnalysisSectionProps {
 
 const getAnalysisIcon = (type: Report['type']) => {
   switch (type) {
-    case 'key-trend':
+    case 'key_trends':
       return <TrendingUp className="h-5 w-5" />;
     case 'netnographic':
       return <Users className="h-5 w-5" />;
-    case 'final-report':
+    case 'final':
       return <FileText className="h-5 w-5" />;
   }
 };

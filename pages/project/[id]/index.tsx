@@ -156,18 +156,18 @@ export default function ProjectPage() {
   const analysisReports = [];
   if (project.analysis?.Key_Trends) {
     analysisReports.push({
-      id: 'key-trends',
+      id: 'key_trends',
       title: project.analysis.Key_Trends.title,
-      type: 'key-trend' as const,
+      type: 'key_trends' as const,
       date: new Date().toISOString(),
       data: project.analysis.Key_Trends
     });
   }
   if (project.analysis?.Netnographic) {
     analysisReports.push({
-      id: 'netnographic',
+      id: 'final',
       title: project.analysis.Netnographic.title,
-      type: 'netnographic' as const,
+      type: 'final' as const,
       date: new Date().toISOString(),
       data: project.analysis.Netnographic
     });
