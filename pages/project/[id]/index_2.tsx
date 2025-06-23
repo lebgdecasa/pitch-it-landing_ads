@@ -11,7 +11,7 @@ import { useAuthContext } from '../../../supa_database/components/AuthProvider';
 // import ShareTeamDialog from '../../../components/project/ShareTeamDialog'; // Lazy loaded
 const ShareTeamDialog = dynamic(() => import('../../../components/project/ShareTeamDialog'), { ssr: false });
 import ActionButtons from '../../../components/project/ActionButtons_freemium_beta_';
-import { AnalysisSection } from '../../../components/project/dashboard/AnalysisSection';
+import { AnalysisSection, type Report } from '../../../components/project/dashboard/AnalysisSection';
 import { MetricsDisplay } from '../../../components/project/dashboard/MetricsDisplay';
 import { Button } from '../../../components/ui/button';
 import PersonaCard from '../../../components/client-components/persona/PersonaCard';
@@ -153,23 +153,33 @@ export default function ProjectPage() {
   } : null;
 
   // Transform analysis data
-  const analysisReports = [];
-  if (project.analysis?.Key_Trends) {
-    analysisReports.push({
-      id: 'key-trends',
-      title: project.analysis.Key_Trends.title,
-      type: 'key-trend' as const,
-      date: new Date().toISOString(),
-      data: project.analysis.Key_Trends
-    });
-  }
-  if (project.analysis?.Netnographic) {
-    analysisReports.push({
-      id: 'netnographic',
-      title: project.analysis.Netnographic.title,
-      type: 'netnographic' as const,
-      date: new Date().toISOString(),
-      data: project.analysis.Netnographic
+  const analysisReports: Report[] = [];
+  if (project.analysis && typeof project.analysis === 'object') {
+    Object.keys(project.analysis).forEach(key => {
+      const analysisData = (project.analysis as any)[key];
+      // Ensure analysisData is an object and has a title property
+      if (analysisData && typeof analysisData === 'object' && 'title' in analysisData && typeof (analysisData as any).title === 'string') {
+        let type: Report['type'] | undefined;
+        const lowerKey = key.toLowerCase().replace(/_/g, '').replace(/\s/g, '');
+
+        if (lowerKey.includes('keytrends')) {
+          type = 'key_trends';
+        } else if (lowerKey.includes('netnographic')) {
+          type = 'netnographic';
+        } else if (lowerKey.includes('final')) {
+          type = 'final';
+        }
+
+        if (type) {
+          analysisReports.push({
+            id: key,
+            title: (analysisData as any).title,
+            type: type,
+            date: (analysisData as any).date || new Date().toISOString(),
+            data: analysisData,
+          });
+        }
+      }
     });
   }
 
@@ -314,11 +324,9 @@ export default function ProjectPage() {
             </div>
 
             {/* Analysis Section */}
-            {analysisReports.length > 0 && (
-              <div className="mb-6">
-                <AnalysisSection analyses={analysisReports} />
-              </div>
-            )}
+            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+              <AnalysisSection analyses={analysisReports} />
+            </div>
 
             {/* Personas Section */}
             <div className="mb-6">
