@@ -429,6 +429,7 @@ async def start_analysis(request: StartAnalysisRequest, background_tasks: Backgr
     background_tasks.add_task(
         analysis_worker.run_analysis_job,
         product_description=request.product_description,
+        name=request.name,
         task_id=task_id,
         project_id=project_id,
         update_status_callback=update_task_status,
