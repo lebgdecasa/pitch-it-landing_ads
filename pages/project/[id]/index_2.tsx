@@ -197,11 +197,70 @@ export default function ProjectPage() {
           {/* Left column */}
           <div className="lg:col-span-2">
             {/* Metrics */}
-            {transformedMetrics && (
+            {transformedMetrics && (() => {
+              const metricGroups = [
+              {
+                title: 'Market Potential',
+                metrics: {
+                'Total Addressable Market (TAM)': transformedMetrics.tam,
+                'Potential Earnings': transformedMetrics.potentialEarnings,
+                'Market Growth Rate': transformedMetrics.marketGrowthRate,
+                'Projected Market Share': transformedMetrics.projectedMarketShare,
+                },
+              },
+              {
+                title: 'Profitability',
+                metrics: {
+                'Customer Acquisition Cost (CAC)': transformedMetrics.cac,
+                'Customer Lifetime Value (CLTV)': transformedMetrics.cltv,
+                'CAC to CLTV Ratio': transformedMetrics.cacCltvRatio,
+                'Average Gross Margin': transformedMetrics.averageGrossMargin,
+                'CAC Payback Period': transformedMetrics.cacPayback,
+                },
+              },
+              {
+                title: 'Time to Market',
+                metrics: {
+                'Sales Cycle': transformedMetrics.salesCycle,
+                'Time to MVP': transformedMetrics.timeToMvp,
+                'Seed to Launch Time': transformedMetrics.seedToLaunch,
+                'Time to Revenue': transformedMetrics.timeToRevenue,
+                },
+              },
+              ];
+
+              const sectionsToShow = metricGroups
+              .map(group => ({
+                ...group,
+                metrics: Object.entries(group.metrics).filter(([_, value]) => value != null && value !== ''),
+              }))
+              .filter(group => group.metrics.length > 0);
+
+              if (sectionsToShow.length === 0) {
+              return null;
+              }
+
+              return (
               <div className="mb-6">
-                <MetricsDisplay metrics={transformedMetrics} />
+                <div className="bg-white rounded-lg shadow-sm border p-6">
+                <h2 className="text-xl font-semibold mb-4">Metrics</h2>
+                {sectionsToShow.map((section, index) => (
+                  <div key={section.title} className={index < sectionsToShow.length - 1 ? 'mb-6' : ''}>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">{section.title}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    {section.metrics.map(([label, value]) => (
+                    <div key={label}>
+                      <h4 className="text-sm font-medium text-gray-500">{label}</h4>
+                      <p className="text-gray-800 font-medium mt-1">{String(value)}</p>
+                    </div>
+                    ))}
+                  </div>
+                  </div>
+                ))}
+                </div>
               </div>
-            )}
+              );
+            })()}
 
             {/* Project Overview */}
             <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
