@@ -383,6 +383,7 @@ async def start_analysis(request: StartAnalysisRequest, background_tasks: Backgr
         # Save project info to Supabase
         supabase.table("projects").insert({
             "id": project_id,
+            "stage": request.stage,
             "user_id": request.user_id,
             "name": request.name,
             "industry": request.industry,
