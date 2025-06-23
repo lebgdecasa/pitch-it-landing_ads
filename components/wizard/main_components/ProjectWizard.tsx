@@ -39,31 +39,27 @@ export const ProjectWizard: React.FC = () => {
     setSubmitError(null);
 
     try {
-      const newProject = await createProject(
-        {
-          name: data.projectName,
-          industry: data.industry,
-          description: data.description,
-          stage: data.stage as ProjectStage,
-        },
-        user?.id // Pass the user ID to the function
-      );
+      // 🚫 Remove the call to createProject
 
-      if (newProject) {
-        // Optionally, trigger background analysis
-        axios.post('/api/start_analysis', { description: data.description, project_id: newProject.id });
-        // Redirect to dashboard on success
-        router.push('/dashboard');
-      } else {
-        setSubmitError('Failed to create project. Please ensure you are logged in and try again.');
-        setIsSubmitting(false);
-      }
+      // ✅ Send everything directly to FastAPI
+      await axios.post('http://localhost:8000/start_analysis', {
+        name: data.projectName,
+        industry: data.industry,
+        stage: data.stage,
+        product_description: data.description,
+        user_id: user?.id,
+      });
+
+      // Redirect user to dashboard after analysis starts
+      router.push('/dashboard');
     } catch (error) {
       console.error('Submission error:', error);
       setSubmitError('An unexpected error occurred. Please try again.');
       setIsSubmitting(false);
     }
   };
+
+
 
   const renderStep = () => {
     switch (currentStep) {
@@ -75,17 +71,17 @@ export const ProjectWizard: React.FC = () => {
             onNext={() => setCurrentStep(2)}
           />
         );
-        case 2:
-          return (
-            <PitchDescriptionAssistant
-              value={data.description}
-              onChange={(newDescription: string) =>
-                setData({ ...data, description: newDescription })
-              }
-              onNext={() => setCurrentStep(3)}
-              onBack={() => setCurrentStep(1)}
-            />
-          );
+      case 2:
+        return (
+          <PitchDescriptionAssistant
+            value={data.description}
+            onChange={(newDescription: string) =>
+              setData({ ...data, description: newDescription })
+            }
+            onNext={() => setCurrentStep(3)}
+            onBack={() => setCurrentStep(1)}
+          />
+        );
       case 3:
         return (
           <StageUploadStep

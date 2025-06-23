@@ -90,7 +90,7 @@ def generate_persona_prompts_and_details(
         product_description: The product description to include in prompts.
 
     Returns:
-        A list of dictionaries, each containing 'name', 'prompt', and 'card_details'.
+        A list of dictionaries, each containing 'name', 'prompt', 'card_details', and 'original_data'.
     """
     all_persona_info = []
 
@@ -116,13 +116,14 @@ def generate_persona_prompts_and_details(
             "why_important": persona.get("why_important", "N/A"),
             "needs": persona.get("needs", "N/A"),
             "relationship_channels": persona.get("relationship_channels", "N/A"),
-            # Add any other fields you want on the card here
+            "company": "Not specified",  # Add this if needed
         }
 
         all_persona_info.append({
             "name": persona_name,
             "prompt": persona_prompt,
-            "card_details": card_details
+            "card_details": card_details,
+            "original_data": persona  # ✅ Preserve original persona data
         })
 
     return all_persona_info
