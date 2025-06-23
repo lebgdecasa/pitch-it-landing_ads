@@ -394,7 +394,7 @@ async def start_analysis(request: StartAnalysisRequest, background_tasks: Backgr
         print(f"CRITICAL: Failed to insert into Supabase: {e}")
         raise HTTPException(status_code=500, detail="Failed to create project.")
     try:
-        db.add_project(task_id, request.product_description)
+        db.add_project(task_id, request.product_description, request.name)
     except Exception as e:
          # Log the error details
          print(f"CRITICAL: Failed to add project {task_id} to database. Aborting start. Error: {e}")
