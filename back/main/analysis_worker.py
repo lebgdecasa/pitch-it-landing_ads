@@ -148,8 +148,8 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, na
         print(f"TASK {task_id}: ----> AFTER gemini_api.generate <----")
 
         print(f"TASK {task_id}: ----> BEFORE call_deep_research_api.run_research_api <----")
-        #TO-DO CHANGE VALUES TO 6 and 4
-        report = back.actions.call_deep_research_api.run_research_api(key_trend_prompt, 1, 1)
+        
+        report = back.actions.call_deep_research_api.run_research_api(key_trend_prompt, 6, 4)
 
         print(f"TASK {task_id}: ----> AFTER call_deep_research_api.run_research_api <----")
         report_to_json = back.actions.markdown_to_json.parse_markdown_to_json(report)

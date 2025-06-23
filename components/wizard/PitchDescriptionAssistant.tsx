@@ -206,7 +206,7 @@ export default function PitchDescriptionAssistant({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isLoadingCheck, setIsLoadingCheck] = useState(false);
 
- 
+
   // Added function from the first code block
   const handleStartAnalysis = async () => {
     if (!description.trim()) {
@@ -435,7 +435,7 @@ export default function PitchDescriptionAssistant({
               </Button>
             )}
             {/* TO-DO change the value length to 6 */}
-            <Button onClick={handleNext} disabled={isLoadingCheck || value.length < 0}>
+            <Button onClick={handleNext} disabled={isLoadingCheck || value.length < 6}>
               {isLoadingCheck ? 'Analyzing...' : 'Next'}
             </Button>
           </div>

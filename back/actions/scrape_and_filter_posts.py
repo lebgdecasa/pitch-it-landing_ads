@@ -82,8 +82,8 @@ def generate_broad_keywords(product_description):
     print("[LOG] No keywords generated.")
     return []
 
-## TO-DO change number to 10
-def search_subreddits(keywords, subreddits_per_keyword=3):
+
+def search_subreddits(keywords, subreddits_per_keyword=10):
     """
     Searches for subreddits across multiple keywords,
     returning up to subreddits_per_keyword for each keyword.
