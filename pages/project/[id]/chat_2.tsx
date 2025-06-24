@@ -24,6 +24,7 @@ interface Persona {
   created_at?: string;
   updated_at?: string;
   avatar_color?: string;
+  prompt?: string;
 }
 
 interface ChatMessage {
@@ -200,9 +201,13 @@ Competition: ${project.overview.Competition || 'N/A'}
 Unique Selling Point: ${project.overview.Unique_selling_point || 'N/A'}
 Marketing Strategy: ${project.overview.Marketing_Strategy || 'N/A'}` : ''}`;
 
-      const prompt = `You are ${persona.name}, a team member with the following characteristics:
+      const personaDefinition = persona.prompt
+        ? persona.prompt
+        : `You are ${persona.name}, a team member with the following characteristics:
 Role: ${persona.role}${companyText}
-Description: ${persona.description}${painPointsText}${goalsText}${demographicsText}
+Description: ${persona.description}${painPointsText}${goalsText}${demographicsText}`;
+
+      const prompt = `${personaDefinition}
 
 You are working on the following project:${projectContext}
 
@@ -226,7 +231,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
             }]
           }],
           generationConfig: {
-            temperature: 0.9,
+            temperature: 0.5,
             topK: 1,
             topP: 1,
             maxOutputTokens: 200,

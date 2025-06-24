@@ -16,6 +16,7 @@ import { MetricsDisplay } from '../../../components/project/dashboard/MetricsDis
 import { Button } from '../../../components/ui/button';
 import PersonaCard from '../../../components/client-components/persona/PersonaCard';
 import PersonaModal from '../../../components/client-components/persona/PersonaModal';
+import { preprocessAnalysisData } from '@/utils/analysisPreprocessor';
 // import { GroupChat } from '../../../components/project/chat/GroupChat'; // Lazy loaded
 const GroupChat = dynamic(() => import('../../../components/project/chat/GroupChat').then(mod => mod.GroupChat), { ssr: false });
 
@@ -153,7 +154,7 @@ export default function ProjectPage() {
   } : null;
 
   // Transform analysis data
-  const analysisReports: Report[] = [];
+  const analysisReports = preprocessAnalysisData(project.analysis);
   if (project.analysis && typeof project.analysis === 'object') {
     Object.keys(project.analysis).forEach(key => {
       const analysisData = (project.analysis as any)[key];

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ChevronLeft, Edit, Download, Users, AlertTriangle, Lightbulb, Briefcase, Swords, Sparkles, Megaphone } from 'lucide-react';
 import ProjectLayout from '@/components/layout/ProjectLayout';
 import dynamic from 'next/dynamic';
+import { preprocessAnalysisData } from '@/utils/analysisPreprocessor';
 
 // Component imports
 // import ShareTeamDialog from '../../../components/project/ShareTeamDialog'; // Lazy loaded
@@ -153,7 +154,7 @@ export default function ProjectPage() {
   } : null;
 
   // Transform analysis data
-  const analysisReports = [];
+  const analysisReports = preprocessAnalysisData(project.analysis);;
   if (project.analysis?.Key_Trends) {
     analysisReports.push({
       id: 'key_trends',
