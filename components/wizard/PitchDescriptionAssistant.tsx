@@ -266,7 +266,7 @@ export default function PitchDescriptionAssistant({
     }));
 
     try {
-      const response = await fetch('http://40.89.185.79:3052/check_description_completeness', {
+      const response = await fetch('/api/check_description_completeness', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
