@@ -512,7 +512,8 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, na
                     "key_trends": report_to_json,
                     "final": final_analysis_result_json
                 },
-                "status": "personas_ready"
+                "status": "personas_ready",
+                "locked": False
             }).eq("id", project_id).execute()
 
            # Replace the persona insertion section in run_analysis_job with this:

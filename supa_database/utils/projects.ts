@@ -18,6 +18,7 @@ export const createProject = async (
   const newProject = {
     ...project,
     user_id: userId,
+    locked: true,
   };
 
   const { data, error } = await supabaseBrowserClient

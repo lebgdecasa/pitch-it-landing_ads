@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { ChevronLeft, Edit, Download, Users, AlertTriangle, Lightbulb, Briefcase, Swords, Sparkles, Megaphone } from 'lucide-react';
+import { ChevronLeft, Edit, Download, Users, AlertTriangle, Lightbulb, Briefcase, Swords, Sparkles, Megaphone, Lock } from 'lucide-react';
 import ProjectLayout from '@/components/layout/ProjectLayout_2';
 import dynamic from 'next/dynamic';
 import { useAuthContext } from '../../../supa_database/components/AuthProvider'; // Import useAuthContext
@@ -92,6 +92,23 @@ export default function ProjectPage() {
     return <div>Redirecting to the appropriate version for your plan...</div>;
   }
 
+  if (project && project.locked) {
+        return (
+          <ProjectLayout>
+            <div className="p-4 md:p-6 max-w-7xl mx-auto text-center">
+              <Lock className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h1 className="text-2xl font-bold">Project is Locked</h1>
+              <p className="text-gray-600 mt-2">
+                This project is still being processed. It will be unlocked once the initial analysis is complete.
+              </p>
+              <Button asChild className="mt-4">
+                  <Link href="/dashboard">Back to Dashboard</Link>
+              </Button>
+            </div>
+          </ProjectLayout>
+        );
+      }
+
   if (projectLoading || personasLoading) {
     let statusMessage = "Loading...";
     if (authLoading) statusMessage = "Authenticating user...";
@@ -155,34 +172,6 @@ export default function ProjectPage() {
 
   // Transform analysis data
   const analysisReports = preprocessAnalysisData(project.analysis);
-  if (project.analysis && typeof project.analysis === 'object') {
-    Object.keys(project.analysis).forEach(key => {
-      const analysisData = (project.analysis as any)[key];
-      // Ensure analysisData is an object and has a title property
-      if (analysisData && typeof analysisData === 'object' && 'title' in analysisData && typeof (analysisData as any).title === 'string') {
-        let type: Report['type'] | undefined;
-        const lowerKey = key.toLowerCase().replace(/_/g, '').replace(/\s/g, '');
-
-        if (lowerKey.includes('keytrends')) {
-          type = 'key_trends';
-        } else if (lowerKey.includes('netnographic')) {
-          type = 'netnographic';
-        } else if (lowerKey.includes('final')) {
-          type = 'final';
-        }
-
-        if (type) {
-          analysisReports.push({
-            id: key,
-            title: (analysisData as any).title,
-            type: type,
-            date: (analysisData as any).date || new Date().toISOString(),
-            data: analysisData,
-          });
-        }
-      }
-    });
-  }
 
   return (
     <ProjectLayout>

@@ -20,6 +20,7 @@ const ProjectCard = ({
   description,
   stage,
   updatedAt,
+  locked,
   onDeleteRequest // Changed from onDeleteClick to onDeleteRequest
 }: {
   id: string;
@@ -51,8 +52,10 @@ const ProjectCard = ({
     onDeleteRequest(id, name || 'Untitled Project'); // Pass project name as well
   };
 
+  const isLocked = locked || false; // Default to false if not provided
+
   return (
-    <Link href={`/project/${id}/index_2`} passHref legacyBehavior>
+    <Link href={isLocked ? "#" : `/project/${id}/index_2`} passHref legacyBehavior>
       <a className="block cursor-pointer h-full group"> {/* Removed relative */}
         <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-5 border border-gray-100 h-full flex flex-col justify-between">
           <div> {/* Content wrapper */}
@@ -115,6 +118,7 @@ export default function Dashboard() {
           description: p.description || '',
           tagline: p.tagline || '',
           industry: p.industry || '',
+          locked: p.locked,
           createdAt: p.created_at,
           updatedAt: p.updated_at,
           stage: mappedStageValue, // Use the correctly mapped lowercase stage value
