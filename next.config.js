@@ -100,9 +100,16 @@ const nextConfig = {
 
   // Configure rewrite for API optimization
   async rewrites() {
-    return [
-      // Add any rewrites for API optimization
-    ]
+    return {
+      // Runs BEFORE Next.js checks filesystem routes, so our proxy
+      // wins over any `/proxy/*` pages or API routes.
+      beforeFiles: [
+        {
+          source: '/proxy/:path*',
+          destination: `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/:path*`,
+        },
+      ],
+    };
   }
 }
 
