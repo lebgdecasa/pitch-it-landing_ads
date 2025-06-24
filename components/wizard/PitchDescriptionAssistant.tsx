@@ -142,8 +142,8 @@ function Textarea({ value, onChange, placeholder, className = '' }: TextareaProp
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      rows={1} // Start with a single row
-      className={`w-full p-3 border border-gray-300 rounded resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${className}`}
+      rows={4} // Start with four rows
+      className={`w-full p-3 border border-gray-300 rounded resize-none overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[120px] text-base ${className}`}
     />
   );
 }
@@ -194,7 +194,7 @@ export default function PitchDescriptionAssistant({
   const [coveredDimensions, setCoveredDimensions] = useState<Record<string, boolean>>({});
   const [feedback, setFeedback] = useState<string | null>(null);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [showAssistant, setShowAssistant] = useState(true);
+  const [showAssistant, setShowAssistant] = useState(false);
 
   // Added state from the first code block
   const [isLoadingProjects, setIsLoadingProjects] = useState(false);
@@ -265,9 +265,8 @@ export default function PitchDescriptionAssistant({
       id, name, description
     }));
 
-    // TO-DO: change to actual URL when backend is ready
     try {
-      const response = await fetch('http://localhost:8000/check_description_completeness', {
+      const response = await fetch('http://40.89.185.79:3052/check_description_completeness', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -403,7 +402,7 @@ export default function PitchDescriptionAssistant({
               value={value}
               onChange={(e) => onChange(e.target.value)}
               placeholder={nextDimension ? `Provide details for ${nextDimension.name} here...` : "Start describing your pitch..."}
-              className="flex-grow resize-text-base leading-relaxed w-full" // Ensure textarea grows and uses full width
+              className="flex-grow leading-relaxed w-full"
             />
             {/* {error && <p className="text-red-500 text-sm mt-1">{error}</p>} */}
           </div>
@@ -429,12 +428,9 @@ export default function PitchDescriptionAssistant({
             <Button onClick={handleBack} variant="outline">
               Back
             </Button>
-            {!showAssistant && (
-              <Button onClick={() => setShowAssistant(true)} variant="outline" className="mx-2">
-                Show Assistant
-              </Button>
-            )}
-            {/* TO-DO change the value length to 6 */}
+            <Button onClick={() => setShowAssistant(prev => !prev)} variant="outline" className="mx-2">
+              {showAssistant ? 'Hide Assistant' : 'Show Assistant'}
+            </Button>
             <Button onClick={handleNext} disabled={isLoadingCheck || value.length < 6}>
               {isLoadingCheck ? 'Analyzing...' : 'Next'}
             </Button>

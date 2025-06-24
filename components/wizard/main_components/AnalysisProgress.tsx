@@ -3,8 +3,6 @@ import { Circle, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Card } from '../ui/card';
 import axios from 'axios';
-// TO-DO: Replace with your actual API endpoint and adjust the logic as needed
-// import { startAnalysis } from '@/lib/api';
 const TOTAL_DURATION = 8000; // 8 seconds total
 const MOCK_PROJECT_ID = '123';
 
@@ -26,7 +24,6 @@ export const AnalysisProgress: React.FC = () => {
 
   useEffect(() => {
     // Start the analysis process by calling the API
-    // TO-DO should be replaced with your actual API endpoint
     const startAnalysis = async () => {
       try {
         const response = await axios.post('/start_analysis', {
