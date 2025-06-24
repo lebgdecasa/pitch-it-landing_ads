@@ -266,7 +266,7 @@ export default function PitchDescriptionAssistant({
     }));
 
     try {
-      const response = await fetch('/api/check_description_completeness', {
+      const response = await fetch('/proxy/check_description_completeness', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

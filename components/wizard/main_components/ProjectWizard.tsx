@@ -42,7 +42,7 @@ export const ProjectWizard: React.FC = () => {
       // 🚫 Remove the call to createProject
 
       // ✅ Send everything directly to FastAPI
-      await axios.post('/api/start_analysis', {
+      await axios.post('/proxy/start_analysis', {
         name: data.projectName,
         industry: data.industry,
         stage: data.stage,
