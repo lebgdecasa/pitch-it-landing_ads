@@ -148,10 +148,18 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, na
         print(f"TASK {task_id}: ----> AFTER gemini_api.generate <----")
 
         print(f"TASK {task_id}: ----> BEFORE call_deep_research_api.run_research_api <----")
-        
+
         report = back.actions.call_deep_research_api.run_research_api(key_trend_prompt, 6, 4)
 
         print(f"TASK {task_id}: ----> AFTER call_deep_research_api.run_research_api <----")
+
+        # Add a check to ensure 'report' is not None before parsing
+        if not report:
+            error_message = "Deep research API call failed and returned no report."
+            safe_callback(lambda: log_callback(task_id, error_message))
+            safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
+            return # Stop execution
+
         report_to_json = back.actions.markdown_to_json.parse_markdown_to_json(report)
         #Save key trends report to markdown file
         # if report:
@@ -388,6 +396,14 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, na
         """
 
         final_analysis_result = back.actions.gemini_api.generate(final_analysis_prompt) # Assign to variable
+
+        # Add a check to ensure 'final_analysis_result' is not None before parsing
+        if not final_analysis_result:
+            error_message = "Final analysis generation failed and returned no result."
+            safe_callback(lambda: log_callback(task_id, error_message))
+            safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
+            return # Stop execution
+
         final_analysis_result_json = back.actions.markdown_to_json.parse_final_analysis(final_analysis_result)
         if final_analysis_result is not None:
             # Save the result to the task state
@@ -504,6 +520,7 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, na
             for persona in detailed_persona_info:
                 # Access both card_details and original_data
                 card_data = persona.get("card_details", {})
+                prompt = persona.get("prompt", "")
                 original_data = persona.get("original_data", {})
 
     # Extract pain points - convert string to array if needed
@@ -531,6 +548,7 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, na
                     "company": "Not specified",  # This field wasn't in your original schema
                     "description": original_data.get("why_important", ""),
                     "pain_points": pain_points_array,
+                    "prompt": prompt,
                     "goals": goals_array,
                     "demographics": {
                         "education": original_data.get("education", "N/A"),

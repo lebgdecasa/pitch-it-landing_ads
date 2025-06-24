@@ -5,6 +5,13 @@ import json
 from typing import List, Dict
 
 def parse_markdown_to_json(markdown_text: str):
+    if not markdown_text:
+        return {
+            "title": "",
+            "subtitle": "",
+            "date": "",
+            "sections": []
+        }
     html = markdown.markdown(markdown_text, extensions=['extra'])
     soup = BeautifulSoup(html, 'html.parser')
 
@@ -83,6 +90,8 @@ def parse_final_analysis(md_text: str) -> Dict:
     2. **Next-Heading**:
        ...
     """
+    if not md_text:
+        return {"title": "", "sections": []}
     html = markdown.markdown(md_text, extensions=["extra"])
     soup = BeautifulSoup(html, "html.parser")
 
