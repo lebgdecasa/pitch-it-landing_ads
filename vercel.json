@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/proxy/check_description_completeness",
-      "destination": "http://40.89.185.79:3052/check_description_completeness"
+      "destination": "http://40.89.185.79:3052/check_description_completeness/"
     },
     {
       "source": "/proxy/start_analysis",
-      "destination": "http://40.89.185.79:3052/start_analysis"
+      "destination": "http://40.89.185.79:3052/start_analysis/"
     }
   ]
 }
