@@ -118,7 +118,7 @@ export const ProjectWizard: React.FC = () => {
       >
         <div className="text-center">
           <h2 id="analysis-started-title" className="text-2xl font-bold mb-4">Project Analysis Started</h2>
-          <p>You will receive an email once the analysis is complete.</p>
+          <p>You will receive an email once the analysis is complete. (Please check your spams folder if you didn't receive anything within an hour.)</p>
           <button
             onClick={() => router.push('/dashboard')}
             className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
