@@ -2,12 +2,12 @@ import React from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 
-const TermsOfService: React.FC = () => {
+const PrivacyPolicy: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Terms of Service | NexTraction</title>
-        <meta name="description" content="Terms of Service for our platform" />
+        <title>Privacy Policy | NexTraction</title>
+        <meta name="description" content="Privacy Policy for NexTraction" />
       </Head>
 
       <div className="min-h-screen bg-gray-50 py-8">
@@ -19,105 +19,141 @@ const TermsOfService: React.FC = () => {
               </Link>
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Terms of Service</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Privacy Policy</h1>
             <p className="text-gray-600 mb-8">Last updated: {new Date().toLocaleDateString()}</p>
 
             <div className="prose prose-lg max-w-none">
               <section className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">1. Acceptance of Terms</h2>
-                <p className="text-gray-700 mb-4">
-                  By accessing and using our platform, you accept and agree to be bound by the terms and provision of this agreement.
-                  If you do not agree to abide by the above, please do not use this service.
-                </p>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">2. Description of Service</h2>
-                <p className="text-gray-700 mb-4">
-                  Our platform provides project analysis and business intelligence services. We offer tools and features
-                  to help users analyze their projects and receive insights about their business ventures.
-                </p>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">3. User Accounts</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">1. Information We Collect</h2>
                 <div className="text-gray-700 space-y-4">
-                  <p>When you create an account with us, you must provide information that is accurate, complete, and current at all times.</p>
-                  <p>You are responsible for safeguarding the password and for all activities that occur under your account.</p>
-                  <p>We reserve the right to refuse service, terminate accounts, or cancel orders at our sole discretion.</p>
-                </div>
-              </section>
+                  <h3 className="text-lg font-medium">Personal Information</h3>
+                  <p>We collect information you provide directly to us, such as when you create an account, use our services, or contact us for support.</p>
+                  <ul className="list-disc pl-6 space-y-1">
+                    <li>Email address</li>
+                    <li>Name and contact information</li>
+                    <li>Project data and descriptions you submit</li>
+                    <li>Communication preferences</li>
+                  </ul>
 
-              <section className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">4. User Content</h2>
-                <div className="text-gray-700 space-y-4">
-                  <p>You retain rights to any content you submit, post or display on or through the service.</p>
-                  <p>By submitting content, you grant us a worldwide, non-exclusive, royalty-free license to use,
-                     reproduce, modify, and distribute your content solely for the purpose of providing our services.</p>
-                  <p>You are solely responsible for your content and the consequences of posting or publishing it.</p>
-                </div>
-              </section>
-
-              <section className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">5. Prohibited Uses</h2>
-                <div className="text-gray-700">
-                  <p className="mb-2">You may not use our service:</p>
-                  <ul className="list-disc pl-6 space-y-2">
-                    <li>For any unlawful purpose or to solicit others to perform illegal acts</li>
-                    <li>To violate any international, federal, provincial, or state regulations, rules, laws, or local ordinances</li>
-                    <li>To infringe upon or violate our intellectual property rights or the intellectual property rights of others</li>
-                    <li>To harass, abuse, insult, harm, defame, slander, disparage, intimidate, or discriminate</li>
-                    <li>To submit false or misleading information</li>
+                  <h3 className="text-lg font-medium">Usage Information</h3>
+                  <p>We automatically collect certain information about your use of our services:</p>
+                  <ul className="list-disc pl-6 space-y-1">
+                    <li>Log data (IP address, browser type, pages visited)</li>
+                    <li>Device information</li>
+                    <li>Usage patterns and preferences</li>
                   </ul>
                 </div>
               </section>
 
               <section className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">6. Privacy Policy</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">2. How We Use Your Information</h2>
+                <div className="text-gray-700">
+                  <p className="mb-2">We use the information we collect to:</p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Provide, maintain, and improve our services</li>
+                    <li>Process transactions and send related information</li>
+                    <li>Send technical notices, updates, and support messages</li>
+                    <li>Respond to your comments, questions, and requests</li>
+                    <li>Analyze usage patterns to improve user experience</li>
+                    <li>Send you notifications about project status updates (if you opt-in)</li>
+                    <li>Comply with legal obligations</li>
+                  </ul>
+                </div>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">3. Information Sharing</h2>
+                <div className="text-gray-700 space-y-4">
+                  <p>We do not sell, trade, or otherwise transfer your personal information to third parties except in the following circumstances:</p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li><strong>Service Providers:</strong> We may share information with trusted third parties who assist us in operating our platform</li>
+                    <li><strong>Legal Requirements:</strong> When required by law, regulation, or legal process</li>
+                    <li><strong>Business Transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
+                    <li><strong>Consent:</strong> When you give us explicit consent to share your information</li>
+                  </ul>
+                </div>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">4. Data Security</h2>
                 <p className="text-gray-700 mb-4">
-                  Your privacy is important to us. Please review our Privacy Policy, which also governs your use of the service,
-                  to understand our practices. Our{' '}
-                  <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-700 underline">
-                    Privacy Policy
-                  </Link>
-                  {' '}is incorporated into these Terms of Service by reference.
+                  We implement appropriate technical and organizational measures to protect your personal information against
+                  unauthorized access, alteration, disclosure, or destruction. This includes encryption, secure data transmission,
+                  and regular security assessments.
                 </p>
               </section>
 
               <section className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">7. Limitation of Liability</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">5. Email Communications</h2>
+                <div className="text-gray-700 space-y-4">
+                  <p>We may send you different types of email communications:</p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li><strong>Transactional emails:</strong> Account verification, password resets, and service-related updates</li>
+                    <li><strong>Project notifications:</strong> Updates about your project analysis status (only if you opt-in during onboarding)</li>
+                    <li><strong>Service updates:</strong> Important changes to our platform or policies</li>
+                  </ul>
+                  <p>You can unsubscribe from non-essential communications at any time using the unsubscribe link in emails or by updating your account preferences.</p>
+                </div>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">6. Data Retention</h2>
                 <p className="text-gray-700 mb-4">
-                  In no event shall our company, nor its directors, employees, partners, agents, suppliers, or affiliates,
-                  be liable for any indirect, incidental, special, consequential, or punitive damages, including without
-                  limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of the service.
+                  We retain your personal information for as long as your account is active or as needed to provide you services.
+                  We will also retain and use your information as necessary to comply with legal obligations, resolve disputes,
+                  and enforce our agreements.
                 </p>
               </section>
 
               <section className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">8. Termination</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">7. Your Rights</h2>
+                <div className="text-gray-700">
+                  <p className="mb-2">You have the right to:</p>
+                  <ul className="list-disc pl-6 space-y-2">
+                    <li>Access and update your personal information</li>
+                    <li>Request deletion of your personal data</li>
+                    <li>Object to processing of your personal data</li>
+                    <li>Request data portability</li>
+                    <li>Withdraw consent where processing is based on consent</li>
+                  </ul>
+                  <p className="mt-4">To exercise these rights, please contact us at the information provided below.</p>
+                </div>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">8. Cookies and Tracking</h2>
                 <p className="text-gray-700 mb-4">
-                  We may terminate or suspend your account and bar access to the service immediately, without prior notice
-                  or liability, under our sole discretion, for any reason whatsoever and without limitation, including but
-                  not limited to a breach of the Terms.
+                  We use cookies and similar tracking technologies to provide functionality and improve your experience.
+                  You can control cookie settings through your browser preferences, though some features may not function properly if cookies are disabled.
                 </p>
               </section>
 
               <section className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">9. Changes to Terms</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">9. Children's Privacy</h2>
                 <p className="text-gray-700 mb-4">
-                  We reserve the right, at our sole discretion, to modify or replace these Terms at any time.
-                  If a revision is material, we will provide at least 30 days notice prior to any new terms taking effect.
+                  Our service is not intended for children under 13 years of age. We do not knowingly collect personal
+                  information from children under 13. If you are a parent or guardian and believe your child has provided
+                  us with personal information, please contact us.
                 </p>
               </section>
 
               <section className="mb-8">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">10. Contact Information</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">10. Changes to This Policy</h2>
                 <p className="text-gray-700 mb-4">
-                  If you have any questions about these Terms of Service, please contact us at:
+                  We may update this privacy policy from time to time. We will notify you of any changes by posting the
+                  new privacy policy on this page and updating the "Last updated" date.
+                </p>
+              </section>
+
+              <section className="mb-8">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">11. Contact Us</h2>
+                <p className="text-gray-700 mb-4">
+                  If you have any questions about this Privacy Policy, please contact us:
                 </p>
                 <div className="text-gray-700">
-                  <p>Email: contact@nextraction.io</p>
-
+                  <p>Email: privacy@yourcompany.com</p>
+                  <p>Address: Your Company Address</p>
+                  <p>Phone: (555) 123-4567</p>
                 </div>
               </section>
             </div>
@@ -128,4 +164,4 @@ const TermsOfService: React.FC = () => {
   )
 }
 
-export default TermsOfService
+export default PrivacyPolicy
