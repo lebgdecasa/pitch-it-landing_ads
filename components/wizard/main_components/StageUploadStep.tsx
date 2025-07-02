@@ -99,19 +99,7 @@ export const StageUploadStep: React.FC<StageUploadStepProps> = ({
           )}
         </div>
 
-        {showUploadZone && (
-          <div className="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors">
-            <div className="space-y-4">
-              {/* <Upload className="mx-auto h-12 w-12 text-gray-400" /> */}
-              <div>
-                <p className="text-base font-medium">Upload project files</p>
-                <p className="text-sm text-gray-500">
-                  Drag and drop your files here or click to browse
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+
       </div>
 
       <div className="flex justify-between">
@@ -129,6 +117,9 @@ export const StageUploadStep: React.FC<StageUploadStepProps> = ({
           </Button>
         </div>
       </div>
+      <p className="text-center text-sm text-gray-500 mt-4">
+      Once your project is ready you'll receive an email! This can take a few minutes. If you don't receive an email within an hour, please check your spam folder or contact support.
+      </p>
     </div>
   );
 };
