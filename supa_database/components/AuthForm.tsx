@@ -1,106 +1,112 @@
-// supa_database/components/AuthForm.tsx
 import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
-import { resetPassword } from '../auth' // signIn, signUp, validateAccessCode removed
-import { supabase } from '../config/supabase' // Import supabase directly from config
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'; // Assuming you use Heroicons
-import NoAccessCodeModal from '@/components/modals/NoAccessCodeModal'; // Import the new modal
+import { supabase } from '@/supa_database/config/supabase'
+import { useAuthContext } from './AuthProvider'
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
+import NoAccessCodeModal from 'components/modals/NoAccessCodeModal'
+import Link from 'next/link'
 
-// Interface for form data
-interface AuthFormData {
+type FormData = {
   email: string
   password: string
   confirmPassword?: string
   accessCode?: string
+  acceptTerms?: boolean
 }
 
+type AuthMode = 'signin' | 'signup' | 'resetPassword'
+
 const AuthForm: React.FC = () => {
-  const [mode, setMode] = useState<'signin' | 'signup' | 'resetPassword'>('signup') // Removed 'magic'
+  const [mode, setMode] = useState<AuthMode>('signin')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(true); // Added rememberMe state
-  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+  const [showNoAccessCodeModal, setShowNoAccessCodeModal] = useState(false)
 
-  // State for the "No Access Code" modal
-  const [showNoAccessCodeModal, setShowNoAccessCodeModal] = useState(false);
+  const router = useRouter()
+  const { checkUser } = useAuthContext()
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<AuthFormData>({
-    defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      accessCode: '',
-    }
-  })
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    reset
+  } = useForm<FormData>()
 
-  const onSubmit = async (data: AuthFormData) => {
+  const onSubmit = async (data: FormData) => {
     setLoading(true)
     setError(null)
     setMessage(null)
 
     try {
       if (mode === 'resetPassword') {
-        const { error: resetError } = await resetPassword(data.email)
-        if (resetError) throw resetError
-        setMessage('If an account with that email exists, a password reset link has been sent. Please check your inbox.')
-        return;
-      }
+        const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        })
+        if (error) throw error
+        setMessage('Password reset email sent. Check your inbox.')
+      } else if (mode === 'signup') {
+        // Check if terms are accepted
+        if (!data.acceptTerms) {
+          setError('You must accept the terms & services to sign up.')
+          return
+        }
 
-      // Common fetch options
-      const fetchOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      };
-
-      if (mode === 'signup') {
+        const fetchOptions: RequestInit = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        }
         const response = await fetch('/api/auth/signup', {
           ...fetchOptions,
           body: JSON.stringify({
             email: data.email,
             password: data.password,
-            accessCode: data.accessCode,
+            accessCode: data.accessCode
           }),
-        });
-        const responseData = await response.json();
+        })
+        const responseData = await response.json()
         if (!response.ok) {
-          throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
+          throw new Error(responseData.error || `HTTP error! status: ${response.status}`)
         }
-        setMessage(responseData.message || 'Sign-up successful. Please check your email.');
+        setMessage(responseData.message || 'Sign-up successful. Please check your email.')
       } else if (mode === 'signin') {
+        const fetchOptions: RequestInit = {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        }
         const response = await fetch('/api/auth/signin', {
           ...fetchOptions,
           body: JSON.stringify({ email: data.email, password: data.password, rememberMe }),
-        });
-        const responseData = await response.json();
+        })
+        const responseData = await response.json()
         if (!response.ok) {
-          throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
+          throw new Error(responseData.error || `HTTP error! status: ${response.status}`)
         }
-        // Sign-in was successful. The cookie is set by the API route.
-        // The onAuthStateChange listener will trigger a state update.
-        // Just push the user to the dashboard. No reload needed.
-        await supabase.auth.getSession();
-        router.push('/dashboard').then(() => window.location.reload());
-        return; // Prevent finally block from clearing potential success message if we were to show one
+        await supabase.auth.getSession()
+        router.push('/dashboard').then(() => window.location.reload())
+        return
       }
-    } catch (err: any) { // Type explicitly as any or Error
-      setError(err.message || 'An unexpected error occurred.');
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred.')
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    // Adjusted container for page layout instead of modal
-    <div className="bg-white rounded-lg p-4 sm:p-6 md:p-8 w-full max-w-md mx-auto my-10 shadow-xl"> {/* Updated padding */}
+    <div className="bg-white rounded-lg p-4 sm:p-6 md:p-8 w-full max-w-md mx-auto my-10 shadow-xl">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-center">
           {mode === 'signin' ? 'Sign In'
             : mode === 'signup' ? 'Sign Up'
-            : 'Reset Password'} {/* Removed Magic Link title */}
+            : 'Reset Password'}
         </h2>
       </div>
 
@@ -141,7 +147,7 @@ const AuthForm: React.FC = () => {
           )}
         </div>
 
-        {(mode === 'signin' || mode === 'signup') && ( // Show password only for signin and signup
+        {mode !== 'resetPassword' && (
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -150,14 +156,11 @@ const AuthForm: React.FC = () => {
               <input
                 id="password"
                 {...register('password', {
-                  required: (mode === 'signin' || mode === 'signup') ? 'Password is required' : false,
-                  minLength: {
-                    value: 6,
-                    message: 'Password must be at least 6 characters'
-                  }
+                  required: 'Password is required',
+                  minLength: { value: 6, message: 'Password must be at least 6 characters' }
                 })}
                 type={showPassword ? 'text' : 'password'}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10" // Added pr-10 for button spacing
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
                 placeholder="••••••••"
                 aria-invalid={errors.password ? "true" : "false"}
                 aria-describedby={errors.password ? "password-error" : undefined}
@@ -195,12 +198,11 @@ const AuthForm: React.FC = () => {
                 Remember me
               </label>
             </div>
-            {/* Keep Forgot Password link on the right if needed, or adjust layout */}
           </div>
         )}
 
         {mode === 'signup' && (
-          <> {/* Use a fragment to group signup-specific fields */}
+          <>
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
                 Confirm Password
@@ -217,7 +219,7 @@ const AuthForm: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
                   placeholder="••••••••"
                   aria-invalid={errors.confirmPassword ? "true" : "false"}
-                  aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
+                  aria-describedby={errors.confirmPassword ? "confirm-password-error" : undefined}
                 />
                 <button
                   type="button"
@@ -232,22 +234,19 @@ const AuthForm: React.FC = () => {
                   )}
                 </button>
               </div>
-              {errors.confirmPassword && (
-                <p id="confirmPassword-error" className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
-              )}
+              {errors.confirmPassword && <p id="confirm-password-error" className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}
             </div>
 
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-1">
-                <label htmlFor="accessCode" className="block text-sm font-medium text-gray-700">
-                  Access Code
-                </label>
+            <div>
+              <label htmlFor="accessCode" className="block text-sm font-medium text-gray-700 mb-1">Access Code</label>
+              <div className="relative">
                 <button
                   type="button"
                   onClick={() => setShowNoAccessCodeModal(true)}
-                  className="text-xs text-blue-600 hover:text-blue-700 hover:underline focus:outline-none"
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-xs text-blue-600 hover:text-blue-700 focus:outline-none z-10"
+                  aria-label="Don't have an access code?"
                 >
-                  No access code?
+                  No code?
                 </button>
               </div>
               <input
@@ -263,6 +262,31 @@ const AuthForm: React.FC = () => {
                 <p id="accessCode-error" className="text-red-500 text-sm mt-1">{errors.accessCode.message}</p>
               )}
             </div>
+
+            {/* Terms & Services Checkbox */}
+            <div className="flex items-start">
+              <input
+                id="acceptTerms"
+                {...register('acceptTerms', {
+                  required: 'You must accept the terms & services to sign up'
+                })}
+                type="checkbox"
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+              />
+              <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-900">
+                By signing up, you accept our{' '}
+                <Link href="/terms-of-service" className="text-blue-600 hover:text-blue-700 underline" target="_blank">
+                  Terms & Services
+                </Link>
+                {' '}and{' '}
+                <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-700 underline" target="_blank">
+                  Privacy Policy
+                </Link>
+              </label>
+            </div>
+            {errors.acceptTerms && (
+              <p className="text-red-500 text-sm mt-1">{errors.acceptTerms.message}</p>
+            )}
           </>
         )}
 
@@ -274,7 +298,7 @@ const AuthForm: React.FC = () => {
           {loading ? 'Loading...'
             : mode === 'signin' ? 'Sign In'
             : mode === 'signup' ? 'Sign Up'
-            : 'Send Reset Link'} {/* Removed Magic Link button text */}
+            : 'Send Reset Link'}
         </button>
       </form>
 
@@ -288,7 +312,7 @@ const AuthForm: React.FC = () => {
             >
               Forgot Password?
             </button>
-            <hr className="my-2"/> {/* Visual separator */}
+            <hr className="my-2"/>
             <button
               type="button"
               onClick={() => { setMode('signup'); setError(null); setMessage(null); }}
@@ -296,11 +320,10 @@ const AuthForm: React.FC = () => {
             >
               Don't have an account? Sign up
             </button>
-            {/* Magic Link button removed */}
           </>
         )}
 
-        {(mode === 'signup' || mode === 'resetPassword') && ( // Removed 'magic' from condition
+        {(mode === 'signup' || mode === 'resetPassword') && (
           <button
             type="button"
             onClick={() => { setMode('signin'); setError(null); setMessage(null); }}
@@ -311,7 +334,6 @@ const AuthForm: React.FC = () => {
         )}
       </div>
 
-      {/* "No Access Code" Modal Integration */}
       <NoAccessCodeModal
         isOpen={showNoAccessCodeModal}
         onClose={() => setShowNoAccessCodeModal(false)}
@@ -320,4 +342,4 @@ const AuthForm: React.FC = () => {
   )
 }
 
-export default AuthForm;
+export default AuthForm

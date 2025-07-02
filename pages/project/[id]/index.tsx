@@ -24,6 +24,7 @@ import { useProjects, useProjectById } from '../../../supa_database/hooks/usePro
 import { usePersonas } from '../../../supa_database/hooks/usePersonas';
 import { supabase } from '../../../supa_database/config/supabase'; // Ensure Supabase client is imported
 import { useAuthContext } from '../../../supa_database/components/AuthProvider'; // Import useAuthContext
+import Head from 'next/dist/shared/lib/head';
 
 // Type definitions
 interface StageInfo {
@@ -175,172 +176,165 @@ export default function ProjectPage() {
   }
 
   return (
-    <ProjectLayout>
-      <div className="p-4 md:p-6 max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{project.name}</h1>
-            <div className="flex items-center mt-2">
-              <span className={`${currentStage.color} text-xs px-2 py-1 rounded-full font-medium mr-2`}>
-                {currentStage.label}
-              </span>
-              <span className="text-gray-500 text-sm">{currentStage.description}</span>
-            </div>
-          </div>
-
-          <div className="flex mt-4 md:mt-0 space-x-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/project/${project.id}/edit`}>
-                <Edit className="h-4 w-4 mr-1" />
-                Edit
-              </Link>
-            </Button>
-            <ShareTeamDialog
-              projectId={project.id}
-              projectName={project.name}
-              variant="outline"
-              size="sm"
-            />
-          </div>
-        </div>
-
-        {/* Main content grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left column */}
-          <div className="lg:col-span-2">
-            {/* Metrics */}
-            {transformedMetrics && (
-              <div className="mb-6">
-                <MetricsDisplay metrics={transformedMetrics} />
-              </div>
-            )}
-
-            {/* Project Overview */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">Project Overview</h2>
-              <p className="text-gray-600 mb-6">{project.description}</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                <PitchDetail
-                  label="Problem"
-                  value={project.overview?.Problem || ""}
-                  icon={AlertTriangle}
-                  color="text-red-300"
-                />
-                <PitchDetail
-                  label="Solution"
-                  value={project.overview?.Solution || ""}
-                  icon={Lightbulb}
-                  color="text-blue-300"
-                />
-                <PitchDetail
-                  label="Target Market"
-                  value={project.overview?.Target_Market || ""}
-                  icon={Users}
-                  color="text-green-300"
-                />
-                <PitchDetail
-                  label="Business Model"
-                  value={project.overview?.Business_Model || ""}
-                  icon={Briefcase}
-                  color="text-yellow-300"
-                />
-                <PitchDetail
-                  label="Competition"
-                  value={project.overview?.Competition || ""}
-                  icon={Swords}
-                  color="text-purple-300"
-                />
-                <PitchDetail
-                  label="Unique Selling Point"
-                  value={project.overview?.Unique_selling_point || ""}
-                  icon={Sparkles}
-                  color="text-pink-300"
-                />
-                <PitchDetail
-                  label="Marketing Strategy"
-                  value={project.overview?.Marketing_Strategy || ""}
-                  icon={Megaphone}
-                  color="text-indigo-300"
-                />
+    <><Head>
+      <title> {project.name} | NexTraction</title>
+      <meta name="description" content="Manage and track your business ideas and projects." />
+    </Head><ProjectLayout>
+        <div className="p-4 md:p-6 max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{project.name}</h1>
+              <div className="flex items-center mt-2">
+                <span className={`${currentStage.color} text-xs px-2 py-1 rounded-full font-medium mr-2`}>
+                  {currentStage.label}
+                </span>
+                <span className="text-gray-500 text-sm">{currentStage.description}</span>
               </div>
             </div>
 
-            {/* Analysis Section */}
-            {analysisReports.length > 0 && (
-              <div className="mb-6">
-                <AnalysisSection analyses={analysisReports} />
-              </div>
-            )}
+            <div className="flex mt-4 md:mt-0 space-x-2">
+              <Button variant="outline" size="sm" asChild>
+                <Link href={`/project/${project.id}/edit`}>
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Link>
+              </Button>
+              <ShareTeamDialog
+                projectId={project.id}
+                projectName={project.name}
+                variant="outline"
+                size="sm" />
+            </div>
+          </div>
 
-            {/* Personas Section */}
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Target Personas</h2>
-              {!showGroupChat && personas && personas.length > 0 && (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-                    {personas.map((persona, index) => (
-                      <PersonaCard
-                        key={persona.id}
-                        persona={{
-                          id: persona.id,
-                          name: persona.name,
-                          role: persona.role,
-                          company: persona.company,
-                          description: persona.description,
-                          accentColor: "#6366f1",
-                          avatarUrl: undefined,
-                          jobTitle: persona.role,
-                          needsSnippet: persona.description.substring(0, 100) + '...'
-                        }}
-                        onShowDetails={() => setSelectedPersona(index)}
-                      />
-                    ))}
-                  </div>
-                  <Button
-                    onClick={() => router.push(`/project/${project.id}/chat`)}
-                    className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
-                  >
-                    <Users className="h-5 w-5 mr-2" />
-                    Chat with Personas
-                  </Button>
-                </>
+          {/* Main content grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left column */}
+            <div className="lg:col-span-2">
+              {/* Metrics */}
+              {transformedMetrics && (
+                <div className="mb-6">
+                  <MetricsDisplay metrics={transformedMetrics} />
+                </div>
               )}
-              {showGroupChat && (
-                <GroupChat projectId={project.id} projectName={project.name} personas={personas} />
+
+              {/* Project Overview */}
+              <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4">Project Overview</h2>
+                <p className="text-gray-600 mb-6">{project.description}</p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                  <PitchDetail
+                    label="Problem"
+                    value={project.overview?.Problem || ""}
+                    icon={AlertTriangle}
+                    color="text-red-300" />
+                  <PitchDetail
+                    label="Solution"
+                    value={project.overview?.Solution || ""}
+                    icon={Lightbulb}
+                    color="text-blue-300" />
+                  <PitchDetail
+                    label="Target Market"
+                    value={project.overview?.Target_Market || ""}
+                    icon={Users}
+                    color="text-green-300" />
+                  <PitchDetail
+                    label="Business Model"
+                    value={project.overview?.Business_Model || ""}
+                    icon={Briefcase}
+                    color="text-yellow-300" />
+                  <PitchDetail
+                    label="Competition"
+                    value={project.overview?.Competition || ""}
+                    icon={Swords}
+                    color="text-purple-300" />
+                  <PitchDetail
+                    label="Unique Selling Point"
+                    value={project.overview?.Unique_selling_point || ""}
+                    icon={Sparkles}
+                    color="text-pink-300" />
+                  <PitchDetail
+                    label="Marketing Strategy"
+                    value={project.overview?.Marketing_Strategy || ""}
+                    icon={Megaphone}
+                    color="text-indigo-300" />
+                </div>
+              </div>
+
+              {/* Analysis Section */}
+              {analysisReports.length > 0 && (
+                <div className="mb-6">
+                  <AnalysisSection analyses={analysisReports} />
+                </div>
               )}
+
+              {/* Personas Section */}
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Target Personas</h2>
+                {!showGroupChat && personas && personas.length > 0 && (
+                  <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                      {personas.map((persona, index) => (
+                        <PersonaCard
+                          key={persona.id}
+                          persona={{
+                            id: persona.id,
+                            name: persona.name,
+                            role: persona.role,
+                            company: persona.company,
+                            description: persona.description,
+                            accentColor: "#6366f1",
+                            avatarUrl: undefined,
+                            jobTitle: persona.role,
+                            needsSnippet: persona.description.substring(0, 100) + '...'
+                          }}
+                          onShowDetails={() => setSelectedPersona(index)} />
+                      ))}
+                    </div>
+                    <Button
+                      onClick={() => router.push(`/project/${project.id}/chat`)}
+                      className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
+                    >
+                      <Users className="h-5 w-5 mr-2" />
+                      Chat with Personas
+                    </Button>
+                  </>
+                )}
+                {showGroupChat && (
+                  <GroupChat projectId={project.id} projectName={project.name} personas={personas} />
+                )}
+              </div>
+            </div>
+
+            {/* Right column */}
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg shadow-sm border p-6">
+                <h2 className="text-xl font-semibold mb-4">Actions</h2>
+                <ActionButtons projectId={project.id} />
+              </div>
             </div>
           </div>
 
-          {/* Right column */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="text-xl font-semibold mb-4">Actions</h2>
-              <ActionButtons projectId={project.id} />
-            </div>
-          </div>
+          {/* Persona Modal */}
+          {selectedPersona !== null && personas[selectedPersona] && (
+            <PersonaModal
+              persona={{
+                ...personas[selectedPersona],
+                role: personas[selectedPersona].role as any, // Type assertion for role compatibility
+                avatarUrl: undefined
+              }}
+              isOpen={selectedPersona !== null}
+              onClose={() => setSelectedPersona(null)}
+              jobTitle={personas[selectedPersona].role}
+              needsDetails={personas[selectedPersona].description}
+              background=""
+              goals={personas[selectedPersona].goals || []}
+              challenges={personas[selectedPersona].pain_points || []}
+              preferredCommunication="" />
+          )}
         </div>
-
-        {/* Persona Modal */}
-        {selectedPersona !== null && personas[selectedPersona] && (
-          <PersonaModal
-            persona={{
-              ...personas[selectedPersona],
-              role: personas[selectedPersona].role as any, // Type assertion for role compatibility
-              avatarUrl: undefined
-            }}
-            isOpen={selectedPersona !== null}
-            onClose={() => setSelectedPersona(null)}
-            jobTitle={personas[selectedPersona].role}
-            needsDetails={personas[selectedPersona].description}
-            background=""
-            goals={personas[selectedPersona].goals || []}
-            challenges={personas[selectedPersona].pain_points || []}
-            preferredCommunication=""
-          />
-        )}
-      </div>
-    </ProjectLayout>
+      </ProjectLayout></>
   );
 }

@@ -1,79 +1,85 @@
-// supa_database/components/AuthModal.tsx
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-// Removed direct auth imports: signIn, signUp, signInWithMagicLink, validateAccessCode
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useAuthContext } from './AuthProvider'
+import Link from 'next/link'
+
+type FormData = {
+  email: string
+  password: string
+  confirmPassword?: string
+  accessCode?: string
+  acceptTerms?: boolean
+}
+
+type AuthMode = 'signin' | 'signup'
 
 interface AuthModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
+  initialMode?: AuthMode
 }
 
-interface AuthFormData {
-  email: string;
-  password: string;
-  confirmPassword?: string; // Added for confirm password
-  accessCode?: string; // Will be made mandatory for signup
-}
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'signin' }) => {
+  const [mode, setMode] = useState<AuthMode>(initialMode)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [message, setMessage] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin'); // Removed 'magic'
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { checkUser } = useAuthContext()
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<AuthFormData>({
-    defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-      accessCode: '',
-    }
-  });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+    reset
+  } = useForm<FormData>()
 
-  const onSubmit = async (data: AuthFormData) => {
-    setLoading(true);
-    setError(null);
-    setMessage(null);
-
-    const fetchOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-    };
+  const onSubmit = async (data: FormData) => {
+    setLoading(true)
+    setError(null)
+    setMessage(null)
 
     try {
       if (mode === 'signup') {
+        if (!data.acceptTerms) {
+          setError('You must accept the terms & services to sign up.')
+          return
+        }
+
         const response = await fetch('/api/auth/signup', {
-          ...fetchOptions,
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({
             email: data.email,
             password: data.password,
-            accessCode: data.accessCode, // Access code is now mandatory
+            accessCode: data.accessCode
           }),
-        });
-        const responseData = await response.json();
+        })
+        const responseData = await response.json()
         if (!response.ok) {
-          throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
+          throw new Error(responseData.error || `HTTP error! status: ${response.status}`)
         }
-        setMessage(responseData.message || 'Sign-up successful. Please check your email.');
-        // Optionally reset form or switch mode after successful signup message
-        // For now, keep on signup form with success message. User can close modal.
-      } else { // signin
+        setMessage(responseData.message || 'Sign-up successful. Please check your email.')
+      } else {
         const response = await fetch('/api/auth/signin', {
-          ...fetchOptions,
-          body: JSON.stringify({ email: data.email, password: data.password }), // rememberMe not typical for modals
-        });
-        const responseData = await response.json();
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email: data.email, password: data.password }),
+        })
+        const responseData = await response.json()
         if (!response.ok) {
-          throw new Error(responseData.error || `HTTP error! status: ${response.status}`);
+          throw new Error(responseData.error || `HTTP error! status: ${response.status}`)
         }
-        // Sign-in successful via API, cookie is set.
-        // AuthProvider will pick up the change. Close modal.
-        onClose();
+        await checkUser()
+        onClose()
       }
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.');
+      setError(err.message || 'An unexpected error occurred.')
     } finally {
       setLoading(false)
     }
@@ -82,11 +88,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 sm:p-6 md:p-8 z-50"> {/* Responsive padding for overlay */}
-      <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md"> {/* Responsive padding for modal content */}
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 sm:p-6 md:p-8 z-50">
+      <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">
-            {mode === 'signin' ? 'Sign In' : 'Sign Up'} {/* Removed Magic Link */}
+            {mode === 'signin' ? 'Sign In' : 'Sign Up'}
           </h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Close modal">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -129,7 +135,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             )}
           </div>
 
-          {/* Password Field (common for signin and signup) */}
           <div>
             <label htmlFor="passwordModal" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <div className="relative">
@@ -155,10 +160,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
           </div>
 
-          {/* Signup Specific Fields */}
           {mode === 'signup' && (
             <>
-              <div> {/* Confirm Password Field */}
+              <div>
                 <label htmlFor="confirmPasswordModal" className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                 <div className="relative">
                   <input
@@ -183,7 +187,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}
               </div>
 
-              <div> {/* Access Code Field - Now Mandatory for Signup */}
+              <div>
                 <label htmlFor="accessCodeModal" className="block text-sm font-medium text-gray-700 mb-1">Access Code</label>
                 <input
                   id="accessCodeModal"
@@ -197,6 +201,31 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     A valid access code is required to sign up.
                  </p>
               </div>
+
+              {/* Terms & Services Checkbox */}
+              <div className="flex items-start">
+                <input
+                  id="acceptTermsModal"
+                  {...register('acceptTerms', {
+                    required: 'You must accept the terms & services to sign up'
+                  })}
+                  type="checkbox"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                />
+                <label htmlFor="acceptTermsModal" className="ml-2 block text-sm text-gray-900">
+                  By signing up, you accept our{' '}
+                  <Link href="/terms-of-service" className="text-blue-600 hover:text-blue-700 underline" target="_blank">
+                    Terms & Services
+                  </Link>
+                  {' '}and{' '}
+                  <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-700 underline" target="_blank">
+                    Privacy Policy
+                  </Link>
+                </label>
+              </div>
+              {errors.acceptTerms && (
+                <p className="text-red-500 text-sm mt-1">{errors.acceptTerms.message}</p>
+              )}
             </>
           )}
 
@@ -217,7 +246,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             >
               Don't have an account? Sign up
             </button>
-          ) : ( // mode === 'signup'
+          ) : (
             <button
               onClick={() => { setMode('signin'); setError(null); setMessage(null);}}
               className="text-blue-600 hover:text-blue-700 text-sm"

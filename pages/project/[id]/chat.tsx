@@ -7,6 +7,7 @@ import { Send, AtSign, Users, Bot, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import ProjectLayout from '@/components/layout/ProjectLayout';
 import { PersonaModal } from '@/components/client-components/persona/PersonaModal'; // Import PersonaModal
+import Head from 'next/dist/shared/lib/head';
 
 
 interface Persona {
@@ -292,219 +293,216 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
   };
 
   return (
-    <ProjectLayout>
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar with Personas */}
-      <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-        <div className="p-4 border-b border-gray-100">
-          <div className="flex items-center mb-2">
+    <><Head>
+      <title> Chat | {project.name}</title>
+      <meta name="description" content="Manage and track your business ideas and projects." />
+    </Head><ProjectLayout>
+        <div className="flex h-screen bg-gray-100">
+          {/* Sidebar with Personas */}
+          <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+            <div className="p-4 border-b border-gray-100">
+              <div className="flex items-center mb-2">
 
-            <div className="flex-1">
-              <h1 className="text-lg font-semibold text-gray-900 truncate">{project.name}</h1>
-              <p className="text-sm text-gray-500">Project Chat</p>
-            </div>
-          </div>
-          <div className="flex items-center text-sm text-gray-600">
-            <Users className="mr-2 h-4 w-4" />
-            Team Members ({personas.length})
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {personas.map((persona) => (
-            <div key={persona.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
-                 onClick={() => handlePersonaClick(persona)}>
-              <div className={`w-10 h-10 rounded-full ${persona.avatar_color} flex items-center justify-center text-white font-medium text-sm`}>
-                {persona.name.charAt(0).toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-gray-900 text-sm truncate">{persona.name}</h3>
-                <p className="text-xs text-gray-500 line-clamp-2">{persona.description}</p>
-                {/* <p className="text-xs text-blue-600 mt-1 truncate">{persona.expertise}</p> */}
-              </div>
-            </div>
-          ))}
-
-          {personas.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <Bot className="mx-auto h-12 w-12 mb-3 text-gray-300" />
-              <p className="text-sm">No team members found for this project.</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Chat Header */}
-        <div className="bg-white border-b border-gray-200 p-4">
-          <h2 className="text-xl font-semibold text-gray-900">Team Collaboration</h2>
-          <p className="text-sm text-gray-500">
-            {personas.length > 0 ? 'Chat with your AI team members' : 'Add team members to start collaborating'}
-          </p>
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
-              <div className="mb-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                  <Send className="h-8 w-8 text-blue-600" />
+                <div className="flex-1">
+                  <h1 className="text-lg font-semibold text-gray-900 truncate">{project.name}</h1>
+                  <p className="text-sm text-gray-500">Project Chat</p>
                 </div>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Start the conversation</h3>
-              <p className="max-w-md mx-auto text-sm">
-                Send a message to begin collaborating with your AI team members.
-                {personas.length > 0 && " Use @name to mention specific team members."}
+              <div className="flex items-center text-sm text-gray-600">
+                <Users className="mr-2 h-4 w-4" />
+                Team Members ({personas.length})
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {personas.map((persona) => (
+                <div key={persona.id} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                  onClick={() => handlePersonaClick(persona)}>
+                  <div className={`w-10 h-10 rounded-full ${persona.avatar_color} flex items-center justify-center text-white font-medium text-sm`}>
+                    {persona.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-gray-900 text-sm truncate">{persona.name}</h3>
+                    <p className="text-xs text-gray-500 line-clamp-2">{persona.description}</p>
+                    {/* <p className="text-xs text-blue-600 mt-1 truncate">{persona.expertise}</p> */}
+                  </div>
+                </div>
+              ))}
+
+              {personas.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <Bot className="mx-auto h-12 w-12 mb-3 text-gray-300" />
+                  <p className="text-sm">No team members found for this project.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Chat Area */}
+          <div className="flex-1 flex flex-col">
+            {/* Chat Header */}
+            <div className="bg-white border-b border-gray-200 p-4">
+              <h2 className="text-xl font-semibold text-gray-900">Team Collaboration</h2>
+              <p className="text-sm text-gray-500">
+                {personas.length > 0 ? 'Chat with your AI team members' : 'Add team members to start collaborating'}
               </p>
             </div>
-          )}
 
-          {messages.map((message) => {
-            const persona = message.persona_id ? personas.find(p => p.id === message.persona_id) : null;
-            const isUser = message.sender_type === 'user';
-
-            return (
-              <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-                <div className={`flex max-w-xs lg:max-w-md xl:max-w-lg ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
-                  {!isUser && (
-                    <div className={`w-8 h-8 rounded-full ${persona?.avatar_color || 'bg-gray-400'} flex items-center justify-center text-white text-xs font-medium`}>
-                      {message.sender.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-
-                  <div className={`px-4 py-2 rounded-lg ${
-                    isUser
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white border border-gray-200 text-gray-900'
-                  }`}>
-                    {!isUser && (
-                      <div className="text-xs font-medium text-gray-600 mb-1">{message.sender}</div>
-                    )}
-                    <div className="text-sm whitespace-pre-wrap">{message.content}</div>
-                    <div className={`text-xs mt-1 ${
-                      isUser ? 'text-blue-100' : 'text-gray-500'
-                    }`}>
-                      {formatTime(message.timestamp)}
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.length === 0 && (
+                <div className="text-center py-12 text-gray-500">
+                  <div className="mb-4">
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                      <Send className="h-8 w-8 text-blue-600" />
                     </div>
                   </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Start the conversation</h3>
+                  <p className="max-w-md mx-auto text-sm">
+                    Send a message to begin collaborating with your AI team members.
+                    {personas.length > 0 && " Use @name to mention specific team members."}
+                  </p>
+                </div>
+              )}
 
-                  {isUser && (
-                    <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-medium">
-                      {currentUser.charAt(0).toUpperCase()}
+              {messages.map((message) => {
+                const persona = message.persona_id ? personas.find(p => p.id === message.persona_id) : null;
+                const isUser = message.sender_type === 'user';
+
+                return (
+                  <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`flex max-w-xs lg:max-w-md xl:max-w-lg ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
+                      {!isUser && (
+                        <div className={`w-8 h-8 rounded-full ${persona?.avatar_color || 'bg-gray-400'} flex items-center justify-center text-white text-xs font-medium`}>
+                          {message.sender.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+
+                      <div className={`px-4 py-2 rounded-lg ${isUser
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white border border-gray-200 text-gray-900'}`}>
+                        {!isUser && (
+                          <div className="text-xs font-medium text-gray-600 mb-1">{message.sender}</div>
+                        )}
+                        <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+                        <div className={`text-xs mt-1 ${isUser ? 'text-blue-100' : 'text-gray-500'}`}>
+                          {formatTime(message.timestamp)}
+                        </div>
+                      </div>
+
+                      {isUser && (
+                        <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-medium">
+                          {currentUser.charAt(0).toUpperCase()}
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+                  </div>
+                );
+              })}
 
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                    <span className="text-sm text-gray-500">Team members are typing...</span>
+                  </div>
                 </div>
-                <span className="text-sm text-gray-500">Team members are typing...</span>
-              </div>
+              )}
+
+              <div ref={messagesEndRef} />
             </div>
-          )}
 
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        {personas.length > 0 && (
-          <div className="bg-white border-t border-gray-200 p-4">
-            {/* Mentions dropdown */}
-            {showMentions && (
-              <div className="mb-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                {personas.map((persona) => (
-                  <div
-                    key={persona.id}
-                    className="flex items-center space-x-2 p-2 hover:bg-gray-50 cursor-pointer"
-                    onClick={() => insertMention(persona.name)}
-                  >
-                    <div className={`w-6 h-6 rounded-full ${persona.avatar_color} flex items-center justify-center text-white text-xs font-medium`}>
-                      {persona.name.charAt(0).toUpperCase()}
-                    </div>
-                    <span className="text-sm font-medium">{persona.name}</span>
+            {/* Input Area */}
+            {personas.length > 0 && (
+              <div className="bg-white border-t border-gray-200 p-4">
+                {/* Mentions dropdown */}
+                {showMentions && (
+                  <div className="mb-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                    {personas.map((persona) => (
+                      <div
+                        key={persona.id}
+                        className="flex items-center space-x-2 p-2 hover:bg-gray-50 cursor-pointer"
+                        onClick={() => insertMention(persona.name)}
+                      >
+                        <div className={`w-6 h-6 rounded-full ${persona.avatar_color} flex items-center justify-center text-white text-xs font-medium`}>
+                          {persona.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="text-sm font-medium">{persona.name}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+
+                <div className="flex items-end space-x-2">
+                  <button
+                    onClick={() => setShowMentions(!showMentions)}
+                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    title="Mention team member"
+                  >
+                    <AtSign className="h-5 w-5" />
+                  </button>
+
+                  <div className="flex-1 relative">
+                    <textarea
+                      ref={inputRef}
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Type a message... (Use @name to mention team members)"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      rows={1}
+                      style={{ minHeight: '42px', maxHeight: '120px' }}
+                      onInput={(e) => {
+                        const target = e.target as HTMLTextAreaElement;
+                        target.style.height = 'auto';
+                        target.style.height = target.scrollHeight + 'px';
+                      } } />
+                  </div>
+
+                  <button
+                    onClick={handleSendMessage}
+                    disabled={!inputMessage.trim() || isLoading}
+                    className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    <Send className="h-5 w-5" />
+                  </button>
+                </div>
+
+                <div className="mt-2 text-xs text-gray-500">
+                  Press Enter to send, Shift+Enter for new line
+                </div>
               </div>
             )}
-
-            <div className="flex items-end space-x-2">
-              <button
-                onClick={() => setShowMentions(!showMentions)}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Mention team member"
-              >
-                <AtSign className="h-5 w-5" />
-              </button>
-
-              <div className="flex-1 relative">
-                <textarea
-                  ref={inputRef}
-                  value={inputMessage}
-                  onChange={(e) => setInputMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Type a message... (Use @name to mention team members)"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  rows={1}
-                  style={{ minHeight: '42px', maxHeight: '120px' }}
-                  onInput={(e) => {
-                    const target = e.target as HTMLTextAreaElement;
-                    target.style.height = 'auto';
-                    target.style.height = target.scrollHeight + 'px';
-                  }}
-                />
-              </div>
-
-              <button
-                onClick={handleSendMessage}
-                disabled={!inputMessage.trim() || isLoading}
-                className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Send className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="mt-2 text-xs text-gray-500">
-              Press Enter to send, Shift+Enter for new line
-            </div>
           </div>
-        )}
-      </div>
 
-      {/* Persona Details Modal using imported component */}
-      {isPersonaModalOpen && selectedPersonaForModal && (
-        <PersonaModal
-          isOpen={isPersonaModalOpen}
-          onClose={() => setIsPersonaModalOpen(false)}
-          persona={{
-            id: selectedPersonaForModal.id,
-            name: selectedPersonaForModal.name,
-            role: 'user', // Provide a default valid role for ChatPersona.role tag
-            // avatarUrl can be omitted; PersonaModal handles placeholder if not present
-          }}
-          jobTitle={selectedPersonaForModal.role} // Use the actual role string for jobTitle
-          needsDetails={selectedPersonaForModal.description}
-          background={selectedPersonaForModal.demographics
-            ? Object.entries(selectedPersonaForModal.demographics)
-                .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}: ${String(value)}`)
-                .join('; ')
-            : undefined}
-          goals={selectedPersonaForModal.goals}
-          challenges={selectedPersonaForModal.pain_points} // Map pain_points to challenges
-          // preferredCommunication will use the default from PersonaModal
-        />
-      )}
-    </div>
-    </ProjectLayout>
+          {/* Persona Details Modal using imported component */}
+          {isPersonaModalOpen && selectedPersonaForModal && (
+            <PersonaModal
+              isOpen={isPersonaModalOpen}
+              onClose={() => setIsPersonaModalOpen(false)}
+              persona={{
+                id: selectedPersonaForModal.id,
+                name: selectedPersonaForModal.name,
+                role: 'user', // Provide a default valid role for ChatPersona.role tag
+                // avatarUrl can be omitted; PersonaModal handles placeholder if not present
+              }}
+              jobTitle={selectedPersonaForModal.role} // Use the actual role string for jobTitle
+              needsDetails={selectedPersonaForModal.description}
+              background={selectedPersonaForModal.demographics
+                ? Object.entries(selectedPersonaForModal.demographics)
+                  .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}: ${String(value)}`)
+                  .join('; ')
+                : undefined}
+              goals={selectedPersonaForModal.goals}
+              challenges={selectedPersonaForModal.pain_points} // Map pain_points to challenges
+            />
+          )}
+        </div>
+      </ProjectLayout></>
   );
 }
 

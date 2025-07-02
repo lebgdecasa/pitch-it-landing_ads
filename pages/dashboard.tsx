@@ -10,6 +10,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useProjects } from '@/supa_database/hooks/useProject';
 // import ConfirmationDialog from '@/components/modals/ConfirmationDialog'; // Lazy loaded
 import dynamic from 'next/dynamic';
+import Head from 'next/head';
 
 const ConfirmationDialog = dynamic(() => import('@/components/modals/ConfirmationDialog'), { ssr: false });
 
@@ -208,77 +209,46 @@ export default function Dashboard() {
   );
 
   return (
-    <DashboardLayout>
-      <div className="mx-auto p-4 md:p-6 max-w-7xl">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">My Projects</h1>
-            <p className="text-gray-600 mt-1">Manage and track your business ideas</p>
-          </div>
-          {projects.length > 0 && (
-            <Button asChild size="lg" className="rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors">
-              <Link href="/wizard" className="flex items-center">
-                <PlusCircle className="mr-2 h-5 w-5" />
-                New Project
-              </Link>
-            </Button>
-          )}
-        </div>
-
-        {projects.length === 0 ? (
-          <div className="w-fit mx-auto flex flex-col items-center justify-center text-center border-gray-200 rounded-lg p-10 md:p-20 lg:p-40 min-h-[50vh] md:min-h-[60vh]">
-            <h3 className="font-semibold text-2xl md:text-3xl mb-4">No projects yet</h3>
-            <p className="text-gray-600 mb-8 max-w-md">Get started by creating your first project. Let's bring your idea to life.</p>
-            <Button asChild size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
-              {/* Assuming /project/creation/wizard is the correct path for the wizard */}
-              <Link href="/wizard" className="flex items-center">
-                <PlusCircle className="mr-2 h-5 w-5" />
-                Create Project
-              </Link>
-            </Button>
-          </div>
-        ) : (
-          <>
-            {/* Recent Projects */}
-            {sortedProjects.length > 0 && (
-              <div className="mb-10">
-                <h2 className="text-xl font-semibold mb-4 text-gray-800">Recent Projects</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {sortedProjects.slice(0, 3).map((project) => (
-                    <ProjectCard
-                      key={project.id}
-                      id={project.id}
-                      name={project.name}
-                      description={project.description}
-                      stage={project.stage}
-                      updatedAt={project.updatedAt.toString()}
-                      onDeleteRequest={handleDeleteRequest} // Pass new handler
-                    />
-                  ))}
-                </div>
-              </div>
+    <><Head>
+      <title>Dashboard | NexTraction</title>
+      <meta name="description" content="Manage and track your business ideas and projects." />
+    </Head><DashboardLayout>
+        <div className="mx-auto p-4 md:p-6 max-w-7xl">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">My Projects</h1>
+              <p className="text-gray-600 mt-1">Manage and track your business ideas</p>
+            </div>
+            {projects.length > 0 && (
+              <Button asChild size="lg" className="rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors">
+                <Link href="/wizard" className="flex items-center">
+                  <PlusCircle className="mr-2 h-5 w-5" />
+                  New Project
+                </Link>
+              </Button>
             )}
+          </div>
 
-            {/* Projects by Stage */}
-            {Object.entries(projectsByStage).map(([stage, stageProjects]) => {
-              if (stageProjects.length === 0) return null;
-
-              const stageLabels = {
-                [ProjectStage.IDEA]: "Idea Stage",
-                [ProjectStage.SERIES_A]: "Series A Stage",
-                [ProjectStage.SERIES_B]: "Series B Stage",
-                [ProjectStage.SERIES_C]: "Series C Stage",
-                [ProjectStage.PRE_SEED]: "Pre-Seed Stage",
-                [ProjectStage.SEED]: "Seed Stage",
-                [ProjectStage.PROTOTYPE]: "Prototype Stage",
-                [ProjectStage.MVP]: "MVP Stage",
-              };
-
-              return (
-                <div key={stage} className="mb-10">
-                  <h2 className="text-xl font-semibold mb-4 text-gray-800">{stageLabels[stage as ProjectStage]}</h2>
+          {projects.length === 0 ? (
+            <div className="w-fit mx-auto flex flex-col items-center justify-center text-center border-gray-200 rounded-lg p-10 md:p-20 lg:p-40 min-h-[50vh] md:min-h-[60vh]">
+              <h3 className="font-semibold text-2xl md:text-3xl mb-4">No projects yet</h3>
+              <p className="text-gray-600 mb-8 max-w-md">Get started by creating your first project. Let's bring your idea to life.</p>
+              <Button asChild size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
+                {/* Assuming /project/creation/wizard is the correct path for the wizard */}
+                <Link href="/wizard" className="flex items-center">
+                  <PlusCircle className="mr-2 h-5 w-5" />
+                  Create Project
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <>
+              {/* Recent Projects */}
+              {sortedProjects.length > 0 && (
+                <div className="mb-10">
+                  <h2 className="text-xl font-semibold mb-4 text-gray-800">Recent Projects</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {stageProjects.map((project) => (
+                    {sortedProjects.slice(0, 3).map((project) => (
                       <ProjectCard
                         key={project.id}
                         id={project.id}
@@ -291,46 +261,79 @@ export default function Dashboard() {
                     ))}
                   </div>
                 </div>
-              );
-            })}
-            {/* Fallback if all categories are empty but projects array is not (e.g. stage mismatch) */}
-            {sortedProjects.length > 0 && Object.values(projectsByStage).every(arr => arr.length === 0) && (
-                 <div className="mb-10">
-                 <h2 className="text-xl font-semibold mb-4 text-gray-800">All Projects</h2>
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                   {sortedProjects.map((project) => (
-                     <ProjectCard
-                       key={project.id}
-                       id={project.id}
-                       name={project.name}
-                       description={project.description}
-                       stage={project.stage}
-                       updatedAt={project.updatedAt.toString()}
-                       onDeleteRequest={handleDeleteRequest} // Pass new handler
-                     />
-                   ))}
-                 </div>
-               </div>
-            )}
-          </>
-        )}
-      </div>
+              )}
 
-      {/* Confirmation Dialog for Deletion */}
-      {projectToDelete && (
-        <ConfirmationDialog
-          isOpen={showDeleteConfirm}
-          onClose={() => {
-            setShowDeleteConfirm(false);
-            setProjectToDelete(null);
-          }}
-          onConfirm={handleConfirmDelete}
-          title={`Delete Project: ${projectToDelete.name}`}
-          description="Are you sure you want to delete this project? This action cannot be undone and all associated data will be lost."
-          confirmButtonText="Delete"
-          confirmButtonClassName="bg-red-600 hover:bg-red-700 text-white"
-        />
-      )}
-    </DashboardLayout>
+              {/* Projects by Stage */}
+              {Object.entries(projectsByStage).map(([stage, stageProjects]) => {
+                if (stageProjects.length === 0) return null;
+
+                const stageLabels = {
+                  [ProjectStage.IDEA]: "Idea Stage",
+                  [ProjectStage.SERIES_A]: "Series A Stage",
+                  [ProjectStage.SERIES_B]: "Series B Stage",
+                  [ProjectStage.SERIES_C]: "Series C Stage",
+                  [ProjectStage.PRE_SEED]: "Pre-Seed Stage",
+                  [ProjectStage.SEED]: "Seed Stage",
+                  [ProjectStage.PROTOTYPE]: "Prototype Stage",
+                  [ProjectStage.MVP]: "MVP Stage",
+                };
+
+                return (
+                  <div key={stage} className="mb-10">
+                    <h2 className="text-xl font-semibold mb-4 text-gray-800">{stageLabels[stage as ProjectStage]}</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {stageProjects.map((project) => (
+                        <ProjectCard
+                          key={project.id}
+                          id={project.id}
+                          name={project.name}
+                          description={project.description}
+                          stage={project.stage}
+                          updatedAt={project.updatedAt.toString()}
+                          onDeleteRequest={handleDeleteRequest} // Pass new handler
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+              {/* Fallback if all categories are empty but projects array is not (e.g. stage mismatch) */}
+              {sortedProjects.length > 0 && Object.values(projectsByStage).every(arr => arr.length === 0) && (
+                <div className="mb-10">
+                  <h2 className="text-xl font-semibold mb-4 text-gray-800">All Projects</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {sortedProjects.map((project) => (
+                      <ProjectCard
+                        key={project.id}
+                        id={project.id}
+                        name={project.name}
+                        description={project.description}
+                        stage={project.stage}
+                        updatedAt={project.updatedAt.toString()}
+                        onDeleteRequest={handleDeleteRequest} // Pass new handler
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Confirmation Dialog for Deletion */}
+        {projectToDelete && (
+          <ConfirmationDialog
+            isOpen={showDeleteConfirm}
+            onClose={() => {
+              setShowDeleteConfirm(false);
+              setProjectToDelete(null);
+            } }
+            onConfirm={handleConfirmDelete}
+            title={`Delete Project: ${projectToDelete.name}`}
+            description="Are you sure you want to delete this project? This action cannot be undone and all associated data will be lost."
+            confirmButtonText="Delete"
+            confirmButtonClassName="bg-red-600 hover:bg-red-700 text-white" />
+        )}
+      </DashboardLayout></>
   );
 }
