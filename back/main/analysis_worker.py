@@ -18,6 +18,7 @@ from dotenv import load_dotenv
 import os
 from back.supabase import supabase
 from datetime import datetime
+from back.actions.send_email import send_project_ready_email
 
 # Load environment variables from the .env file in the project root
 # Get the project root directory (2 levels up from this file)
@@ -518,6 +519,20 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, na
 
            # Replace the persona insertion section in run_analysis_job with this:
 
+            # After successfully updating the project, fetch the user's email
+            user_id_response = supabase.table("projects").select("user_id").eq("id", project_id).execute()
+            if user_id_response.data:
+                user_id = user_id_response.data[0]['user_id']
+                user_email_response = supabase.table("users").select("email").eq("id", user_id).execute()
+                if user_email_response.data:
+                    user_email = user_email_response.data[0]['email']
+                    # Send the email
+                    send_project_ready_email(recipient_email=user_email, project_name=name)
+                else:
+                    safe_callback(lambda: log_callback(task_id, "Could not find user email to send notification."))
+            else:
+                safe_callback(lambda: log_callback(task_id, "Could not find user_id for the project."))
+
             for persona in detailed_persona_info:
                 # Access both card_details and original_data
                 card_data = persona.get("card_details", {})
@@ -591,8 +606,6 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, na
         print(error_message)
         safe_callback(lambda: log_callback(task_id, f"A critical error occurred in the background task: {str(e)}"))
         safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
-# Note: The chat_with_persona part is removed from this worker function.
-# It needs to be triggered by the '/select_persona' endpoint after the user makes a choice.
 
 if __name__ == "__main__":
     # Example usage for testing purposes

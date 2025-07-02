@@ -9,6 +9,7 @@ import { AnalysisProgress } from './AnalysisProgress';
 import { createProject } from '@/supa_database/utils/projects';
 import axios from 'axios';
 import { ProjectStage } from '@/types';
+import Modal from '@/components/ui/Modal'; // Import Modal
 
 interface ProjectData {
   projectName: string;
@@ -23,6 +24,7 @@ export const ProjectWizard: React.FC = () => {
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // Add modal state
   const router = useRouter();
   const { user } = useAuthContext(); // Get the user from the context
 
@@ -51,15 +53,13 @@ export const ProjectWizard: React.FC = () => {
       });
 
       // Redirect user to dashboard after analysis starts
-      router.push('/dashboard');
+      setIsModalOpen(true); // Open the modal instead of redirecting
     } catch (error) {
       console.error('Submission error:', error);
       setSubmitError('An unexpected error occurred. Please try again.');
       setIsSubmitting(false);
     }
   };
-
-
 
   const renderStep = () => {
     switch (currentStep) {
@@ -108,6 +108,25 @@ export const ProjectWizard: React.FC = () => {
       <div className="mt-8">
         {renderStep()}
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          router.push('/dashboard');
+        }}
+        titleId="analysis-started-title"
+      >
+        <div className="text-center">
+          <h2 id="analysis-started-title" className="text-2xl font-bold mb-4">Project Analysis Started</h2>
+          <p>You will receive an email once the analysis is complete.</p>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Back to Dashboard
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 };
