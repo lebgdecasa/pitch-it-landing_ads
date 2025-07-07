@@ -37,7 +37,7 @@ const stageDescriptions: { [key: string]: string } = {
   'prototype': "📌 You have a basic working model of your product.",
   'mvp': "📌 You have a Minimum Viable Product with core features and some user traction.",
   'Pre-seed': "📌 You're starting to build your team and refine your business model, seeking initial funding.",
-  Seed: "📌 You have a product, a team, and early market validation, seeking funding for growth.",
+  'seed': "📌 You have a product, a team, and early market validation, seeking funding for growth.",
   'Series A': "📌 You have a proven business model and significant traction, seeking funding to scale.",
   'Later-stage': "📌 You are an established company looking for further expansion and market leadership."
 };
@@ -91,8 +91,8 @@ export const StageUploadStep: React.FC<StageUploadStepProps> = ({
               </SelectGroup>
             </SelectContent>
           </Select>
-          {data.stage && stageDescriptions[data.stage] && (
-            <p className="text-sm text-gray-600 mt-1">{stageDescriptions[data.stage]}</p>
+          {data.stage && stageDescriptions[data.stage.toLowerCase()] && (
+            <p className="text-sm text-gray-600 mt-1">{stageDescriptions[data.stage.toLowerCase()]}</p>
           )}
           {error && (
             <p className="text-sm text-red-500">{error}</p>

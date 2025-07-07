@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { Check, X } from 'lucide-react';
+import Modal from '@/components/ui/Modal'; // Import the Modal component
+
 
 import type {
   PitchDimension,
@@ -195,6 +197,7 @@ export default function PitchDescriptionAssistant({
   const [feedback, setFeedback] = useState<string | null>(null);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
   const [showAssistant, setShowAssistant] = useState(false);
+  const [showValidationModal, setShowValidationModal] = useState(false);
 
   // Added state from the first code block
   const [isLoadingProjects, setIsLoadingProjects] = useState(false);
@@ -366,6 +369,10 @@ export default function PitchDescriptionAssistant({
       alert("Please provide a more detailed description (at least 50 characters).");
       return;
     }
+    if (Object.values(coveredDimensions).filter(Boolean).length < 6) {
+      setShowValidationModal(true);
+      return;
+    }
     if (onNext) {
       onNext();
     }
@@ -431,7 +438,7 @@ export default function PitchDescriptionAssistant({
             <Button onClick={() => setShowAssistant(prev => !prev)} variant="outline" className="mx-2">
               {showAssistant ? 'Hide Assistant' : 'Show Assistant'}
             </Button>
-            <Button onClick={handleNext} disabled={isLoadingCheck || value.length < 6}>
+            <Button onClick={handleNext} disabled={isLoadingCheck || Object.values(coveredDimensions).filter(Boolean).length < 6}>
               {isLoadingCheck ? 'Analyzing...' : 'Next'}
             </Button>
           </div>
@@ -449,6 +456,20 @@ export default function PitchDescriptionAssistant({
         )}
       </div>
       {/* Buttons were moved into the left panel */}
+      <Modal isOpen={showValidationModal} onClose={() => setShowValidationModal(false)} titleId="validation-modal-title">
+        <div className="text-center">
+          <h2 id="validation-modal-title" className="text-lg font-semibold">Almost There!</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            To better analyze your project and be as relevant as possible, we'd need you to cover <em>at least</em> 6 out of the 11 dimensions.
+          </p>
+          <button
+            onClick={() => setShowValidationModal(false)}
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Got it
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }
