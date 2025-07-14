@@ -146,6 +146,14 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, na
 
         print(f"TASK {task_id}: ----> BEFORE gemini_api.generate <----")
         key_trend_prompt = back.actions.gemini_api.generate(key_trend_prompt_generator)
+        key_trend_prompt = f'''PRODUCT_NAME: {name}
+                              PRODUCT_DESCRIPTION: {product_description}
+                                Focus on uncovering:
+                                - Non-obvious indirect competitors and substitutes
+                                - Trends in hydration tech and consumer health gadgets
+                                - Strategic GTM insights that could create defensibility
+                                - Any overlooked buyer segments worth exploring
+                                '''
         print(f"TASK {task_id}: ----> AFTER gemini_api.generate <----")
 
         print(f"TASK {task_id}: ----> BEFORE call_deep_research_api.run_research_api <----")
@@ -161,7 +169,7 @@ def run_analysis_job(product_description: str, task_id: str, project_id: str, na
             safe_callback(lambda: update_status_callback(task_id, status="failed", data_key="error", data_value=error_message))
             return # Stop execution
 
-        report_to_json = back.actions.markdown_to_json.parse_markdown_to_json(report)
+        report_to_json = back.actions.markdown_to_json.parse_pmf_report(report)
         #Save key trends report to markdown file
         # if report:
         #     key_trends_file_path = os.path.join(task_dir, f"key_trends_report_{task_id}.md")
