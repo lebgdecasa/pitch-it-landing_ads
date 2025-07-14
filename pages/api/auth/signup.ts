@@ -81,11 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       email: email as string,
       password: password as string,
       options: {
-        // Example: Pass data to be stored in the raw_user_meta_data or similar
-        // data: {
-        //   full_name: 'Registered via API with Access Code',
-        //   access_code_used: accessCode
-        // }
+        emailRedirectTo: 'https://nextraction.io/dashboard'
       }
     });
 
