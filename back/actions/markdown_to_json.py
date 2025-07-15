@@ -192,8 +192,8 @@ def parse_pmf_report(response: Dict) -> Optional[Dict[str, any]]:
         "competitive_benchmarks": extract_section("4. Competitive Benchmarks and Industry Comparison"),
         "user_workarounds": extract_section("5. Current User Workarounds & Substitutes"),
         "go_to_market": extract_section("6. Go-to-Market Landscape & Channel Fit"),
-        "validation_signals": extract_section("8. Key Validation Signals"),
-        "recommendations": extract_section("9. Recommendations"),
+        "validation_signals": extract_section("7. Key Validation Signals"),
+        "recommendations": extract_section("8. Recommendations"),
     }
 
     return result
