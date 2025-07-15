@@ -8,6 +8,29 @@ export interface ProcessedAnalysis {
   data: any;
 }
 
+export interface KeyTrendsSection {
+  subheading?: string;
+  content?: string;
+}
+
+export interface KeyTrendsData {
+  overview?: KeyTrendsSection[];
+  emerging_trends?: KeyTrendsSection[];
+  market_conditions?: KeyTrendsSection[];
+  competitive_benchmarks?: KeyTrendsSection[];
+  user_workarounds?: KeyTrendsSection[];
+  go_to_market?: KeyTrendsSection[];
+  validation_signals?: KeyTrendsSection[];
+  recommendations?: KeyTrendsSection[];
+}
+
+export interface StandardSection {
+  heading: string;
+  content: string;
+  bullets?: string[];
+  subsections?: StandardSection[];
+}
+
 /**
  * Preprocesses analysis data from the database to ensure consistent structure
  */
@@ -51,13 +74,21 @@ export function preprocessAnalysisData(rawAnalysis: any): ProcessedAnalysis[] {
         .join(' ');
     }
 
+    // Process data based on type
+    let processedData = value;
+    if (type === 'key_trends') {
+      processedData = processKeyTrendsData(value);
+    } else {
+      processedData = normalizeAnalysisData(value);
+    }
+
     // Create the processed report
     reports.push({
       id: key.toLowerCase().replace(/\s+/g, '_'),
       title,
       type,
       date: value.date || new Date().toISOString(),
-      data: normalizeAnalysisData(value)
+      data: processedData
     });
   });
 
@@ -65,7 +96,75 @@ export function preprocessAnalysisData(rawAnalysis: any): ProcessedAnalysis[] {
 }
 
 /**
- * Normalizes analysis data to ensure consistent structure
+ * Process key trends data to convert to standard sections format
+ */
+function processKeyTrendsData(data: any): { sections: StandardSection[] } {
+  const sections: StandardSection[] = [];
+
+  // Define the order and display names for key trends sections
+  const sectionConfig = [
+    { key: 'overview', title: '1- Overview' },
+    { key: 'emerging_trends', title: '2- Emerging Trends' },
+    { key: 'market_conditions', title: '3- Market Conditions' },
+    { key: 'competitive_benchmarks', title: '4- Competitive Benchmarks & Industry Comparison' },
+    { key: 'user_workarounds', title: '5- Current User Workarounds & Substitutes' },
+    { key: 'go_to_market', title: '6- Go-to-Market Landscape & Channel Fit' },
+    { key: 'validation_signals', title: '7- Key Validation Signals' },
+    { key: 'recommendations', title: '8- Recommendations' }
+  ];
+
+  sectionConfig.forEach(({ key, title }) => {
+    const sectionData = data[key];
+    if (!sectionData || !Array.isArray(sectionData)) return;
+
+    const subsections: StandardSection[] = [];
+    let mainContent = '';
+
+    sectionData.forEach((item: KeyTrendsSection) => {
+      if (item.subheading && item.content) {
+        // Both subheading and content - create a subsection
+        subsections.push({
+          heading: item.subheading,
+          content: item.content,
+          bullets: [],
+          subsections: []
+        });
+      } else if (item.subheading && !item.content) {
+        // Only subheading - treat as a divider or intro for next content
+        if (subsections.length > 0 || mainContent) {
+          // If we already have content, create a new subsection
+          subsections.push({
+            heading: item.subheading,
+            content: '',
+            bullets: [],
+            subsections: []
+          });
+        }
+      } else if (item.content && !item.subheading) {
+        // Only content
+        if (subsections.length > 0 && subsections[subsections.length - 1].content === '') {
+          // Add to the last subsection if it has no content
+          subsections[subsections.length - 1].content = item.content;
+        } else {
+          // Otherwise, add to main content
+          mainContent += (mainContent ? '\n\n' : '') + item.content;
+        }
+      }
+    });
+
+    sections.push({
+      heading: title,
+      content: mainContent,
+      bullets: [],
+      subsections
+    });
+  });
+
+  return { sections };
+}
+
+/**
+ * Normalizes analysis data for ethnographic/final analysis types
  */
 function normalizeAnalysisData(data: any): any {
   if (!data || typeof data !== 'object') return data;
@@ -106,7 +205,7 @@ function normalizeAnalysisData(data: any): any {
 /**
  * Normalizes a section to ensure consistent structure
  */
-function normalizeSectionData(section: any): any {
+function normalizeSectionData(section: any): StandardSection {
   if (!section || typeof section !== 'object') {
     return {
       heading: 'Section',

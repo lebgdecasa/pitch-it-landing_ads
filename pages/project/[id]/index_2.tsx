@@ -1,5 +1,5 @@
 // pages/project/[id]/index.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { ChevronLeft, Edit, Download, Users, AlertTriangle, Lightbulb, Briefcase, Swords, Sparkles, Megaphone, Lock } from 'lucide-react';
@@ -83,6 +83,20 @@ export default function ProjectPage() {
 
   const [selectedPersona, setSelectedPersona] = useState<number | null>(null);
   const [showGroupChat, setShowGroupChat] = useState(false);
+
+  // Transform analysis data
+  const processedAnalyses = useMemo(() => {
+    if (!project?.analysis) return [];
+
+    // The analysis object from the database should have structure like:
+    // {
+    //   Key_Trends: { ...key trends data },
+    //   Netnographic: { ...netnographic data },
+    //   Final: { ...final analysis data }
+    // }
+
+    return preprocessAnalysisData(project.analysis);
+  }, [project?.analysis]);
 
   if (authLoading || (!profile && !user && authLoading !== false)) { // Adjusted loading check
     return <div>Loading user information...</div>;
@@ -170,9 +184,6 @@ export default function ProjectPage() {
     seedToLaunch: project.metrics.Time_to_Market?.Seed_to_Launch,
     timeToRevenue: project.metrics.Time_to_Market?.Time_to_revenue
   } : null;
-
-  // Transform analysis data
-  const analysisReports = preprocessAnalysisData(project.analysis);
 
   return (
     <><Head>
@@ -311,9 +322,16 @@ export default function ProjectPage() {
               </div>
 
               {/* Analysis Section */}
-              <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-                <AnalysisSection analyses={analysisReports} />
-              </div>
+              {processedAnalyses && processedAnalyses.length > 0 && (
+                <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+                  <AnalysisSection
+                    analyses={processedAnalyses}
+                    onAnalysisClick={(analysis) => {
+                      console.log('Analysis clicked:', analysis);
+                    }}
+                  />
+                </div>
+              )}
 
               {/* Personas Section */}
               <div className="mb-6">
