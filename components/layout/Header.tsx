@@ -93,17 +93,25 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
                 </button>
               </>
             ) : (
-              <Link href="/auth" className={`text-sm sm:text-base font-medium transition-colors ${router.pathname === "/auth" ? "text-blue-700 font-semibold" : "text-gray-600 hover:text-blue-600"}`} onClick={() => handleNavClick('auth_desktop', '/auth')}>
-                {t('nav_sign_in_up', 'Sign In / Up')}
-              </Link>
+              <>
+                <Link
+                  href="/auth?mode=signup"
+                  className="px-3 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md text-sm sm:text-base font-semibold transition-colors"
+                  data-cta="signup"
+                  onClick={() => handleNavClick('signup_button', '/auth?mode=signup')}
+                >
+                  {t('nav_sign_up', 'Sign Up')}
+                </Link>
+                <Link
+                  href="/auth?mode=signin"
+                  className="px-3 py-2 border border-blue-600 text-blue-600 hover:bg-blue-50 rounded-md text-sm sm:text-base font-medium transition-colors ml-1"
+                  data-cta="login"
+                  onClick={() => handleNavClick('login_button', '/auth?mode=signin')}
+                >
+                  {t('nav_sign_in', 'Sign In')}
+                </Link>
+              </>
             )}
-            <div className="border-l border-gray-200 h-8 mx-2"></div> {/* Added small divider */}
-            <button
-              onClick={onOpenDemoModal}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg cta-button text-sm sm:text-base"
-            >
-              {t('nav_book_demo')}
-            </button>
             {/* Language buttons are not navigation links, so no active state needed based on path */}
             <div className="ml-2 sm:ml-4 flex border border-gray-200 rounded-md">
               <button
@@ -169,9 +177,24 @@ const Header = ({ onOpenDemoModal }: HeaderProps) => {
                 </button>
               </>
             ) : (
-          <Link href="/auth" className={`block py-2 text-lg font-medium transition-colors ${router.pathname === "/auth" ? "text-blue-700 font-semibold" : "text-gray-700 hover:text-blue-600"}`} onClick={() => handleNavClick('auth_mobile', '/auth')}>
-                {t('nav_sign_in_up', 'Sign In / Up')}
-              </Link>
+              <>
+                <Link
+                  href="/auth?mode=signup"
+                  className="block py-2 bg-blue-600 text-white text-lg font-semibold rounded-md text-center"
+                  data-cta="signup_mobile"
+                  onClick={() => handleNavClick('signup_mobile', '/auth?mode=signup')}
+                >
+                  {t('nav_sign_up', 'Sign Up')}
+                </Link>
+                <Link
+                  href="/auth?mode=signin"
+                  className="block py-2 mt-2 border border-blue-600 text-blue-600 text-lg font-medium rounded-md text-center"
+                  data-cta="login_mobile"
+                  onClick={() => handleNavClick('login_mobile', '/auth?mode=signin')}
+                >
+                  {t('nav_log_in', 'Log In')}
+                </Link>
+              </>
             )}
 
             <button

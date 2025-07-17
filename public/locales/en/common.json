@@ -126,7 +126,8 @@
     "waitlist_modal_last_name_min_length": "Last name must not be empty",
     "waitlist_modal_email_required": "Email is required",
     "waitlist_modal_email_invalid": "Invalid email address",
-
+    "nav_sign_in": "Sign In",
+    "nav_sign_up": "Sign Up",
   "waitlist_modal_submitting": "Submitting...",
   "waitlist_modal_success": "Thank you {{firstName}} {{lastName}}! You've been added to our Priority List. We'll be in touch soon at {{email}}.",
   "waitlist_modal_email_placeholder": "you@example.com",

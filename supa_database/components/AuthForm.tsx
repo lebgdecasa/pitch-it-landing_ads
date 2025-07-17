@@ -17,8 +17,12 @@ type FormData = {
 
 type AuthMode = 'signin' | 'signup' | 'resetPassword'
 
-const AuthForm: React.FC = () => {
-  const [mode, setMode] = useState<AuthMode>('signin')
+interface AuthFormProps {
+  initialMode?: AuthMode;
+}
+
+const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
+  const [mode, setMode] = useState<AuthMode>(initialMode)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
