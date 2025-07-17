@@ -539,6 +539,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.error('Error fetching personas:', personasError);
   }
 
+  // If no personas are found, redirect to the project page
+  if (!personas || personas.length === 0) {
+    return {
+      redirect: {
+        destination: `/project/${id}`,
+        permanent: false,
+      },
+    };
+  }
+
   return {
     props: {
       project,
