@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'next-i18next';
 import LazyHeroBackground from '@/components/ui/LazyHeroBackground'; // Lazy-loaded desktop 3D animation
 import MobileHeroBackground from '@/components/ui/MobileHeroBackground'; // Mobile bubbles animation
+import Link from 'next/link';
 
 interface HeroSectionProps {
   onOpenWaitlistModal: () => void;
@@ -33,12 +34,13 @@ const HeroSection = ({ onOpenWaitlistModal, onOpenDemoModal }: HeroSectionProps)
             {t('hero_subtitle')}
           </p>
           <div className="space-y-4 md:space-y-0 md:space-x-6 animate-fade-in-up delay-600">
-            <button
-              onClick={onOpenWaitlistModal}
+            <Link href="/auth?mode=signup">
+              <button
               className="bg-blue-700 text-white font-bold py-3 px-8 rounded-lg text-lg cta-button hover:bg-blue-800 shadow-xl"
-            >
+              >
               {t('hero_cta_free')}
-            </button>
+              </button>
+            </Link>
             <button
               onClick={onOpenDemoModal}
               className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-3 px-8 rounded-lg text-lg cta-button shadow-xl"
