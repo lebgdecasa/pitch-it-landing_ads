@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useAuthContext } from './AuthProvider'
 import Link from 'next/link'
+import { useTranslation, Trans } from 'next-i18next'
 
 type FormData = {
   email: string
@@ -20,6 +21,7 @@ interface AuthModalProps {
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'signin' }) => {
+  const { t } = useTranslation('common');
   const [mode, setMode] = useState<AuthMode>(initialMode)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -45,7 +47,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
     try {
       if (mode === 'signup') {
         if (!data.acceptTerms) {
-          setError('You must accept the terms & services to sign up.')
+          setError(t('auth_accept_terms_required'))
           return
         }
 
@@ -63,7 +65,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
         if (!response.ok) {
           throw new Error(responseData.error || `HTTP error! status: ${response.status}`)
         }
-        setMessage(responseData.message || 'Sign-up successful. Please check your email.')
+        setMessage(responseData.message || t('auth_signup_success'))
       } else {
         const response = await fetch('/api/auth/signin', {
           method: 'POST',
@@ -79,7 +81,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
         onClose()
       }
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.')
+      setError(err.message || t('auth_error_unexpected'))
     } finally {
       setLoading(false)
     }
@@ -92,9 +94,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
       <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">
-            {mode === 'signin' ? 'Sign In' : 'Sign Up'}
+            {t(mode === 'signin' ? 'auth_signin' : 'auth_signup')}
           </h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label="Close modal">
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700" aria-label={t('auth_close_modal')}>
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -116,19 +118,19 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
+              {t('auth_email_label')}
             </label>
             <input
               {...register('email', {
-                required: 'Email is required',
+                required: t('auth_email_required'),
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address'
+                  message: t('auth_email_invalid')
                 }
               })}
               type="email"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="your@email.com"
+              placeholder={t('auth_email_placeholder')}
             />
             {errors.email && (
               <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
@@ -136,14 +138,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
           </div>
 
           <div>
-            <label htmlFor="passwordModal" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label htmlFor="passwordModal" className="block text-sm font-medium text-gray-700 mb-1">{t('auth_password_label')}</label>
             <div className="relative">
               <input
                 id="passwordModal"
                 type={showPassword ? 'text' : 'password'}
                 {...register('password', {
-                  required: 'Password is required',
-                  minLength: { value: 6, message: 'Password must be at least 6 characters' }
+                  required: t('auth_password_required'),
+                  minLength: { value: 6, message: t('auth_password_min_length') }
                 })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
                 placeholder="••••••••"
@@ -152,9 +154,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-800 focus:outline-none"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword ? t('auth_password_aria_hide') : t('auth_password_aria_show')}
               >
-                {showPassword ? 'Hide' : 'Show'}
+                {showPassword ? t('auth_password_hide') : t('auth_password_show')}
               </button>
             </div>
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>}
@@ -163,64 +165,59 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
           {mode === 'signup' && (
             <>
               <div>
-                <label htmlFor="confirmPasswordModal" className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                <label htmlFor="confirmPasswordModal" className="block text-sm font-medium text-gray-700 mb-1">{t('auth_confirm_password_label')}</label>
                 <div className="relative">
                   <input
                     id="confirmPasswordModal"
                     type={showConfirmPassword ? 'text' : 'password'}
                     {...register('confirmPassword', {
-                      required: 'Please confirm your password',
-                      validate: value => value === watch('password') || 'Passwords do not match'
+                      required: t('auth_confirm_password_required'),
+                      validate: value => value === watch('password') || t('auth_confirm_password_mismatch')
                     })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
-                    placeholder="Re-enter your password"
+                    placeholder={t('auth_confirm_password_placeholder')}
                   />
                    <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-800 focus:outline-none"
-                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                      aria-label={showConfirmPassword ? t('auth_password_aria_hide') : t('auth_password_aria_show')}
                     >
-                      {showConfirmPassword ? 'Hide' : 'Show'}
+                      {showConfirmPassword ? t('auth_password_hide') : t('auth_password_show')}
                     </button>
                 </div>
                 {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>}
               </div>
 
               <div>
-                <label htmlFor="accessCodeModal" className="block text-sm font-medium text-gray-700 mb-1">Access Code</label>
+                <label htmlFor="accessCodeModal" className="block text-sm font-medium text-gray-700 mb-1">{t('auth_access_code_label')}</label>
                 <input
                   id="accessCodeModal"
                   type="text"
-                  {...register('accessCode', { required: 'Access code is required' })}
+                  {...register('accessCode', { required: t('auth_access_code_required') })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter your access code"
+                  placeholder={t('auth_access_code_placeholder')}
                 />
                 {errors.accessCode && <p className="text-red-500 text-sm mt-1">{errors.accessCode.message}</p>}
                  <p className="text-sm text-gray-500 mt-1">
-                    A valid access code is required to sign up.
+                    {t('auth_access_code_prompt')}
                  </p>
               </div>
 
-              {/* Terms & Services Checkbox */}
               <div className="flex items-start">
                 <input
                   id="acceptTermsModal"
                   {...register('acceptTerms', {
-                    required: 'You must accept the terms & services to sign up'
+                    required: t('auth_accept_terms_required')
                   })}
                   type="checkbox"
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
                 />
                 <label htmlFor="acceptTermsModal" className="ml-2 block text-sm text-gray-900">
-                  By signing up, you accept our{' '}
-                  <Link href="/terms-of-service" className="text-blue-600 hover:text-blue-700 underline" target="_blank">
-                    Terms & Services
-                  </Link>
-                  {' '}and{' '}
-                  <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-700 underline" target="_blank">
-                    Privacy Policy
-                  </Link>
+                    <Trans i18nKey="auth_accept_terms_label" t={t} components={[
+                        <Link href="/terms-of-service" key="terms" className="text-blue-600 hover:text-blue-700 underline" target="_blank" />,
+                        <Link href="/privacy-policy" key="privacy" className="text-blue-600 hover:text-blue-700 underline" target="_blank" />
+                    ]} />
                 </label>
               </div>
               {errors.acceptTerms && (
@@ -234,7 +231,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
           >
-            {loading ? 'Loading...' : (mode === 'signin' ? 'Sign In' : 'Sign Up')}
+            {loading ? t('auth_loading') : (mode === 'signin' ? t('auth_signin') : t('auth_signup'))}
           </button>
         </form>
 
@@ -244,14 +241,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
               onClick={() => { setMode('signup'); setError(null); setMessage(null);}}
               className="text-blue-600 hover:text-blue-700 text-sm"
             >
-              Don't have an account? Sign up
+              {t('auth_prompt_signup')}
             </button>
           ) : (
             <button
               onClick={() => { setMode('signin'); setError(null); setMessage(null);}}
               className="text-blue-600 hover:text-blue-700 text-sm"
             >
-              Already have an account? Sign in
+              {t('auth_prompt_signin')}
             </button>
           )}
         </div>
@@ -260,4 +257,4 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 's
   )
 }
 
-export default AuthModal
+export default AuthModal;

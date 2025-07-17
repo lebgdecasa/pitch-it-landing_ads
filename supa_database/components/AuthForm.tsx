@@ -6,6 +6,7 @@ import { useAuthContext } from './AuthProvider'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import NoAccessCodeModal from 'components/modals/NoAccessCodeModal'
 import Link from 'next/link'
+import { useTranslation, Trans } from 'next-i18next'
 
 type FormData = {
   email: string
@@ -22,6 +23,7 @@ interface AuthFormProps {
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
+  const { t } = useTranslation('common');
   const [mode, setMode] = useState<AuthMode>(initialMode)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -53,11 +55,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
           redirectTo: `${window.location.origin}/auth/reset-password`,
         })
         if (error) throw error
-        setMessage('Password reset email sent. Check your inbox.')
+        setMessage(t('auth_reset_password_success'))
       } else if (mode === 'signup') {
-        // Check if terms are accepted
         if (!data.acceptTerms) {
-          setError('You must accept the terms & services to sign up.')
+          setError(t('auth_accept_terms_required'))
           return
         }
 
@@ -78,7 +79,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
         if (!response.ok) {
           throw new Error(responseData.error || `HTTP error! status: ${response.status}`)
         }
-        setMessage(responseData.message || 'Sign-up successful. Please check your email.')
+        setMessage(responseData.message || t('auth_signup_success'))
       } else if (mode === 'signin') {
         const fetchOptions: RequestInit = {
           method: 'POST',
@@ -98,7 +99,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
         return
       }
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred.')
+      setError(err.message || t('auth_error_unexpected'))
     } finally {
       setLoading(false)
     }
@@ -108,9 +109,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
     <div className="bg-white rounded-lg p-4 sm:p-6 md:p-8 w-full max-w-md mx-auto my-10 shadow-xl">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-center">
-          {mode === 'signin' ? 'Sign In'
-            : mode === 'signup' ? 'Sign Up'
-            : 'Reset Password'}
+          {mode === 'signin' ? t('auth_signin')
+            : mode === 'signup' ? t('auth_signup')
+            : t('auth_reset_password')}
         </h2>
       </div>
 
@@ -129,20 +130,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-            Email
+            {t('auth_email_label')}
           </label>
           <input
             id="email"
             {...register('email', {
-              required: 'Email is required',
+              required: t('auth_email_required'),
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Invalid email address'
+                message: t('auth_email_invalid')
               }
             })}
             type="email"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="your@email.com"
+            placeholder={t('auth_email_placeholder')}
             aria-invalid={errors.email ? "true" : "false"}
             aria-describedby={errors.email ? "email-error" : undefined}
           />
@@ -154,14 +155,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
         {mode !== 'resetPassword' && (
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-              Password
+              {t('auth_password_label')}
             </label>
             <div className="relative">
               <input
                 id="password"
                 {...register('password', {
-                  required: 'Password is required',
-                  minLength: { value: 6, message: 'Password must be at least 6 characters' }
+                  required: t('auth_password_required'),
+                  minLength: { value: 6, message: t('auth_password_min_length') }
                 })}
                 type={showPassword ? 'text' : 'password'}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
@@ -173,7 +174,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-800 focus:outline-none"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={showPassword ? t('auth_password_aria_hide') : t('auth_password_aria_show')}
               >
                 {showPassword ? (
                   <EyeSlashIcon className="h-5 w-5" />
@@ -199,7 +200,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-900">
-                Remember me
+                {t('auth_remember_me')}
               </label>
             </div>
           </div>
@@ -209,15 +210,15 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
           <>
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
+                {t('auth_confirm_password_label')}
               </label>
               <div className="relative">
                 <input
                   id="confirmPassword"
                   {...register('confirmPassword', {
-                    required: mode === 'signup' ? 'Confirm password is required' : false,
+                    required: mode === 'signup' ? t('auth_confirm_password_required') : false,
                     validate: value =>
-                      value === watch('password') || 'Passwords do not match'
+                      value === watch('password') || t('auth_confirm_password_mismatch')
                   })}
                   type={showConfirmPassword ? 'text' : 'password'}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 pr-10"
@@ -229,7 +230,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-800 focus:outline-none"
-                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                  aria-label={showConfirmPassword ? t('auth_password_aria_hide') : t('auth_password_aria_show')}
                 >
                   {showConfirmPassword ? (
                     <EyeSlashIcon className="h-5 w-5" />
@@ -242,7 +243,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
             </div>
 
             <div>
-              <label htmlFor="accessCode" className="block text-sm font-medium text-gray-700 mb-1">Access Code</label>
+              <label htmlFor="accessCode" className="block text-sm font-medium text-gray-700 mb-1">{t('auth_access_code_label')}</label>
               <div className="relative">
                 <button
                   type="button"
@@ -258,7 +259,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
                 {...register('accessCode')}
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your access code if you have one"
+                placeholder={t('auth_access_code_placeholder')}
                 aria-invalid={errors.accessCode ? "true" : "false"}
                 aria-describedby={errors.accessCode ? "accessCode-error" : undefined}
               />
@@ -267,25 +268,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
               )}
             </div>
 
-            {/* Terms & Services Checkbox */}
             <div className="flex items-start">
               <input
                 id="acceptTerms"
                 {...register('acceptTerms', {
-                  required: 'You must accept the terms & services to sign up'
+                  required: t('auth_accept_terms_required')
                 })}
                 type="checkbox"
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
               />
               <label htmlFor="acceptTerms" className="ml-2 block text-sm text-gray-900">
-                By signing up, you accept our{' '}
-                <Link href="/terms-of-service" className="text-blue-600 hover:text-blue-700 underline" target="_blank">
-                  Terms & Services
-                </Link>
-                {' '}and{' '}
-                <Link href="/privacy-policy" className="text-blue-600 hover:text-blue-700 underline" target="_blank">
-                  Privacy Policy
-                </Link>
+                <Trans i18nKey="auth_accept_terms_label" t={t} components={[
+                    <Link href="/terms-of-service" key="terms" className="text-blue-600 hover:text-blue-700 underline" target="_blank" />,
+                    <Link href="/privacy-policy" key="privacy" className="text-blue-600 hover:text-blue-700 underline" target="_blank" />
+                ]} />
               </label>
             </div>
             {errors.acceptTerms && (
@@ -299,10 +295,10 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
           disabled={loading}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
         >
-          {loading ? 'Loading...'
-            : mode === 'signin' ? 'Sign In'
-            : mode === 'signup' ? 'Sign Up'
-            : 'Send Reset Link'}
+          {loading ? t('auth_loading')
+            : mode === 'signin' ? t('auth_signin')
+            : mode === 'signup' ? t('auth_signup')
+            : t('auth_reset_password')}
         </button>
       </form>
 
@@ -314,7 +310,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
               onClick={() => { setMode('resetPassword'); setError(null); setMessage(null); }}
               className="w-full text-blue-600 hover:text-blue-700 text-sm py-1"
             >
-              Forgot Password?
+              {t('auth_forgot_password')}
             </button>
             <hr className="my-2"/>
             <button
@@ -322,7 +318,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
               onClick={() => { setMode('signup'); setError(null); setMessage(null); }}
               className="w-full text-blue-600 hover:text-blue-700 text-sm py-1"
             >
-              Don't have an account? Sign up
+              {t('auth_prompt_signup')}
             </button>
           </>
         )}
@@ -333,7 +329,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
             onClick={() => { setMode('signin'); setError(null); setMessage(null); }}
             className="w-full text-blue-600 hover:text-blue-700 text-sm py-1"
           >
-            Go to Sign In
+            {t('auth_go_to_signin')}
           </button>
         )}
       </div>
@@ -346,4 +342,4 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
   )
 }
 
-export default AuthForm
+export default AuthForm;
