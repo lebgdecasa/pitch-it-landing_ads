@@ -349,6 +349,7 @@
   "auth_signup_success": "Inscription réussie. Veuillez vérifier votre e-mail.",
   "auth_error_unexpected": "Une erreur inattendue s'est produite.",
   "auth_signin": "Se Connecter",
+  "auth_back_to_home": "Retour à l'accueil",
   "auth_signup": "S'inscrire",
   "auth_close_modal": "Fermer le modal",
   "auth_email_label": "Email",

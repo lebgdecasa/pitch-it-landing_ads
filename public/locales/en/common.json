@@ -358,6 +358,7 @@
   "auth_password_aria_show": "Show password",
   "auth_password_hide": "Hide",
   "auth_password_show": "Show",
+  "auth_back_to_home": "Back to Homepage",
   "auth_confirm_password_label": "Confirm Password",
   "auth_confirm_password_required": "Please confirm your password",
   "auth_confirm_password_mismatch": "Passwords do not match",

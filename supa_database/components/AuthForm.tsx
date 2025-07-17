@@ -334,6 +334,12 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
         )}
       </div>
 
+      <div className="mt-4 text-center">
+        <Link href="/" className="text-sm text-gray-600 hover:text-blue-500 transition-colors">
+          {t('auth_back_to_home', 'Back to Homepage')}
+        </Link>
+      </div>
+
       <NoAccessCodeModal
         isOpen={showNoAccessCodeModal}
         onClose={() => setShowNoAccessCodeModal(false)}
