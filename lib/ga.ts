@@ -91,6 +91,31 @@ declare global {
     });
   };
 
+  export const trackAnalysisReportOpen = (analysisId: string, analysisType: string) => {
+    event({
+      action: 'open_analysis_report',
+      category: 'dashboard',
+      label: `report_opened_${analysisType}_${analysisId}`,
+    });
+  };
+
+  export const trackAnalysisReportDownload = (analysisId: string, analysisType: string) => {
+    event({
+      action: 'download_analysis_report',
+      category: 'dashboard',
+      label: `report_downloaded_${analysisType}_${analysisId}`,
+    });
+  };
+
+  export const trackAnalysisReportViewDuration = (analysisId: string, analysisType: string, durationInSeconds: number) => {
+    event({
+      action: 'view_analysis_report_duration',
+      category: 'dashboard',
+      label: `report_viewed_${analysisType}_${analysisId}`,
+      value: durationInSeconds,
+    });
+  };
+
   export const trackPersonasModalOpen = () => {
     event({
       action: 'open_personas_modal',

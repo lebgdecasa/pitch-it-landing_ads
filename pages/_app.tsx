@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'; // Added useEffect
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router'; // Added useRouter
-import { LanguageProvider } from '@/context/Language-context';
+import { LanguageProvider } from '@/context/LanguageContext';
 import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 import LazyGoogleAnalytics from '@/components/LazyGoogleAnalytics';
 import OptimizedAnalytics from '@/components/OptimizedAnalytics';

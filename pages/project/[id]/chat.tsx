@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuthContext } from '@/supa_database/components/AuthProvider'; // Corrected import path
 import { createClient } from '@supabase/supabase-js';
+import * as ga from '@/lib/ga';
 import { GetServerSideProps } from 'next';
 import { Send, AtSign, Users, Bot, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';

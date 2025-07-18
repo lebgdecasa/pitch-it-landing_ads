@@ -40,6 +40,7 @@ export const AnalysisSection: React.FC<AnalysisSectionProps> = ({
 
   const handleAnalysisClick = (analysis: Report) => {
     ga.trackAnalysisModalOpen();
+    ga.trackAnalysisReportOpen(analysis.id, analysis.type);
     setSelectedAnalysis(analysis);
     onAnalysisClick?.(analysis);
   };
