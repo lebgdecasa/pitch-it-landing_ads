@@ -402,10 +402,14 @@ export default function ProjectPage() {
               onClose={() => setSelectedPersona(null)}
               jobTitle={personas[selectedPersona].role}
               needsDetails={personas[selectedPersona].description}
-              background=""
+              background={personas[selectedPersona].demographics
+                ? Object.entries(personas[selectedPersona].demographics)
+                  .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}: ${String(value)}`)
+                  .join('; ')
+                : undefined}
               goals={personas[selectedPersona].goals || []}
               challenges={personas[selectedPersona].pain_points || []}
-              preferredCommunication="" />
+            />
           )}
         </div>
       </ProjectLayout></>

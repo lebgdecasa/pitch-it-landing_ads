@@ -321,6 +321,8 @@ export interface Project {
 }
 
 export interface Persona {
+  preferred_communication: string
+  background: string | undefined
   id: string
   project_id: string
   name: string
