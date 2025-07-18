@@ -52,6 +52,10 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   const { profile, loading: authLoading } = useAuthContext();
 
   useEffect(() => {
+    ga.trackChatPageView();
+  }, []);
+
+  useEffect(() => {
     if (!authLoading && profile && projectId) {
       if (profile.subscription_tier === 'free') {
         router.push(`/project/${projectId}/chat_2`);
@@ -74,6 +78,7 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
 
   // Function to open persona details modal
   const handlePersonaClick = (persona: Persona) => {
+    ga.trackChatInteraction(`viewed_persona_${persona.name}`);
     setSelectedPersonaForModal(persona);
     setIsPersonaModalOpen(true);
   };
@@ -201,6 +206,8 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+
+    ga.trackChatMessageSent();
 
     const mentions = extractMentions(inputMessage);
     const userMessage: ChatMessage = {
