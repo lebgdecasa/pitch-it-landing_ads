@@ -226,8 +226,8 @@ export default function Dashboard() {
               <p className="text-gray-600 mt-1">Manage and track your business ideas</p>
             </div>
             {projects.length > 0 && (
-              <Button asChild size="lg" className="rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors" onClick={() => ga.trackButtonClick('new_project', 'dashboard')}>
-                <Link href="/wizard" className="flex items-center">
+              <Button asChild size="lg" className="rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors">
+                <Link href="/wizard" className="flex items-center" onClick={() => ga.trackButtonClick('new_project', 'dashboard')}>
                   <PlusCircle className="mr-2 h-5 w-5" />
                   New Project
                 </Link>
