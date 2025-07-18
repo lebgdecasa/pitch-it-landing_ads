@@ -6,7 +6,7 @@ import { ChevronLeft, Edit, Download, Users, AlertTriangle, Lightbulb, Briefcase
 import ProjectLayout from '@/components/layout/ProjectLayout_2';
 import dynamic from 'next/dynamic';
 import { useAuthContext } from '../../../supa_database/components/AuthProvider'; // Import useAuthContext
-import Head from 'next/dist/shared/lib/head';
+import Head from 'next/head';
 import * as ga from '@/lib/ga';
 
 // Component imports
