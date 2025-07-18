@@ -1,5 +1,6 @@
 // pages/auth.tsx
-import React from 'react';
+import React, { useEffect } from 'react';
+import * as ga from '@/lib/ga';
 import AuthForm from '../supa_database/components/AuthForm';
 import { AuthProvider } from '../supa_database/components/AuthProvider';
 import Head from 'next/head';
@@ -14,6 +15,14 @@ type Props = {
 const AuthPage: React.FC<InferGetStaticPropsType<typeof getStaticProps>> = () => {
   const router = useRouter();
   const { mode } = router.query;
+
+  useEffect(() => {
+    ga.event({
+      action: 'page_view',
+      category: 'authentication',
+      label: 'auth_page',
+    });
+  }, []);
 
   // Determine initialMode based on query param, default to 'signin'
   const initialMode = mode === 'signup' ? 'signup' : 'signin';

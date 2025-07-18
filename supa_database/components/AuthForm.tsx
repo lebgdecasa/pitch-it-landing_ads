@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import * as ga from '@/lib/ga'
 import { useForm } from 'react-hook-form'
 import { useRouter } from 'next/router'
 import { supabase } from '@/supa_database/config/supabase'
@@ -79,6 +80,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
         if (!response.ok) {
           throw new Error(responseData.error || `HTTP error! status: ${response.status}`)
         }
+        ga.trackRegistration('email');
         setMessage(responseData.message || t('auth_signup_success'))
         reset() // Clear the form fields
       } else if (mode === 'signin') {
@@ -95,6 +97,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
         if (!response.ok) {
           throw new Error(responseData.error || `HTTP error! status: ${response.status}`)
         }
+        ga.trackLogin('email');
         await supabase.auth.getSession()
         router.push('/dashboard').then(() => window.location.reload())
         return

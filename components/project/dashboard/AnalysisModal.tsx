@@ -1,9 +1,10 @@
 // components/project/dashboard/AnalysisModal.tsx
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { X, FileText, List, CheckSquare, Hash, Download } from 'lucide-react';
 import { type Report } from './AnalysisSection';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import * as ga from '@/lib/ga';
 
 interface AnalysisModalProps {
   analysis: Report | null; // Allow analysis to be null
@@ -13,9 +14,28 @@ interface AnalysisModalProps {
 
 const AnalysisModal: React.FC<AnalysisModalProps> = ({ analysis, isOpen, onClose }) => {
   const contentRef = useRef<HTMLDivElement>(null);
+  const viewStartTimeRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (isOpen && analysis) {
+      viewStartTimeRef.current = Date.now();
+    }
+
+    return () => {
+      if (viewStartTimeRef.current && analysis) {
+        const durationInSeconds = Math.round((Date.now() - viewStartTimeRef.current) / 1000);
+        ga.trackAnalysisReportViewDuration(analysis.id, analysis.type, durationInSeconds);
+        viewStartTimeRef.current = null;
+      }
+    };
+  }, [isOpen, analysis]);
+
   if (!isOpen || !analysis) return null;
 
   const handleDownloadPdf = () => {
+    if (analysis) {
+      ga.trackAnalysisReportDownload(analysis.id, analysis.type);
+    }
     const input = contentRef.current;
     if (!input) {
       console.error("Content element not found");

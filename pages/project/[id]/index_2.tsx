@@ -6,6 +6,8 @@ import { ChevronLeft, Edit, Download, Users, AlertTriangle, Lightbulb, Briefcase
 import ProjectLayout from '@/components/layout/ProjectLayout_2';
 import dynamic from 'next/dynamic';
 import { useAuthContext } from '../../../supa_database/components/AuthProvider'; // Import useAuthContext
+import Head from 'next/head';
+import * as ga from '@/lib/ga';
 
 // Component imports
 // import ShareTeamDialog from '../../../components/project/ShareTeamDialog'; // Lazy loaded
@@ -24,7 +26,6 @@ const GroupChat = dynamic(() => import('../../../components/project/chat/GroupCh
 import { useProjects, useProjectById } from '../../../supa_database/hooks/useProject';
 import { usePersonas } from '../../../supa_database/hooks/usePersonas';
 import { supabase } from '../../../supa_database/config/supabase'; // Ensure Supabase client is imported
-import Head from 'next/dist/shared/lib/head';
 
 // Type definitions
 interface StageInfo {
@@ -54,6 +55,12 @@ export default function ProjectPage() {
   const router = useRouter();
   const { id: projectIdFromRouter } = router.query;
   const { user, loading: authLoading, profile } = useAuthContext();
+
+  useEffect(() => {
+    if (projectIdFromRouter) {
+      ga.trackProjectOpen(projectIdFromRouter as string);
+    }
+  }, [projectIdFromRouter]);
 
   useEffect(() => {
     // Log current auth state when it changes or projectIdFromRouter changes
@@ -326,9 +333,6 @@ export default function ProjectPage() {
                 <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
                   <AnalysisSection
                     analyses={processedAnalyses}
-                    onAnalysisClick={(analysis) => {
-                      console.log('Analysis clicked:', analysis);
-                    }}
                   />
                 </div>
               )}
@@ -353,11 +357,17 @@ export default function ProjectPage() {
                             jobTitle: persona.role,
                             needsSnippet: persona.description.substring(0, 100) + '...'
                           }}
-                          onShowDetails={() => setSelectedPersona(index)} />
+                          onShowDetails={() => {
+                                                      ga.trackPersonasModalOpen();
+                                                      setSelectedPersona(index);
+                                                    }} />
                       ))}
                     </div>
                     <Button
-                      onClick={() => router.push(`/project/${project.id}/chat_2`)}
+                      onClick={() => {
+                        ga.trackButtonClick('chat_with_personas', 'project_dashboard');
+                        router.push(`/project/${project.id}/chat_2`)
+                      }}
                       className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
                     >
                       <Users className="h-5 w-5 mr-2" />

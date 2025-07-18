@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuthContext } from '@/supa_database/components/AuthProvider'; // Corrected import path
 import { createClient } from '@supabase/supabase-js';
+import * as ga from '@/lib/ga';
 import { GetServerSideProps } from 'next';
 import { Send, AtSign, Users, Bot, ArrowLeft, Lock } from 'lucide-react';
 import Link from 'next/link';
@@ -53,6 +54,10 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   const { profile, loading: authLoading } = useAuthContext();
 
   useEffect(() => {
+    ga.trackChatPageView();
+  }, []);
+
+  useEffect(() => {
     if (!authLoading && profile && projectId) {
       if (profile.subscription_tier === 'premium' || profile.subscription_tier === 'enterprise') {
         router.push(`/project/${projectId}/chat`);
@@ -84,6 +89,7 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
 
   // Function to open persona details modal
   const handlePersonaClick = (persona: Persona) => {
+    ga.trackChatInteraction(`viewed_persona_${persona.name}`);
     setSelectedPersonaForModal(persona);
     setIsPersonaModalOpen(true);
   };
@@ -269,6 +275,8 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
   // In your handleSendMessage function, update to show optimistic UI
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+
+    ga.trackChatMessageSent();
 
     const mentions = extractMentions(inputMessage);
     setIsLoading(true);

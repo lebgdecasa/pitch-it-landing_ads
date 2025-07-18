@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, MouseEvent } from 'react';
 import Link from 'next/link';
+import * as ga from '@/lib/ga';
 import { PlusCircle, Loader2, Trash2 } from 'lucide-react';
 import { useAuthContext } from '@/supa_database/components/AuthProvider';
 import { Button } from '@/components/ui/button';
@@ -93,6 +94,10 @@ export default function Dashboard() {
   const [projectToDelete, setProjectToDelete] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
+    ga.trackDashboardView();
+  }, []);
+
+  useEffect(() => {
     if (fetchedProjects) {
       // Map Supabase project data to the Project type expected by ProjectCard
       const mappedProjects = fetchedProjects.map((p: any) => {
@@ -144,6 +149,7 @@ export default function Dashboard() {
 
   const handleConfirmDelete = async () => {
     if (projectToDelete) {
+      ga.trackButtonClick('delete_project', 'dashboard');
       await deleteProject(projectToDelete.id);
       // Optionally, refetch projects or filter out the deleted project locally
       // refetch(); // Or setProjects(projects.filter(p => p.id !== projectToDelete.id));
@@ -221,7 +227,7 @@ export default function Dashboard() {
             </div>
             {projects.length > 0 && (
               <Button asChild size="lg" className="rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors">
-                <Link href="/wizard" className="flex items-center">
+                <Link href="/wizard" className="flex items-center" onClick={() => ga.trackButtonClick('new_project', 'dashboard')}>
                   <PlusCircle className="mr-2 h-5 w-5" />
                   New Project
                 </Link>

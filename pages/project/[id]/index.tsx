@@ -1,6 +1,7 @@
 // pages/project/[id]/index.tsx
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import * as ga from '@/lib/ga';
 import Link from 'next/link';
 import { ChevronLeft, Edit, Download, Users, AlertTriangle, Lightbulb, Briefcase, Swords, Sparkles, Megaphone } from 'lucide-react';
 import ProjectLayout from '@/components/layout/ProjectLayout';
@@ -54,6 +55,12 @@ export default function ProjectPage() {
   const router = useRouter();
   const { id: projectIdFromRouter } = router.query;
   const { user, loading: authLoading, profile } = useAuthContext();
+
+  useEffect(() => {
+    if (projectIdFromRouter) {
+      ga.trackProjectOpen(projectIdFromRouter as string);
+    }
+  }, [projectIdFromRouter]);
 
   useEffect(() => {
     // Log current auth state when it changes or projectIdFromRouter changes
@@ -290,11 +297,17 @@ export default function ProjectPage() {
                             jobTitle: persona.role,
                             needsSnippet: persona.description.substring(0, 100) + '...'
                           }}
-                          onShowDetails={() => setSelectedPersona(index)} />
+                          onShowDetails={() => {
+                            ga.trackPersonasModalOpen();
+                            setSelectedPersona(index);
+                          }} />
                       ))}
                     </div>
                     <Button
-                      onClick={() => router.push(`/project/${project.id}/chat`)}
+                      onClick={() => {
+                        ga.trackButtonClick('chat_with_personas', 'project_dashboard');
+                        router.push(`/project/${project.id}/chat`);
+                      }}
                       className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
                     >
                       <Users className="h-5 w-5 mr-2" />
