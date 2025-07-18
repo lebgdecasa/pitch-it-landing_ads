@@ -8,7 +8,7 @@ interface CalendlyModalProps {
 const CalendlyModal = ({ onClose }: CalendlyModalProps) => {
   return (
     <>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-1">
         <h3 className="text-2xl font-bold text-gray-800">Book a Demo</h3>
         <button
           onClick={onClose}
@@ -18,8 +18,8 @@ const CalendlyModal = ({ onClose }: CalendlyModalProps) => {
           &times;
         </button>
       </div>
-      <p className="text-gray-600 mb-6">Schedule a demo with our team.</p>
-      <InlineWidget url="https://calendly.com/your-username/your-event" />
+      <p className="text-gray-600 mb-2">Schedule a demo with our team.</p>
+      <InlineWidget url="https://calendly.com/jlahrichi-nextraction/nextraction-demo-onboarding" />
     </>
   );
 };
