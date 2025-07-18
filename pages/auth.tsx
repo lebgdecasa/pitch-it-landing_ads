@@ -1,22 +1,52 @@
 // pages/auth.tsx
-import React from 'react';
-import AuthForm from '../supa_database/components/AuthForm'; // Adjusted path as per standard project structure
-import { AuthProvider } from '../supa_database/components/AuthProvider'; // To provide auth context
+import React, { useEffect } from 'react';
+import * as ga from '@/lib/ga';
+import AuthForm from '../supa_database/components/AuthForm';
+import { AuthProvider } from '../supa_database/components/AuthProvider';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import type { GetStaticProps, InferGetStaticPropsType } from 'next';
 
-const AuthPage: React.FC = () => {
+type Props = {
+  // Add any other props you might need from getStaticProps
+};
+
+const AuthPage: React.FC<InferGetStaticPropsType<typeof getStaticProps>> = () => {
+  const router = useRouter();
+  const { mode } = router.query;
+
+  useEffect(() => {
+    ga.event({
+      action: 'page_view',
+      category: 'authentication',
+      label: 'auth_page',
+    });
+  }, []);
+
+  // Determine initialMode based on query param, default to 'signin'
+  const initialMode = mode === 'signup' ? 'signup' : 'signin';
+
   return (
-    <><Head>
-      <title>Authentication | NexTraction</title>
-      <meta name="description" content="Authentication page for NexTraction" />
-    </Head><AuthProvider> {/* Wrap with AuthProvider as AuthForm or its children might use useAuthContext */}
+    <>
+      <Head>
+        <title>Authentication | NexTraction</title>
+        <meta name="description" content="Authentication page for NexTraction" />
+      </Head>
+      <AuthProvider>
         <main className="container mx-auto px-4 py-8 flex flex-col items-center min-h-screen bg-gray-50">
-          <h1 className="text-3xl font-bold text-center mb-8 text-gray-800 sr-only">Authentication</h1> {/* Added sr-only for now, can be made visible */}
-          {/* The AuthForm component contains h2 for "Sign In", "Sign Up", etc. */}
-          <AuthForm />
+          <h1 className="text-3xl font-bold text-center mb-8 text-gray-800 sr-only">Authentication</h1>
+          <AuthForm initialMode={initialMode} />
         </main>
-      </AuthProvider></>
+      </AuthProvider>
+    </>
   );
 };
+
+export const getStaticProps: GetStaticProps<Props> = async ({ locale }) => ({
+  props: {
+    ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+  },
+});
 
 export default AuthPage;

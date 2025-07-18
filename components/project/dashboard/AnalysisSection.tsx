@@ -1,5 +1,6 @@
 // components/project/dashboard/AnalysisSection.tsx
 import React, { useState } from 'react';
+import * as ga from '@/lib/ga';
 import { ChevronRight, FileCheck, FileText, TrendingUp, Users } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
@@ -38,6 +39,8 @@ export const AnalysisSection: React.FC<AnalysisSectionProps> = ({
   const [selectedAnalysis, setSelectedAnalysis] = useState<Report | null>(null);
 
   const handleAnalysisClick = (analysis: Report) => {
+    ga.trackAnalysisModalOpen();
+    ga.trackAnalysisReportOpen(analysis.id, analysis.type);
     setSelectedAnalysis(analysis);
     onAnalysisClick?.(analysis);
   };

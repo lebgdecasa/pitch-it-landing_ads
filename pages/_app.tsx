@@ -3,6 +3,7 @@ import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router'; // Added useRouter
 import { LanguageProvider } from '@/context/LanguageContext';
+import { AnalyticsProvider } from '@/components/AnalyticsProvider';
 import LazyGoogleAnalytics from '@/components/LazyGoogleAnalytics';
 import OptimizedAnalytics from '@/components/OptimizedAnalytics';
 import ResourcePrefetcher from '@/components/ResourcePrefetcher';
@@ -157,6 +158,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <AuthProvider>
         {/* <Toaster position="top-center" reverseOrder={false} /> */} {/* Placeholder for react-hot-toast Toaster */}
         <RouteGuard>
+          <AnalyticsProvider>
           <LanguageProvider> {/* LanguageProvider now inside RouteGuard to access context if needed, or can be outside if independent */}
             <Component {...enhancedPageProps} />
             {/* Modals are outside the main Component render tree from Next.js perspective but within context providers */}
@@ -173,6 +175,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             {/* Consider removing AuthModal if /auth page is the primary auth method now */}
             {isAuthModalOpen && <AuthModal isOpen={isAuthModalOpen} onClose={closeAuthModal} />}
           </LanguageProvider>
+          </AnalyticsProvider>
         </RouteGuard>
       </AuthProvider>
     </>

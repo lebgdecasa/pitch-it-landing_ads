@@ -2,13 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useAuthContext } from '@/supa_database/components/AuthProvider'; // Corrected import path
 import { createClient } from '@supabase/supabase-js';
+import * as ga from '@/lib/ga';
 import { GetServerSideProps } from 'next';
-import { Send, AtSign, Users, Bot, ArrowLeft } from 'lucide-react';
+import { Send, AtSign, Users, Bot, ArrowLeft, Lock } from 'lucide-react';
 import Link from 'next/link';
 import ProjectLayout from '@/components/layout/ProjectLayout_2';
 import { useChatMessages } from '@/supa_database/hooks/useChatMessages'; // Add this import
 import { PersonaModal } from '@/components/client-components/persona/PersonaModal'; // Import PersonaModal
-import Head from 'next/dist/shared/lib/head';
+import Head from 'next/head';
+import { Button } from '@/components/ui/button';
 
 
 interface Persona {
@@ -52,6 +54,10 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   const { profile, loading: authLoading } = useAuthContext();
 
   useEffect(() => {
+    ga.trackChatPageView();
+  }, []);
+
+  useEffect(() => {
     if (!authLoading && profile && projectId) {
       if (profile.subscription_tier === 'premium' || profile.subscription_tier === 'enterprise') {
         router.push(`/project/${projectId}/chat`);
@@ -83,9 +89,27 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
 
   // Function to open persona details modal
   const handlePersonaClick = (persona: Persona) => {
+    ga.trackChatInteraction(`viewed_persona_${persona.name}`);
     setSelectedPersonaForModal(persona);
     setIsPersonaModalOpen(true);
   };
+
+  if (project && project.locked) {
+    return (
+      <ProjectLayout>
+        <div className="p-4 md:p-6 max-w-7xl mx-auto text-center">
+          <Lock className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <h1 className="text-2xl font-bold">Project is Locked</h1>
+          <p className="text-gray-600 mt-2">
+            This project is still being processed. It will be unlocked once the initial analysis is complete.
+          </p>
+          <Button asChild className="mt-4">
+              <Link href={`/project/${project.id}`}>Back to Project</Link>
+          </Button>
+        </div>
+      </ProjectLayout>
+    );
+  }
 
   if (authLoading || !profile) {
     return <div>Loading user information...</div>;
@@ -251,6 +275,8 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
   // In your handleSendMessage function, update to show optimistic UI
   const handleSendMessage = async () => {
     if (!inputMessage.trim() || isLoading) return;
+
+    ga.trackChatMessageSent();
 
     const mentions = extractMentions(inputMessage);
     setIsLoading(true);
