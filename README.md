@@ -35,13 +35,13 @@ To get the analytics working, you need to provide the necessary API keys and IDs
 2. **Add the following environment variables** to the file and replace the placeholder values with your actual credentials:
 
 ```
-NEXT_PUBLIC_GA_ID='G-XXXXXXXXXX'
+NEXT_PUBLIC_GA_MEASUREMENT_ID='G-XXXXXXXXXX'
 NEXT_PUBLIC_POSTHOG_ID='phc_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-NEXT_PUBLIC_HOTJAR_ID='0000000'
+NEXT_PUBLIC_HOTJAR_ID=''
 NEXT_PUBLIC_HOTJAR_SV='0'
 ```
 
-- `NEXT_PUBLIC_GA_ID`: Your Google Analytics 4 Measurement ID.
+- `NEXT_PUBLIC_GA_MEASUREMENT_ID`: Your Google Analytics 4 Measurement ID.
 - `NEXT_PUBLIC_POSTHOG_ID`: Your PostHog Project API Key.
 - `NEXT_PUBLIC_HOTJAR_ID`: Your Hotjar Site ID.
 - `NEXT_PUBLIC_HOTJAR_SV`: Your Hotjar Snippet Version.
