@@ -9,7 +9,7 @@ import Link from 'next/link';
 import ProjectLayout from '@/components/layout/ProjectLayout_2';
 import { useChatMessages } from '@/supa_database/hooks/useChatMessages'; // Add this import
 import { PersonaModal } from '@/components/client-components/persona/PersonaModal'; // Import PersonaModal
-import Head from 'next/dist/shared/lib/head';
+import Head from 'next/head';
 import { Button } from '@/components/ui/button';
 
 
