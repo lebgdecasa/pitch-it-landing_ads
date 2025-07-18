@@ -16,7 +16,7 @@ import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 
 const WaitlistModal = dynamic(() => import('@/components/modals/WaitlistModal'), { ssr: false });
-const DemoModal = dynamic(() => import('@/components/modals/DemoModal'), { ssr: false });
+const CalendlyModal = dynamic(() => import('@/components/modals/CalendlyModal'), { ssr: false });
 
 const WhyPitchItSection = dynamic(() => import('@/components/sections/WhyPitchItSection'), { ssr: false });
 const FeaturesSection = dynamic(() => import('@/components/sections/FeaturesSection'), { ssr: false });
@@ -90,7 +90,7 @@ export default function Home({ generatedAt }: HomeProps) {
       </Modal>
 
       <Modal isOpen={isDemoModalOpen} onClose={closeDemoModal} maxWidth="max-w-2xl">
-        <DemoModal onClose={closeDemoModal} />
+        <CalendlyModal onClose={closeDemoModal} />
       </Modal>
     </>
   );

@@ -8,7 +8,7 @@ import LazyGoogleAnalytics from '@/components/LazyGoogleAnalytics';
 import OptimizedAnalytics from '@/components/OptimizedAnalytics';
 import ResourcePrefetcher from '@/components/ResourcePrefetcher';
 import Modal from '@/components/ui/Modal';
-import DemoModal from '@/components/modals/DemoModal';
+import CalendlyModal from '@/components/modals/CalendlyModal';
 import WaitlistModal from '@/components/modals/WaitlistModal';
 import '@/styles/globals.css';
 import { appWithTranslation } from 'next-i18next';
@@ -164,7 +164,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             {/* Modals are outside the main Component render tree from Next.js perspective but within context providers */}
             {isDemoModalOpen && (
               <Modal isOpen={isDemoModalOpen} onClose={closeDemoModal} maxWidth="max-w-2xl">
-                <DemoModal onClose={closeDemoModal} />
+                <CalendlyModal onClose={closeDemoModal} />
               </Modal>
             )}
             {isWaitlistModalOpen && (
