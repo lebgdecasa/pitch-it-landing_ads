@@ -82,7 +82,9 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
         }
         ga.trackRegistration('email');
         setMessage(responseData.message || t('auth_signup_success'))
+      } finally {
         reset() // Clear the form fields
+      }
       } else if (mode === 'signin') {
         const fetchOptions: RequestInit = {
           method: 'POST',
