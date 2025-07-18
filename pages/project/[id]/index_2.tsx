@@ -141,27 +141,62 @@ export default function ProjectPage() {
 
   // If not authenticated after auth check, show an appropriate message
   if (!user) {
-    return <div className="p-4">Authentication required. Please log in to view this project.</div>;
+    return (
+      <div className="p-4 text-center">
+        <p>Authentication required. Please log in to view this project.</p>
+        <Button asChild className="mt-4">
+          <Link href="/">Back to Homepage</Link>
+        </Button>
+      </div>
+    );
   }
 
   // Handle project-specific errors first
   if (projectError) {
     // Check for our custom "not found or access denied" message
     if (projectError === 'Project not found or access denied.') {
-      return <div className="p-4">Project not found or access is denied. Please check the ID or your permissions. Logged UserID: {user?.id}</div>;
+      return (
+        <div className="p-4 text-center">
+          <p>Project not found or access is denied. Please check the ID or your permissions. Logged UserID: {user?.id}</p>
+          <Button asChild className="mt-4">
+            <Link href="/">Back to Homepage</Link>
+          </Button>
+        </div>
+      );
     }
     // Display other project errors
-    return <div className="p-4">Error loading project data: {projectError}</div>;
+    return (
+      <div className="p-4 text-center">
+        <p>Error loading project data: {projectError}</p>
+        <Button asChild className="mt-4">
+          <Link href="/">Back to Homepage</Link>
+        </Button>
+      </div>
+    );
   }
 
   // Handle personas error if project loaded successfully but personas failed
   if (personasError) {
-    return <div className="p-4">Error loading associated personas: {personasError}</div>;
+    return (
+      <div className="p-4 text-center">
+        <p>Error loading associated personas: {personasError}</p>
+        <Button asChild className="mt-4">
+          <Link href="/">Back to Homepage</Link>
+        </Button>
+      </div>
+    );
   }
 
   // If there was no project error, but project is still null (should be caught by projectError now)
   if (!project) {
-    return <div className="p-4">Project data is not available. Logged UserID: {user?.id}</div>;
+    return (
+      <div className="p-4 text-center">
+        <p>Project data is not available. Logged UserID: {user?.id}</p>
+        <Button asChild className="mt-4">
+          <Link href="/">Back to Homepage</Link>
+        </Button>
+      </div>
+    );
   }
 
   const stageInfo: StageInfo = {
