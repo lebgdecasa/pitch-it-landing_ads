@@ -9,6 +9,8 @@ import Link from 'next/link';
 import ProjectLayout from '@/components/layout/ProjectLayout';
 import { PersonaModal } from '@/components/client-components/persona/PersonaModal'; // Import PersonaModal
 import Head from 'next/dist/shared/lib/head';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 
 interface Persona {
@@ -45,6 +47,7 @@ interface ChatPageProps {
 
 export default function ChatPage({ project, projectId: initialProjectId, initialPersonas }: ChatPageProps) {
   const router = useRouter();
+  const { t } = useTranslation('common');
   // Use projectId from router.query if available, otherwise fallback to initialProjectId from props
   // This is to ensure router.query.id is available for redirection logic
   const { id: queryProjectId } = router.query;
@@ -69,7 +72,7 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showMentions, setShowMentions] = useState(false);
-  const [currentUser] = useState('You'); // You can replace this with actual user context
+  const [currentUser] = useState(t('you')); // You can replace this with actual user context
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -85,11 +88,11 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   };
 
   if (authLoading || !profile) {
-    return <div>Loading user information...</div>;
+    return <div>{t('loading_user_info')}</div>;
   }
 
   if (profile.subscription_tier === 'free') {
-    return <div>Redirecting to the appropriate version for your plan...</div>;
+    return <div>{t('redirecting_for_plan')}</div>;
   }
 
   // Colors for persona avatars
@@ -198,10 +201,10 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
       });
 
       const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm thinking...";
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || t('thinking');
     } catch (error) {
       console.error('Error generating response:', error);
-      return "Sorry, I'm having trouble responding right now.";
+      return t('error_responding');
     }
   };
 
@@ -302,8 +305,8 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
   return (
     <><Head>
-      <title> Chat | {project.name}</title>
-      <meta name="description" content="Manage and track your business ideas and projects." />
+      <title>{t('chat_page_title', { projectName: project.name })}</title>
+      <meta name="description" content={t('chat_page_description')} />
     </Head><ProjectLayout>
         <div className="flex h-screen bg-gray-100">
           {/* Sidebar with Personas */}
@@ -313,12 +316,12 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
                 <div className="flex-1">
                   <h1 className="text-lg font-semibold text-gray-900 truncate">{project.name}</h1>
-                  <p className="text-sm text-gray-500">Project Chat</p>
+                  <p className="text-sm text-gray-500">{t('project_chat')}</p>
                 </div>
               </div>
               <div className="flex items-center text-sm text-gray-600">
                 <Users className="mr-2 h-4 w-4" />
-                Team Members ({personas.length})
+                {t('team_members', { count: personas.length })}
               </div>
             </div>
 
@@ -340,7 +343,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
               {personas.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
                   <Bot className="mx-auto h-12 w-12 mb-3 text-gray-300" />
-                  <p className="text-sm">No team members found for this project.</p>
+                  <p className="text-sm">{t('no_team_members_found')}</p>
                 </div>
               )}
             </div>
@@ -350,9 +353,9 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
           <div className="flex-1 flex flex-col">
             {/* Chat Header */}
             <div className="bg-white border-b border-gray-200 p-4">
-              <h2 className="text-xl font-semibold text-gray-900">Team Collaboration</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('team_collaboration')}</h2>
               <p className="text-sm text-gray-500">
-                {personas.length > 0 ? 'Chat with your AI team members' : 'Add team members to start collaborating'}
+                {personas.length > 0 ? t('chat_with_ai_team') : t('add_team_members_to_chat')}
               </p>
             </div>
 
@@ -365,10 +368,10 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                       <Send className="h-8 w-8 text-blue-600" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Start the conversation</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">{t('start_conversation_title')}</h3>
                   <p className="max-w-md mx-auto text-sm">
-                    Send a message to begin collaborating with your AI team members.
-                    {personas.length > 0 && " Use @name to mention specific team members."}
+                    {t('start_conversation_description')}
+                    {personas.length > 0 && ` ${t('mention_prompt')}`}
                   </p>
                 </div>
               )}
@@ -416,7 +419,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
-                    <span className="text-sm text-gray-500">Team members are typing...</span>
+                    <span className="text-sm text-gray-500">{t('team_typing')}</span>
                   </div>
                 </div>
               )}
@@ -449,7 +452,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                   <button
                     onClick={() => setShowMentions(!showMentions)}
                     className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Mention team member"
+                    title={t('mention_team_member_title')}
                   >
                     <AtSign className="h-5 w-5" />
                   </button>
@@ -460,7 +463,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Type a message... (Use @name to mention team members)"
+                      placeholder={t('chat_placeholder')}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       rows={1}
                       style={{ minHeight: '42px', maxHeight: '120px' }}
@@ -481,7 +484,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                 </div>
 
                 <div className="mt-2 text-xs text-gray-500">
-                  Press Enter to send, Shift+Enter for new line
+                  {t('chat_send_instruction')}
                 </div>
               </div>
             )}
@@ -498,15 +501,15 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                 role: 'user', // Provide a default valid role for ChatPersona.role tag
                 // avatarUrl can be omitted; PersonaModal handles placeholder if not present
               }}
-              jobTitle={selectedPersonaForModal.role} // Use the actual role string for jobTitle
+              jobTitle={selectedPersonaForModal.role}
               needsDetails={selectedPersonaForModal.description}
               background={selectedPersonaForModal.demographics
                 ? Object.entries(selectedPersonaForModal.demographics)
                   .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}: ${String(value)}`)
                   .join('; ')
                 : undefined}
-              goals={selectedPersonaForModal.goals}
-              challenges={selectedPersonaForModal.pain_points} // Map pain_points to challenges
+              goals={selectedPersonaForModal.goals || []}
+              challenges={selectedPersonaForModal.pain_points || []}
             />
           )}
         </div>
@@ -515,29 +518,26 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.params!;
+  const { id } = context.params as { id: string };
+  const { req } = context;
 
-  // Create Supabase client
+  // Initialize Supabase client with auth context
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Fetch the project from Supabase
+  // Fetch project details
   const { data: project, error: projectError } = await supabase
     .from('projects')
     .select('*')
     .eq('id', id)
     .single();
 
-  // Handle errors or missing project
   if (projectError || !project) {
-    console.error('Error fetching project:', projectError);
-    return {
-      notFound: true
-    };
+    return { notFound: true };
   }
 
-  // Fetch personas for this project
+  // Fetch personas for the project
   const { data: personas, error: personasError } = await supabase
     .from('personas')
     .select('*')
@@ -545,13 +545,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (personasError) {
     console.error('Error fetching personas:', personasError);
+    // Decide if you want to return an error page or just an empty array of personas
   }
+
+  const locale = context.locale ?? 'en';
+  const translations = await serverSideTranslations(locale, ['common']);
 
   return {
     props: {
       project,
-      projectId: id as string,
-      initialPersonas: personas || []
-    }
+      projectId: id,
+      initialPersonas: personas || [],
+      ...translations,
+    },
   };
 };

@@ -1,32 +1,34 @@
 import React from 'react';
+import { useTranslation } from 'next-i18next';
 
 interface WizardStepperProps {
   currentStep: number;
 }
 
-const steps = [
+const steps = (t: (key: string) => string) => [
   {
     id: 1,
-    name: 'Basic Info',
-    description: 'Project details',
+    name: t('stepper_basic_info_name'),
+    description: t('stepper_basic_info_desc'),
   },
   {
     id: 2,
-    name: 'Description',
-    description: 'AI-assisted description',
+    name: t('stepper_description_name'),
+    description: t('stepper_description_desc'),
   },
   {
     id: 3,
-    name: 'Stage & Files',
-    description: 'Project stage',
+    name: t('stepper_stage_files_name'),
+    description: t('stepper_stage_files_desc'),
   },
 ];
 
 export const WizardStepper: React.FC<WizardStepperProps> = ({ currentStep }) => {
+  const { t } = useTranslation('common');
   return (
-    <nav aria-label="Progress">
+    <nav aria-label={t('stepper_aria_label')}>
       <ol role="list" className="space-y-4 md:flex md:space-y-0 md:space-x-8">
-        {steps.map((step) => (
+        {steps(t).map((step) => (
           <li key={step.name} className="md:flex-1">
             <div className={`group ${step.id < currentStep ? 'border-blue-600' : step.id === currentStep ? 'border-gray-200' : 'border-gray-200'} pl-4 py-2 border-l-4 hover:border-gray-300 md:pl-0 md:pt-4 md:pb-0 md:border-l-0 md:border-t-4`}>
               <span className="flex items-center text-sm font-medium">

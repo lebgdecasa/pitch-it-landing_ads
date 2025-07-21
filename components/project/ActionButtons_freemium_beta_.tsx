@@ -1,9 +1,10 @@
 // components/project/ActionButtons.tsx
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
 import { Users, Activity, FileEdit, Video, Lock } from 'lucide-react'; // Added Lock icon
-// import { UpgradeModal } from '../modals/UpgradeModal'; // Lazy loaded
+import { useTranslation } from 'next-i18next';
+
 import dynamic from 'next/dynamic';
 
 const UpgradeModal = dynamic(() => import('../modals/UpgradeModal').then(mod => mod.UpgradeModal), { ssr: false });
@@ -21,6 +22,7 @@ interface ActionButtonsProps {
 }
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({ projectId, buttonConfigs = {} }) => {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false); // State for modal
 
@@ -51,7 +53,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({ projectId, buttonC
       >
         <div className="flex items-center space-x-3">
           {icon}
-          <span>{label}</span>
+          <span>{t(label)}</span>
         </div>
         {isLocked && <Lock className="h-5 w-5 text-white" />}
       </Button>
@@ -61,25 +63,25 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({ projectId, buttonC
   const buttons: ActionButtonConfig[] = [
     {
       icon: <Users className="h-5 w-5" />,
-      label: 'Chat with Personas',
+      label: 'chat_with_personas',
       redirectPath: `/project/${projectId}/chat_2`,
     },
     {
       icon: <Activity className="h-5 w-5" />,
-      label: 'Run Pulse',
+      label: 'run_pulse',
       redirectPath: `/project/${projectId}/pulse`,
       // Example: lock this button by default
       locked: true,
     },
     {
       icon: <FileEdit className="h-5 w-5" />,
-      label: 'Edit Pitch Deck',
+      label: 'edit_pitch_deck',
       redirectPath: `/project/${projectId}/deck/edit`,
       locked: true,
     },
     {
       icon: <Video className="h-5 w-5" />,
-      label: 'Virtual VC Pitch',
+      label: 'virtual_vc_pitch',
       redirectPath: `/project/${projectId}/virtual-vc/setup`,
       locked: true,
     },

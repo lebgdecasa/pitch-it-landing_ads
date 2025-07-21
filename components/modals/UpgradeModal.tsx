@@ -2,6 +2,7 @@ import React from 'react';
 import { useRouter } from 'next/router';
 import { Button } from '../ui/button';
 import Modal from '../ui/Modal'; // Corrected import: Assuming Modal is a default export
+import { useTranslation } from 'next-i18next';
 
 interface UpgradeModalProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface UpgradeModalProps {
 
 export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) => {
   const router = useRouter();
+  const { t } = useTranslation('common');
 
   const handleUpgrade = () => {
     router.push('/subscription'); // Or your actual subscription page path
@@ -23,16 +25,16 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="p-6">
-        <h3 className="text-xl font-semibold mb-4">Upgrade to Unlock Feature</h3>
+        <h3 className="text-xl font-semibold mb-4">{t('upgrade_modal_title')}</h3>
         <p className="text-lg text-gray-700 mb-4">
-          This feature is available for premium users. Please upgrade your plan to access it.
+          {t('upgrade_modal_description')}
         </p>
         <div className="flex justify-end space-x-3">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t('Cancel')}
           </Button>
           <Button onClick={handleUpgrade} className="bg-blue-500 text-white hover:bg-blue-600">
-            Upgrade Now
+            {t('upgrade_modal_upgrade_now')}
           </Button>
         </div>
       </div>

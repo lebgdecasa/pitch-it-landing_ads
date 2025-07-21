@@ -13,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "../../ui/tooltip"
+import { useTranslation } from 'next-i18next';
 
 interface MetricValue {
   label: string;
@@ -89,11 +90,12 @@ const MetricCard: React.FC<{ metric: MetricValue }> = ({ metric }) => {
 };
 
 export const MetricsDisplay: React.FC<{ metrics: MetricsData }> = ({ metrics }) => {
+  const { t } = useTranslation('common');
   return (
     <div className="space-y-6">
       {/* Market Potential */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Market Potential</h3>
+        <h3 className="text-lg font-semibold mb-3">{t('metrics_display_market_potential')}</h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {metrics.tam && <MetricCard metric={metrics.tam} />}
           {metrics.potentialEarnings && <MetricCard metric={metrics.potentialEarnings} />}
@@ -104,7 +106,7 @@ export const MetricsDisplay: React.FC<{ metrics: MetricsData }> = ({ metrics }) 
 
       {/* Profitability */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Profitability</h3>
+        <h3 className="text-lg font-semibold mb-3">{t('metrics_display_profitability')}</h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {metrics.cac && <MetricCard metric={metrics.cac} />}
           {metrics.cltv && <MetricCard metric={metrics.cltv} />}
@@ -115,7 +117,7 @@ export const MetricsDisplay: React.FC<{ metrics: MetricsData }> = ({ metrics }) 
 
       {/* Time to Market */}
       <div>
-        <h3 className="text-lg font-semibold mb-3">Time to Market</h3>
+        <h3 className="text-lg font-semibold mb-3">{t('metrics_display_time_to_market')}</h3>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {metrics.timeToMvp && <MetricCard metric={metrics.timeToMvp} />}
           {metrics.timeToRevenue && <MetricCard metric={metrics.timeToRevenue} />}

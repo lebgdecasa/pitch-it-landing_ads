@@ -12,6 +12,9 @@ import { useProjects } from '@/supa_database/hooks/useProject';
 // import ConfirmationDialog from '@/components/modals/ConfirmationDialog'; // Lazy loaded
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import type { GetStaticProps } from 'next';
 
 const ConfirmationDialog = dynamic(() => import('@/components/modals/ConfirmationDialog'), { ssr: false });
 
@@ -33,25 +36,26 @@ const ProjectCard = ({
   locked?: boolean;
   onDeleteRequest: (projectId: string, projectName: string) => void; // Updated prop type
 }) => {
+  const { t } = useTranslation('common');
   // Get stage color and label, aligned with project/[id]/index.tsx
   const stageInfo: Record<ProjectStage, { color: string; label: string; }> = {
-    [ProjectStage.IDEA]: { color: 'bg-blue-100 text-blue-800', label: 'Idea' },
-    [ProjectStage.PROTOTYPE]: { color: 'bg-purple-100 text-purple-800', label: 'Prototype' },
-    [ProjectStage.MVP]: { color: 'bg-green-100 text-green-800', label: 'MVP' },
-    [ProjectStage.PRE_SEED]: { color: 'bg-red-100 text-gray-800', label: 'PRE SEED' }, // Kept from original dashboard as not in project page
-    [ProjectStage.SEED]: { color: 'bg-yellow-100 text-yellow-800', label: 'SEED' }, // Kept from original dashboard as not in project page
-    [ProjectStage.SERIES_A]: { color: 'bg-amber-100 text-amber-800', label: 'SERIES A' },
-    [ProjectStage.SERIES_B]: { color: 'bg-indigo-100 text-indigo-800', label: 'SERIES B' },
-    [ProjectStage.SERIES_C]: { color: 'bg-teal-100 text-teal-800', label: 'SERIES C' },
+    [ProjectStage.IDEA]: { color: 'bg-blue-100 text-blue-800', label: t('project_stage_idea') },
+    [ProjectStage.PROTOTYPE]: { color: 'bg-purple-100 text-purple-800', label: t('project_stage_prototype') },
+    [ProjectStage.MVP]: { color: 'bg-green-100 text-green-800', label: t('project_stage_mvp') },
+    [ProjectStage.PRE_SEED]: { color: 'bg-red-100 text-gray-800', label: t('project_stage_pre_seed') },
+    [ProjectStage.SEED]: { color: 'bg-yellow-100 text-yellow-800', label: t('project_stage_seed') },
+    [ProjectStage.SERIES_A]: { color: 'bg-amber-100 text-amber-800', label: t('project_stage_series_a') },
+    [ProjectStage.SERIES_B]: { color: 'bg-indigo-100 text-indigo-800', label: t('project_stage_series_b') },
+    [ProjectStage.SERIES_C]: { color: 'bg-teal-100 text-teal-800', label: t('project_stage_series_c') },
   };
 
-  const { color, label } = stageInfo[stage] || { color: 'bg-gray-100 text-gray-800', label: 'UNKNOWN' };
+  const { color, label } = stageInfo[stage] || { color: 'bg-gray-100 text-gray-800', label: t('project_stage_unknown') };
   const formattedDate = new Date(updatedAt).toLocaleDateString();
 
   const handleDeleteClick = (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault(); // Prevent Link navigation
     event.stopPropagation(); // Stop event bubbling
-    onDeleteRequest(id, name || 'Untitled Project'); // Pass project name as well
+    onDeleteRequest(id, name || t('untitled_project')); // Pass project name as well
   };
 
   const isLocked = locked || false; // Default to false if not provided
@@ -62,19 +66,19 @@ const ProjectCard = ({
         <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 p-5 border border-gray-100 h-full flex flex-col justify-between">
           <div> {/* Content wrapper */}
             <div className="flex justify-between items-start mb-3">
-              <h3 className="text-lg font-semibold text-gray-900 truncate pr-2">{name || 'Untitled Project'}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 truncate pr-2">{name || t('untitled_project')}</h3>
               <span className={`${color} text-xs px-2 py-1 rounded-full font-medium whitespace-nowrap`}>{label}</span>
             </div>
             <p className="text-gray-600 text-sm line-clamp-2 mb-4">{description}</p>
           </div>
           <div className="flex justify-between items-center text-xs text-gray-500 mt-auto">
-            <span>Last updated: {formattedDate}</span>
+            <span>{t('last_updated')}: {formattedDate}</span>
             {/* Delete Icon - now on the bottom right */}
             <button
               type="button"
               onClick={handleDeleteClick}
               className="p-1.5 rounded-full text-red-500 hover:bg-red-100 transition-colors cursor-pointer ml-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
-              aria-label={`Delete project ${name || 'Untitled Project'}`}
+              aria-label={`${t('delete_project_aria_label')} ${name || t('untitled_project')}`}
             >
               <Trash2 size={18} />
             </button>
@@ -87,6 +91,7 @@ const ProjectCard = ({
 
 export default function Dashboard() {
   const { user } = useAuthContext();
+  const { t } = useTranslation('common');
   // Use the useProjects hook
   const { projects: fetchedProjects, loading, error, refetch, deleteProject } = useProjects(user?.id); // Added deleteProject
   const [projects, setProjects] = useState<Project[]>([]);
@@ -162,10 +167,10 @@ export default function Dashboard() {
     return (
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center min-h-[50vh] p-4">
-          <h2 className="text-2xl font-bold mb-4">Please Log In</h2>
-          <p className="mb-6 text-center">You need to be logged in to view your dashboard.</p>
+          <h2 className="text-2xl font-bold mb-4">{t('please_log_in')}</h2>
+          <p className="mb-6 text-center">{t('log_in_prompt')}</p>
           <Button asChild>
-            <Link href="/auth">Log In</Link> {/* Changed from /login to /auth based on file structure */}
+            <Link href="/auth">{t('log_in')}</Link> {/* Changed from /login to /auth based on file structure */}
           </Button>
         </div>
       </DashboardLayout>
@@ -177,7 +182,7 @@ export default function Dashboard() {
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center min-h-[50vh] p-4">
           <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
-          <p className="mt-4 text-lg text-gray-700">Loading your projects...</p>
+          <p className="mt-4 text-lg text-gray-700">{t('loading_projects')}</p>
         </div>
       </DashboardLayout>
     );
@@ -187,10 +192,10 @@ export default function Dashboard() {
     return (
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center min-h-[50vh] p-4 bg-red-50 border border-red-200 rounded-lg">
-          <h2 className="text-2xl font-bold mb-4 text-red-700">Error Loading Projects</h2>
+          <h2 className="text-2xl font-bold mb-4 text-red-700">{t('error_loading_projects')}</h2>
           <p className="mb-6 text-center text-red-600">{error}</p>
           <Button onClick={() => refetch()} className="bg-red-600 hover:bg-red-700 text-white">
-            Try Again
+            {t('try_again')}
           </Button>
         </div>
       </DashboardLayout>
@@ -216,20 +221,20 @@ export default function Dashboard() {
 
   return (
     <><Head>
-      <title>Dashboard | NexTraction</title>
-      <meta name="description" content="Manage and track your business ideas and projects." />
+      <title>{t('dashboard_title')}</title>
+      <meta name="description" content={t('dashboard_description')} />
     </Head><DashboardLayout>
         <div className="mx-auto p-4 md:p-6 max-w-7xl">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">My Projects</h1>
-              <p className="text-gray-600 mt-1">Manage and track your business ideas</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('my_projects')}</h1>
+              <p className="text-gray-600 mt-1">{t('manage_your_projects')}</p>
             </div>
             {projects.length > 0 && (
               <Button asChild size="lg" className="rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors">
                 <Link href="/wizard" className="flex items-center" onClick={() => ga.trackButtonClick('new_project', 'dashboard')}>
                   <PlusCircle className="mr-2 h-5 w-5" />
-                  New Project
+                  {t('new_project')}
                 </Link>
               </Button>
             )}
@@ -237,13 +242,13 @@ export default function Dashboard() {
 
           {projects.length === 0 ? (
             <div className="w-fit mx-auto flex flex-col items-center justify-center text-center border-gray-200 rounded-lg p-10 md:p-20 lg:p-40 min-h-[50vh] md:min-h-[60vh]">
-              <h3 className="font-semibold text-2xl md:text-3xl mb-4">No projects yet</h3>
-              <p className="text-gray-600 mb-8 max-w-md">Get started by creating your first project. Let's bring your idea to life.</p>
+              <h3 className="font-semibold text-2xl md:text-3xl mb-4">{t('no_projects_yet')}</h3>
+              <p className="text-gray-600 mb-8 max-w-md">{t('get_started_creating_project')}</p>
               <Button asChild size="lg" className="bg-blue-600 text-white hover:bg-blue-700">
                 {/* Assuming /project/creation/wizard is the correct path for the wizard */}
                 <Link href="/wizard" className="flex items-center">
                   <PlusCircle className="mr-2 h-5 w-5" />
-                  Create Project
+                  {t('create_project')}
                 </Link>
               </Button>
             </div>
@@ -252,7 +257,7 @@ export default function Dashboard() {
               {/* Recent Projects */}
               {sortedProjects.length > 0 && (
                 <div className="mb-10">
-                  <h2 className="text-xl font-semibold mb-4 text-gray-800">Recent Projects</h2>
+                  <h2 className="text-xl font-semibold mb-4 text-gray-800">{t('recent_projects')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {sortedProjects.slice(0, 3).map((project) => (
                       <ProjectCard
@@ -274,14 +279,14 @@ export default function Dashboard() {
                 if (stageProjects.length === 0) return null;
 
                 const stageLabels = {
-                  [ProjectStage.IDEA]: "Idea Stage",
-                  [ProjectStage.SERIES_A]: "Series A Stage",
-                  [ProjectStage.SERIES_B]: "Series B Stage",
-                  [ProjectStage.SERIES_C]: "Series C Stage",
-                  [ProjectStage.PRE_SEED]: "Pre-Seed Stage",
-                  [ProjectStage.SEED]: "Seed Stage",
-                  [ProjectStage.PROTOTYPE]: "Prototype Stage",
-                  [ProjectStage.MVP]: "MVP Stage",
+                  [ProjectStage.IDEA]: t('stage_label_idea'),
+                  [ProjectStage.SERIES_A]: t('stage_label_series_a'),
+                  [ProjectStage.SERIES_B]: t('stage_label_series_b'),
+                  [ProjectStage.SERIES_C]: t('stage_label_series_c'),
+                  [ProjectStage.PRE_SEED]: t('stage_label_pre_seed'),
+                  [ProjectStage.SEED]: t('stage_label_seed'),
+                  [ProjectStage.PROTOTYPE]: t('stage_label_prototype'),
+                  [ProjectStage.MVP]: t('stage_label_mvp'),
                 };
 
                 return (
@@ -306,7 +311,7 @@ export default function Dashboard() {
               {/* Fallback if all categories are empty but projects array is not (e.g. stage mismatch) */}
               {sortedProjects.length > 0 && Object.values(projectsByStage).every(arr => arr.length === 0) && (
                 <div className="mb-10">
-                  <h2 className="text-xl font-semibold mb-4 text-gray-800">All Projects</h2>
+                  <h2 className="text-xl font-semibold mb-4 text-gray-800">{t('all_projects')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {sortedProjects.map((project) => (
                       <ProjectCard
@@ -335,11 +340,17 @@ export default function Dashboard() {
               setProjectToDelete(null);
             } }
             onConfirm={handleConfirmDelete}
-            title={`Delete Project: ${projectToDelete.name}`}
-            description="Are you sure you want to delete this project? This action cannot be undone and all associated data will be lost."
-            confirmButtonText="Delete"
+            title={`${t('delete_project_title')} ${projectToDelete.name}`}
+            description={t('delete_project_description')}
+            confirmButtonText={t('delete_button_text')}
             confirmButtonClassName="bg-red-600 hover:bg-red-700 text-white" />
         )}
       </DashboardLayout></>
   );
 }
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => ({
+  props: {
+    ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+  },
+});

@@ -26,6 +26,9 @@ import { usePersonas } from '../../../supa_database/hooks/usePersonas';
 import { supabase } from '../../../supa_database/config/supabase'; // Ensure Supabase client is imported
 import { useAuthContext } from '../../../supa_database/components/AuthProvider'; // Import useAuthContext
 import Head from 'next/dist/shared/lib/head';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import type { GetServerSideProps } from 'next';
 
 // Type definitions
 interface StageInfo {
@@ -41,18 +44,21 @@ const PitchDetail = ({ label, value, icon: Icon, color }: {
   value: string;
   icon?: React.ElementType;
   color?: string
-}) => (
+}) => {
+  const { t } = useTranslation('common');
+  return (
   <div className="mb-4">
     <div className="flex items-center mb-1">
       {Icon && <Icon className={`h-4 w-4 mr-2 ${color || "text-gray-500"}`} />}
       <h4 className="text-sm font-medium text-gray-500">{label}</h4>
     </div>
-    <p className="text-gray-800 ml-6">{value || "Not defined yet"}</p>
+    <p className="text-gray-800 ml-6">{value || t('not_defined_yet')}</p>
   </div>
-);
+)};
 
 export default function ProjectPage() {
   const router = useRouter();
+  const { t } = useTranslation('common');
   const { id: projectIdFromRouter } = router.query;
   const { user, loading: authLoading, profile } = useAuthContext();
 
@@ -92,54 +98,54 @@ export default function ProjectPage() {
   const [showGroupChat, setShowGroupChat] = useState(false);
 
   if (authLoading || (!profile && !user && authLoading !== false) ) { // Adjusted loading check
-    return <div>Loading user information...</div>;
+    return <div>{t('loading_user_info')}</div>;
   }
 
   if (profile && profile.subscription_tier === 'free') {
     // This condition is primarily handled by useEffect, but this can be a fallback.
-    return <div>Redirecting to the appropriate version for your plan...</div>;
+    return <div>{t('redirecting_for_plan')}</div>;
   }
 
   if (projectLoading || personasLoading) {
-    let statusMessage = "Loading...";
-    if (authLoading) statusMessage = "Authenticating user...";
-    else if (projectLoading) statusMessage = "Loading project details...";
-    else if (personasLoading) statusMessage = "Loading personas...";
+    let statusMessage = t('loading');
+    if (authLoading) statusMessage = t('authenticating_user');
+    else if (projectLoading) statusMessage = t('loading_project_details');
+    else if (personasLoading) statusMessage = t('loading_personas');
     return <div className="p-4">{statusMessage}</div>;
   }
 
   // If not authenticated after auth check, show an appropriate message
   if (!user) {
-    return <div className="p-4">Authentication required. Please log in to view this project.</div>;
+    return <div className="p-4">{t('auth_required')}</div>;
   }
 
   // Handle project-specific errors first
   if (projectError) {
     // Check for our custom "not found or access denied" message
     if (projectError === 'Project not found or access denied.') {
-      return <div className="p-4">Project not found or access is denied. Please check the ID or your permissions. Logged UserID: {user?.id}</div>;
+      return <div className="p-4">{t('project_not_found_or_denied', { userId: user?.id })}</div>;
     }
     // Display other project errors
-    return <div className="p-4">Error loading project data: {projectError}</div>;
+    return <div className="p-4">{t('error_loading_project', { error: projectError })}</div>;
   }
 
   // Handle personas error if project loaded successfully but personas failed
   if (personasError) {
-    return <div className="p-4">Error loading associated personas: {personasError}</div>;
+    return <div className="p-4">{t('error_loading_personas', { error: personasError })}</div>;
   }
 
   // If there was no project error, but project is still null (should be caught by projectError now)
   if (!project) {
-    return <div className="p-4">Project data is not available. Logged UserID: {user?.id}</div>;
+    return <div className="p-4">{t('project_data_not_available', { userId: user?.id })}</div>;
   }
 
   const stageInfo: StageInfo = {
-    'Idea': { color: 'bg-blue-100 text-blue-800', label: 'IDEA', description: 'Define your business idea' },
-    'Prototype': { color: 'bg-purple-100 text-purple-800', label: 'PROTOTYPE', description: 'Build your prototype' },
-    'MVP': { color: 'bg-green-100 text-green-800', label: 'MVP', description: 'Launch your MVP' },
-    'Series A': { color: 'bg-amber-100 text-amber-800', label: 'SERIES A', description: 'Series A funding' },
-    'Series B': { color: 'bg-indigo-100 text-indigo-800', label: 'SERIES B', description: 'Series B funding' },
-    'Series C': { color: 'bg-teal-100 text-teal-800', label: 'SERIES C', description: 'Series C funding' }
+    'Idea': { color: 'bg-blue-100 text-blue-800', label: t('project_stage_idea_label'), description: t('project_stage_idea_desc') },
+    'Prototype': { color: 'bg-purple-100 text-purple-800', label: t('project_stage_prototype_label'), description: t('project_stage_prototype_desc') },
+    'MVP': { color: 'bg-green-100 text-green-800', label: t('project_stage_mvp_label'), description: t('project_stage_mvp_desc') },
+    'Series A': { color: 'bg-amber-100 text-amber-800', label: t('project_stage_series_a_label'), description: t('project_stage_series_a_desc') },
+    'Series B': { color: 'bg-indigo-100 text-indigo-800', label: t('project_stage_series_b_label'), description: t('project_stage_series_b_desc') },
+    'Series C': { color: 'bg-teal-100 text-teal-800', label: t('project_stage_series_c_label'), description: t('project_stage_series_c_desc') }
   };
 
   const currentStage = stageInfo[project.stage] || stageInfo['Idea'];
@@ -184,8 +190,8 @@ export default function ProjectPage() {
 
   return (
     <><Head>
-      <title> {project.name} | NexTraction</title>
-      <meta name="description" content="Manage and track your business ideas and projects." />
+      <title> {t('project_page_title', { projectName: project.name })}</title>
+      <meta name="description" content={t('project_page_description')} />
     </Head><ProjectLayout>
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
           {/* Header */}
@@ -204,14 +210,16 @@ export default function ProjectPage() {
               <Button variant="outline" size="sm" asChild>
                 <Link href={`/project/${project.id}/edit`}>
                   <Edit className="h-4 w-4 mr-1" />
-                  Edit
+                  {t('edit_button')}
                 </Link>
               </Button>
               <ShareTeamDialog
                 projectId={project.id}
                 projectName={project.name}
                 variant="outline"
-                size="sm" />
+                size="sm" isOpen={false} onClose={function (): void {
+                  throw new Error('Function not implemented.');
+                } } />
             </div>
           </div>
 
@@ -228,42 +236,42 @@ export default function ProjectPage() {
 
               {/* Project Overview */}
               <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-                <h2 className="text-xl font-semibold mb-4">Project Overview</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('project_overview')}</h2>
                 <p className="text-gray-600 mb-6">{project.description}</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                   <PitchDetail
-                    label="Problem"
+                    label={t('problem_label')}
                     value={project.overview?.Problem || ""}
                     icon={AlertTriangle}
                     color="text-red-300" />
                   <PitchDetail
-                    label="Solution"
+                    label={t('solution_label')}
                     value={project.overview?.Solution || ""}
                     icon={Lightbulb}
                     color="text-blue-300" />
                   <PitchDetail
-                    label="Target Market"
+                    label={t('target_market_label')}
                     value={project.overview?.Target_Market || ""}
                     icon={Users}
                     color="text-green-300" />
                   <PitchDetail
-                    label="Business Model"
+                    label={t('business_model_label')}
                     value={project.overview?.Business_Model || ""}
                     icon={Briefcase}
                     color="text-yellow-300" />
                   <PitchDetail
-                    label="Competition"
+                    label={t('competition_label')}
                     value={project.overview?.Competition || ""}
                     icon={Swords}
                     color="text-purple-300" />
                   <PitchDetail
-                    label="Unique Selling Point"
+                    label={t('usp_label')}
                     value={project.overview?.Unique_selling_point || ""}
                     icon={Sparkles}
                     color="text-pink-300" />
                   <PitchDetail
-                    label="Marketing Strategy"
+                    label={t('marketing_strategy_label')}
                     value={project.overview?.Marketing_Strategy || ""}
                     icon={Megaphone}
                     color="text-indigo-300" />
@@ -279,7 +287,7 @@ export default function ProjectPage() {
 
               {/* Personas Section */}
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Target Personas</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('target_personas')}</h2>
                 {!showGroupChat && personas && personas.length > 0 && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
@@ -311,7 +319,7 @@ export default function ProjectPage() {
                       className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
                     >
                       <Users className="h-5 w-5 mr-2" />
-                      Chat with Personas
+                      {t('chat_with_personas')}
                     </Button>
                   </>
                 )}
@@ -324,8 +332,12 @@ export default function ProjectPage() {
             {/* Right column */}
             <div className="space-y-6">
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h2 className="text-xl font-semibold mb-4">Actions</h2>
-                <ActionButtons projectId={project.id} />
+                <h2 className="text-xl font-semibold mb-4">{t('actions_title')}</h2>
+                <ActionButtons projectId={project.id} onRunPulse={function (): void {
+                  throw new Error('Function not implemented.');
+                } } onBookDemo={function (): void {
+                  throw new Error('Function not implemented.');
+                } } isPulseRunning={false} />
               </div>
             </div>
           </div>
@@ -351,3 +363,9 @@ export default function ProjectPage() {
       </ProjectLayout></>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => ({
+  props: {
+    ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+  },
+});

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { Check, X } from 'lucide-react';
+import { useTranslation, Trans } from 'next-i18next';
 import Modal from '@/components/ui/Modal'; // Import the Modal component
 
 
@@ -17,91 +18,92 @@ import type {
   CompletenessCheckRequest
 } from '@/types/wizard';
 
-export const PITCH_DIMENSIONS: PitchDimension[] = [
+export const PITCH_DIMENSIONS: (t: (key: string) => string) => PitchDimension[] = (t) => [
   {
     id: 'targetAudience',
-    name: 'Target Audience',
-    description: 'Who will use your product or service? Be specific about demographics, needs, and behaviors.',
-    example: 'Our target audience is small business owners (5-50 employees) who struggle with digital marketing but don\'t have the budget for agencies or dedicated staff.'
+    name: t('pitch_dimension_target_audience_name'),
+    description: t('pitch_dimension_target_audience_description'),
+    example: t('pitch_dimension_target_audience_example')
   },
   {
     id: 'coreProblem',
-    name: 'Core Problem',
-    prompt: 'What specific problem are you trying to solve?',
-    description: 'What specific problem are you solving? Why is this a significant issue worth addressing?',
-    example: 'Small businesses waste an average of 20 hours per week on ineffective marketing efforts, resulting in poor ROI and missed growth opportunities.'
+    name: t('pitch_dimension_core_problem_name'),
+    prompt: t('pitch_dimension_core_problem_prompt'),
+    description: t('pitch_dimension_core_problem_description'),
+    example: t('pitch_dimension_core_problem_example')
   },
   {
     id: 'uniqueDifferentiator',
-    name: 'Unique Differentiator',
-    prompt: 'What makes your approach different from existing tools?',
-    description: 'How is your solution different from alternatives? What makes you stand out?',
-    example: 'Unlike generic marketing tools, our platform uses proprietary AI algorithms specifically trained on small business success patterns across 50+ industries.'
+    name: t('pitch_dimension_unique_differentiator_name'),
+    prompt: t('pitch_dimension_unique_differentiator_prompt'),
+    description: t('pitch_dimension_unique_differentiator_description'),
+    example: t('pitch_dimension_unique_differentiator_example')
   },
   {
     id: 'underlyingTechnology',
-    name: 'Underlying Technology',
-    prompt: 'Could you explain the technology that makes this possible?',
-    description: 'What technology powers your solution? How does it work behind the scenes?',
-    example: 'Our platform combines natural language processing and predictive analytics to automatically generate marketing content and optimize campaign performance in real-time.'
+    name: t('pitch_dimension_underlying_technology_name'),
+    prompt: t('pitch_dimension_underlying_technology_prompt'),
+    description: t('pitch_dimension_underlying_technology_description'),
+    example: t('pitch_dimension_underlying_technology_example')
   },
   {
     id: 'keyBenefits',
-    name: 'Key Benefits',
-    prompt: 'What are the main benefits users will experience?',
-    description: 'What specific benefits does your solution provide? Focus on outcomes, not features.',
-    example: 'Our customers experience an average 3.5x ROI within 90 days, 65% reduction in time spent on marketing tasks, and consistent lead growth without increasing budget.'
+    name: t('pitch_dimension_key_benefits_name'),
+    prompt: t('pitch_dimension_key_benefits_prompt'),
+    description: t('pitch_dimension_key_benefits_description'),
+    example: t('pitch_dimension_key_benefits_example')
   },
   {
     id: 'workflowUsage',
-    name: 'Workflow/Usage',
-    prompt: 'How would someone actually use this in their day-to-day?',
-    description: 'How do users interact with your product? What does the user experience look like?',
-    example: 'Users connect their social and advertising accounts, answer 5 questions about their business goals, and receive a customized marketing plan within minutes. Weekly 15-minute checkpoints are all that\'s needed to keep campaigns optimized.'
+    name: t('pitch_dimension_workflow_usage_name'),
+    prompt: t('pitch_dimension_workflow_usage_prompt'),
+    description: t('pitch_dimension_workflow_usage_description'),
+    example: t('pitch_dimension_workflow_usage_example')
   },
   {
     id: 'emotionalValue',
-    name: 'Emotional Value',
-    prompt: 'How does your solution make users feel emotionally?',
-    description: 'How does your solution make users feel? What emotional need does it address?',
-    example: 'Our platform gives small business owners the confidence that their marketing is working effectively, relieving the anxiety of wasting money and the frustration of not knowing what to do next.'
+    name: t('pitch_dimension_emotional_value_name'),
+    prompt: t('pitch_dimension_emotional_value_prompt'),
+    description: t('pitch_dimension_emotional_value_description'),
+    example: t('pitch_dimension_emotional_value_example')
   },
   {
     id: 'costTimeSavings',
-    name: 'Cost/Time Savings',
-    prompt: 'How does it save time or money for your users?',
-    description: 'How much time or money does your solution save? Quantify when possible.',
-    example: 'Businesses save an average of $3,500 per month in agency fees and 15-20 hours per week previously spent on manual marketing tasks.'
+    name: t('pitch_dimension_cost_time_savings_name'),
+    prompt: t('pitch_dimension_cost_time_savings_prompt'),
+    description: t('pitch_dimension_cost_time_savings_description'),
+    example: t('pitch_dimension_cost_time_savings_example')
   },
   {
     id: 'useCasesPlatforms',
-    name: 'Use Cases/Platforms',
-    prompt: 'What specific scenarios or platforms is this designed for?',
-    description: 'What are specific scenarios where your solution shines? What platforms does it work on?',
-    example: 'The platform works across all major marketing channels including social media, email, Google Ads, and content marketing. It\'s particularly effective for service businesses, local retailers, and professional practices.'
+    name: t('pitch_dimension_use_cases_platforms_name'),
+    prompt: t('pitch_dimension_use_cases_platforms_prompt'),
+    description: t('pitch_dimension_use_cases_platforms_description'),
+    example: t('pitch_dimension_use_cases_platforms_example')
   },
   {
     id: 'competitorGap',
-    name: 'Competitor Gap',
-    prompt: 'What are competitors missing that you provide?',
-    description: 'What gap in existing solutions are you filling? How do competitors fall short?',
-    example: 'Existing marketing tools either require significant expertise (like HubSpot) or offer limited functionality (like Mailchimp). None provide the combination of automation, customization, and simplicity that small businesses need.'
+    name: t('pitch_dimension_competitor_gap_name'),
+    prompt: t('pitch_dimension_competitor_gap_prompt'),
+    description: t('pitch_dimension_competitor_gap_description'),
+    example: t('pitch_dimension_competitor_gap_example')
   },
   {
     id: 'summarySentence',
-    name: 'Summary Sentence',
-    prompt: 'Can you summarize your entire pitch in one sentence?',
-    description: 'Can you summarize your entire value proposition in one concise sentence?',
-    example: 'SmartMarketer helps small businesses achieve enterprise-level marketing results with minimal time, expertise, and budget through our AI-powered platform.'
+    name: t('pitch_dimension_summary_sentence_name'),
+    prompt: t('pitch_dimension_summary_sentence_prompt'),
+    description: t('pitch_dimension_summary_sentence_description'),
+    example: t('pitch_dimension_summary_sentence_example')
   }
 ];
 
 function PitchExample({ dimension }: PitchExampleProps) {
+  const { t } = useTranslation('common');
   if (!dimension.example) return null;
 
   return (
     <div className="mt-2 p-2 bg-gray-100 rounded text-xs">
-      <span className="font-medium text-gray-700">Example: </span>
+      <span className="font-medium text-gray-700">{t('pitch_example_label')} </span>
       <span className="text-gray-600">{dimension.example}</span>
     </div>
   );
@@ -151,13 +153,15 @@ function Textarea({ value, onChange, placeholder, className = '' }: TextareaProp
 }
 
 function PitchAssistant({ coveredDimensions, onClose }: PitchAssistantProps) {
-  const coveredDimensionsArray = PITCH_DIMENSIONS.filter(d => coveredDimensions[d.id]);
-  const percentComplete = Math.floor((coveredDimensionsArray.length / PITCH_DIMENSIONS.length) * 100);
+  const { t } = useTranslation('common');
+  const dimensions = PITCH_DIMENSIONS(t);
+  const coveredDimensionsArray = dimensions.filter(d => coveredDimensions[d.id]);
+  const percentComplete = Math.floor((coveredDimensionsArray.length / dimensions.length) * 100);
 
   return (
     <div className="bg-gray-50 p-6 rounded-lg shadow h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold text-gray-800">Pitch Assistant</h3>
+        <h3 className="text-xl font-semibold text-gray-800">{t('pitch_assistant_title')}</h3>
         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
           {/* Heroicon name: x */}
           <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
@@ -169,9 +173,9 @@ function PitchAssistant({ coveredDimensions, onClose }: PitchAssistantProps) {
       {/* <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4"> */}
         {/* <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${percentComplete}%` }}></div> */}
       {/* </div> */}
-      <p className="text-sm text-gray-700 font-medium mb-2">Key Dimensions:</p>
+      <p className="text-sm text-gray-700 font-medium mb-2">{t('pitch_assistant_key_dimensions')}</p>
       <div className="overflow-y-auto max-h-[400px] pr-2 space-y-2 custom-scrollbar"> {/* Added max-h and overflow for scroll */}
-        {PITCH_DIMENSIONS.map(dim => (
+        {dimensions.map(dim => (
           <div key={dim.id} className={`p-3 rounded-md text-sm ${coveredDimensions[dim.id] ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
             {dim.name}
           </div>
@@ -193,6 +197,8 @@ export default function PitchDescriptionAssistant({
   onNext: () => void;
   onBack: () => void;
 }) {
+  const { t } = useTranslation('common');
+  const dimensions = PITCH_DIMENSIONS(t);
   const [coveredDimensions, setCoveredDimensions] = useState<Record<string, boolean>>({});
   const [feedback, setFeedback] = useState<string | null>(null);
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -214,7 +220,7 @@ export default function PitchDescriptionAssistant({
   const handleStartAnalysis = async () => {
     if (!description.trim()) {
       // Optionally show an error toast/message
-      toast.warn('Please enter a project description.');
+      toast.warn(t('please_enter_project_description'));
       return;
     }
     console.log('Starting analysis with description...');
@@ -245,12 +251,12 @@ export default function PitchDescriptionAssistant({
       });
     } catch (e) {
       console.error("Error formatting date:", isoString, e);
-      return "Invalid Date";
+      return t('invalid_date');
     }
   };
 
   const formatStatus = (status: string) => {
-    if (!status) return "Unknown";
+    if (!status) return t('status_unknown');
     return status.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Capitalize words
   };
 
@@ -262,9 +268,9 @@ export default function PitchDescriptionAssistant({
     }
 
     setIsLoadingCheck(true);
-    setFeedback("Analyzing description...");
+    setFeedback(t('analyzing_description'));
 
-    const dimensionsToCheck = PITCH_DIMENSIONS.map(({ id, name, description }) => ({
+    const dimensionsToCheck = dimensions.map(({ id, name, description }) => ({
       id, name, description
     }));
 
@@ -279,7 +285,7 @@ export default function PitchDescriptionAssistant({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ detail: `HTTP error ${response.status}` }));
-        throw new Error(errorData.detail || 'Failed to check description');
+        throw new Error(errorData.detail || t('failed_to_check_description'));
       }
 
       const data: { coverage: Record<string, boolean> } = await response.json();
@@ -290,8 +296,8 @@ export default function PitchDescriptionAssistant({
 
     } catch (error: any) {
       console.error('Error checking description completeness:', error);
-      toast.error(`Error analyzing description: ${error.message}`);
-      setFeedback("Error analyzing description. Please try again later.");
+      toast.error(`${t('error_analyzing_description')}: ${error.message}`);
+      setFeedback(t('error_analyzing_description_feedback'));
     } finally {
       setIsLoadingCheck(false);
     }
@@ -317,7 +323,7 @@ export default function PitchDescriptionAssistant({
 
   const generateFeedback = useCallback((dimensions: Record<string, boolean>) => {
     const coveredCount = Object.values(dimensions).filter(Boolean).length;
-    const totalDimensions = PITCH_DIMENSIONS.length;
+    const totalDimensions = PITCH_DIMENSIONS(t).length;
 
     if (value.length < 50) {
       setFeedback(null);
@@ -325,40 +331,40 @@ export default function PitchDescriptionAssistant({
     }
 
     if (isLoadingCheck) {
-      setFeedback("Analyzing description...");
+      setFeedback(t('analyzing_description'));
       return;
     }
 
     if (coveredCount === 0) {
-      setFeedback("Start by describing who your product is for and what problem it solves.");
+      setFeedback(t('feedback_start'));
     } else if (coveredCount < 3) {
-      setFeedback("Good start! Consider adding more details about what makes your solution unique.");
+      setFeedback(t('feedback_good_start'));
     } else if (coveredCount < 6) {
-      setFeedback("You're making progress! Try explaining how users interact with your solution.");
+      setFeedback(t('feedback_making_progress'));
     } else if (coveredCount < 9) {
-      setFeedback("Great details! Now consider adding how your solution compares to alternatives.");
+      setFeedback(t('feedback_great_details'));
     } else if (coveredCount < totalDimensions) {
-      setFeedback("Almost there! Try adding a concise summary sentence to tie everything together.");
+      setFeedback(t('feedback_almost_there'));
     } else {
-      setFeedback("Excellent! Your pitch covers all the key dimensions investors look for.");
+      setFeedback(t('feedback_excellent'));
     }
-  }, [value.length, isLoadingCheck]);
+  }, [value.length, isLoadingCheck, t]);
 
   const updateCurrentPrompt = useCallback((dimensionsStatus: Record<string, boolean>) => {
-    const missingDimensions = PITCH_DIMENSIONS.filter(
+    const missingDimensions = PITCH_DIMENSIONS(t).filter(
       dimension => !dimensionsStatus[dimension.id]
     );
-  }, [value.length, isLoadingCheck]);
+  }, [value.length, isLoadingCheck, t]);
 
   const calculateProgress = () => {
     if (isLoadingCheck) return 0;
     const coveredCount = Object.values(coveredDimensions).filter(Boolean).length;
-    return (coveredCount / PITCH_DIMENSIONS.length) * 100;
+    return (coveredCount / PITCH_DIMENSIONS(t).length) * 100;
   };
 
   // Get the next dimension to prompt for
   const getNextDimension = (): PitchDimension | null => {
-    const missingDimensions = PITCH_DIMENSIONS.filter(
+    const missingDimensions = PITCH_DIMENSIONS(t).filter(
       dimension => !coveredDimensions[dimension.id]
     );
     return missingDimensions.length > 0 ? missingDimensions[0] : null;
@@ -366,7 +372,7 @@ export default function PitchDescriptionAssistant({
 
   const handleNext = () => {
     if (value.trim().length < 50) {
-      alert("Please provide a more detailed description (at least 50 characters).");
+      alert(t('alert_more_details_required'));
       return;
     }
     if (Object.values(coveredDimensions).filter(Boolean).length < 6) {
@@ -391,13 +397,13 @@ export default function PitchDescriptionAssistant({
       <div className="flex-grow flex flex-col md:flex-row gap-4 overflow-hidden"> {/* Handles layout and prevents its children from causing page scroll */}
         {/* Left Panel: Prompt, Textarea, Feedback, Progress, Buttons */}
         <div className="flex-1 flex flex-col space-y-4 overflow-y-auto custom-scrollbar pr-2"> {/* Made left panel scrollable */}
-          <h2 className="text-2xl font-semibold text-gray-800">Describe Your Pitch</h2>
+          <h2 className="text-2xl font-semibold text-gray-800">{t('describe_your_pitch_title')}</h2>
 
           {/* Current Dimension Prompt Area */}
           {nextDimension && (
             <div className="p-3 border border-gray-200 rounded-lg bg-gray-50 text-sm">
               <h3 className="text-base font-semibold text-gray-700 mb-1">
-                Tell me more about: <span className="text-blue-600">{nextDimension.name}</span>
+                {t('tell_me_more_about')}: <span className="text-blue-600">{nextDimension.name}</span>
               </h3>
               <p className="text-gray-600">{nextDimension.description}</p>
               <PitchExample dimension={nextDimension} />
@@ -408,7 +414,7 @@ export default function PitchDescriptionAssistant({
             <Textarea
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              placeholder={nextDimension ? `Provide details for ${nextDimension.name} here...` : "Start describing your pitch..."}
+              placeholder={nextDimension ? t('provide_details_for', { name: nextDimension.name }) : t('start_describing_pitch')}
               className="flex-grow leading-relaxed w-full"
             />
             {/* {error && <p className="text-red-500 text-sm mt-1">{error}</p>} */}
@@ -426,20 +432,20 @@ export default function PitchDescriptionAssistant({
               <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${calculateProgress()}%` }}></div>
             </div>
             <p className="text-xs text-gray-500 text-center">
-              {Object.values(coveredDimensions).filter(Boolean).length} of {PITCH_DIMENSIONS.length} dimensions covered
+              {t('dimensions_covered', { count: Object.values(coveredDimensions).filter(Boolean).length, total: PITCH_DIMENSIONS(t).length })}
             </p>
           </div>
 
           {/* Action Buttons - Moved to the bottom of the left panel's content flow */}
           <div className="mt-4 flex justify-between items-center">
             <Button onClick={handleBack} variant="outline">
-              Back
+              {t('back_button')}
             </Button>
             <Button onClick={() => setShowAssistant(prev => !prev)} variant="outline" className="mx-2">
-              {showAssistant ? 'Hide Assistant' : 'Show Assistant'}
+              {showAssistant ? t('hide_assistant_button') : t('show_assistant_button')}
             </Button>
             <Button onClick={handleNext} disabled={isLoadingCheck || Object.values(coveredDimensions).filter(Boolean).length < 6}>
-              {isLoadingCheck ? 'Analyzing...' : 'Next'}
+              {isLoadingCheck ? t('analyzing_button') : t('next_button')}
             </Button>
           </div>
         </div>
@@ -458,15 +464,17 @@ export default function PitchDescriptionAssistant({
       {/* Buttons were moved into the left panel */}
       <Modal isOpen={showValidationModal} onClose={() => setShowValidationModal(false)} titleId="validation-modal-title">
         <div className="text-center">
-          <h2 id="validation-modal-title" className="text-lg font-semibold">Almost There!</h2>
+          <h2 id="validation-modal-title" className="text-lg font-semibold">{t('validation_modal_title')}</h2>
           <p className="mt-2 text-sm text-gray-600">
-            To better analyze your project and be as relevant as possible, we'd need you to cover <em>at least</em> 6 out of the 11 dimensions.
+            <Trans t={t} i18nKey="validation_modal_description">
+              To better analyze your project and be as relevant as possible, we'd need you to cover <em>at least</em> 6 out of the 11 dimensions.
+            </Trans>
           </p>
           <button
             onClick={() => setShowValidationModal(false)}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            Got it
+            {t('got_it_button')}
           </button>
         </div>
       </Modal>

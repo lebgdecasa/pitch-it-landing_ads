@@ -3,8 +3,9 @@ import { Circle, CheckCircle2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Card } from '../ui/card';
 import axios from 'axios';
+import { useTranslation } from 'next-i18next';
+
 const TOTAL_DURATION = 8000; // 8 seconds total
-const MOCK_PROJECT_ID = '123';
 
 interface AnalysisStep {
   id: number;
@@ -13,12 +14,12 @@ interface AnalysisStep {
 }
 
 export const AnalysisProgress: React.FC = () => {
+  const { t } = useTranslation('common');
   const router = useRouter();
   const [steps, setSteps] = useState<AnalysisStep[]>([
-    //{ id: 1, label: 'Reading documents', completed: false },
-    { id: 1, label: 'Running key-trend analysis', completed: false },
-    { id: 2, label: 'Running netnographic analysis', completed: false },
-    { id: 3, label: 'Generating personas', completed: false },
+    { id: 1, label: t('analysis_step_key_trend'), completed: false },
+    { id: 2, label: t('analysis_step_netnographic'), completed: false },
+    { id: 3, label: t('analysis_step_generating_personas'), completed: false },
   ]);
   const [taskId, setTaskId] = useState<string | null>(null);
 
@@ -27,18 +28,18 @@ export const AnalysisProgress: React.FC = () => {
     const startAnalysis = async () => {
       try {
         const response = await axios.post('/start_analysis', {
-          product_description: 'Sample product description for analysis',
+          product_description: t('sample_product_description'),
         });
         setTaskId(response.data.task_id);
         console.log(`Analysis started with task ID: ${response.data.task_id}`);
       } catch (error) {
         console.error('Failed to start analysis:', error);
-        alert('An error occurred while starting the analysis.');
+        alert(t('error_starting_analysis'));
       }
     };
 
     startAnalysis();
-  }, []);
+  }, [t]);
   useEffect(() => {
     if (!taskId) return;
 
@@ -68,7 +69,7 @@ export const AnalysisProgress: React.FC = () => {
       <Card className="w-full max-w-xl p-8 shadow-lg">
         <div className="space-y-6">
           <h2 className="text-2xl font-semibold text-center text-gray-900">
-            Analyzing Your Project
+            {t('analyzing_your_project_title')}
           </h2>
 
           <div className="space-y-4">
@@ -98,7 +99,7 @@ export const AnalysisProgress: React.FC = () => {
           </div>
 
           <p className="text-sm text-center text-gray-500 mt-6">
-            Please wait while we analyze your project data
+            {t('analysis_progress_message')}
           </p>
         </div>
       </Card>

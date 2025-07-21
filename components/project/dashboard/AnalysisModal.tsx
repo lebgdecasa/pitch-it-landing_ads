@@ -5,6 +5,7 @@ import { type Report } from './AnalysisSection';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import * as ga from '@/lib/ga';
+import { useTranslation } from 'next-i18next';
 
 interface AnalysisModalProps {
   analysis: Report | null; // Allow analysis to be null
@@ -13,6 +14,7 @@ interface AnalysisModalProps {
 }
 
 const AnalysisModal: React.FC<AnalysisModalProps> = ({ analysis, isOpen, onClose }) => {
+  const { t } = useTranslation('common');
   const contentRef = useRef<HTMLDivElement>(null);
   const viewStartTimeRef = useRef<number | null>(null);
 
@@ -270,7 +272,7 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({ analysis, isOpen, onClose
 
   const renderContent = () => {
     if (!analysis.data) {
-      return <p className="text-gray-500">No data available for this report.</p>;
+      return <p className="text-gray-500">{t('analysis_modal_no_data')}</p>;
     }
 
     try {
@@ -298,7 +300,7 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({ analysis, isOpen, onClose
       return (
         <div>
           <p className="text-amber-600 mb-3 text-sm">
-            Note: This analysis format is not fully supported. Displaying available data:
+            {t('analysis_modal_unsupported_format')}
           </p>
           <pre className="bg-gray-50 p-4 rounded-lg overflow-auto text-xs">
             {JSON.stringify(analysis.data, null, 2)}
@@ -309,7 +311,7 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({ analysis, isOpen, onClose
       console.error('Error rendering analysis content:', error);
       return (
         <div>
-          <p className="text-red-600 mb-3">Error displaying analysis content.</p>
+          <p className="text-red-600 mb-3">{t('analysis_modal_error_displaying')}</p>
           <pre className="bg-gray-50 p-4 rounded-lg overflow-auto text-xs">
             {JSON.stringify(analysis.data, null, 2)}
           </pre>
@@ -342,10 +344,10 @@ const AnalysisModal: React.FC<AnalysisModalProps> = ({ analysis, isOpen, onClose
             <button
               onClick={handleDownloadPdf}
               className="flex items-center space-x-2 p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-              title="Download as PDF"
+              title={t('analysis_modal_download_pdf_title')}
             >
               <Download className="h-5 w-5" />
-              <span className="text-sm font-medium">Download as PDF</span>
+              <span className="text-sm font-medium">{t('analysis_modal_download_pdf')}</span>
             </button>
             <button
               onClick={onClose}

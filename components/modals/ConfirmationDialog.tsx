@@ -13,6 +13,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'next-i18next';
 
 interface ConfirmationDialogProps {
   isOpen: boolean;
@@ -29,17 +30,26 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   isOpen,
   onClose,
   onConfirm,
-  title = 'Are you sure?',
-  description = 'This action cannot be undone.',
-  confirmButtonText = 'Confirm',
-  cancelButtonText = 'Cancel',
+  title,
+  description,
+  confirmButtonText,
+  cancelButtonText,
   confirmButtonClassName = '',
 }) => {
+  const { t } = useTranslation('common');
   const [isConfirming, setIsConfirming] = useState(false);
 
   if (!isOpen) {
     return null;
   }
+
+  const finalTitle = title ?? t('confirmation_dialog_are_you_sure');
+  const finalDescription =
+    description ?? t('confirmation_dialog_action_cannot_be_undone');
+  const finalConfirmButtonText =
+    confirmButtonText ?? t('confirmation_dialog_confirm');
+  const finalCancelButtonText =
+    cancelButtonText ?? t('confirmation_dialog_cancel');
 
   const handleConfirm = async () => {
     setIsConfirming(true);
@@ -61,13 +71,17 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle id="confirmation-dialog-title">{title}</DialogTitle>
-          {description && <DialogDescription id="confirmation-dialog-description">{description}</DialogDescription>}
+          <DialogTitle id="confirmation-dialog-title">{finalTitle}</DialogTitle>
+          {finalDescription && (
+            <DialogDescription id="confirmation-dialog-description">
+              {finalDescription}
+            </DialogDescription>
+          )}
         </DialogHeader>
         <DialogFooter className="sm:justify-end">
           <DialogClose asChild>
             <Button type="button" variant="outline" disabled={isConfirming}>
-              {cancelButtonText}
+              {finalCancelButtonText}
             </Button>
           </DialogClose>
           <Button
@@ -79,10 +93,10 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             {isConfirming ? (
               <>
                 {/* <Loader2 className="mr-2 h-4 w-4 animate-spin" /> */}
-                Processing...
+                {t('confirmation_dialog_processing')}
               </>
             ) : (
-              confirmButtonText
+              finalConfirmButtonText
             )}
           </Button>
         </DialogFooter>

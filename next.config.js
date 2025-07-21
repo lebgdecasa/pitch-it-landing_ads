@@ -1,3 +1,5 @@
+const { i18n } = require('./next-i18next.config.js');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -6,10 +8,7 @@ const nextConfig = {
   output: 'standalone',
 
   // i18n configuration
-  i18n: {
-    locales: ['en', 'fr'],
-    defaultLocale: 'en',
-  },
+  i18n,
 
   // Optimize images
   images: {

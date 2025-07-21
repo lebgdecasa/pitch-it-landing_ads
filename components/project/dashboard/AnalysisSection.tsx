@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import * as ga from '@/lib/ga';
 import { ChevronRight, FileCheck, FileText, TrendingUp, Users } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import { useTranslation } from 'next-i18next';
 
 const AnalysisModal = dynamic(() => import('./AnalysisModal'), { ssr: false });
 
@@ -37,6 +38,7 @@ export const AnalysisSection: React.FC<AnalysisSectionProps> = ({
   onAnalysisClick
 }) => {
   const [selectedAnalysis, setSelectedAnalysis] = useState<Report | null>(null);
+  const { t } = useTranslation('common');
 
   const handleAnalysisClick = (analysis: Report) => {
     ga.trackAnalysisModalOpen();
@@ -47,13 +49,13 @@ export const AnalysisSection: React.FC<AnalysisSectionProps> = ({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-gray-900">Analysis Reports</h2>
+      <h2 className="text-xl font-semibold text-gray-900">{t('analysis_section_title')}</h2>
 
       {(!analyses || analyses.length === 0) ? (
         <div className="mt-4 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 p-12 text-center">
           <FileText className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No reports yet</h3>
-          <p className="mt-1 text-sm text-gray-500">Analysis reports for this project will appear here.</p>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">{t('analysis_section_no_reports_title')}</h3>
+          <p className="mt-1 text-sm text-gray-500">{t('analysis_section_no_reports_desc')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
