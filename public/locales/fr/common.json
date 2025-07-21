@@ -761,5 +761,9 @@
   "nav_virtual_vc_desc": "Entraînez-vous à pitcher avec un VC IA",
   "nav_team_collab": "Collaboration d'Équipe",
   "nav_project_settings_desc": "Gérer les détails et les paramètres du projet",
-  "nav_back_to_projects": "Retour aux Projets"
+  "nav_back_to_projects": "Retour aux Projets",
+  "dashboard_header_search_placeholder": "Rechercher des projets...",
+  "dashboard_header_subscription": "Abonnement",
+  "nav_sign_out": "Se déconnecter",
+  "dashboard_header_user_placeholder": "Utilisateur"
 }

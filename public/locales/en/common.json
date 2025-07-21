@@ -757,5 +757,9 @@
   "nav_virtual_vc_desc": "Practice your pitch with an AI VC",
   "nav_team_collab": "Team Collaboration",
   "nav_project_settings_desc": "Manage project details and settings",
-  "nav_back_to_projects": "Back to Projects"
+  "nav_back_to_projects": "Back to Projects",
+  "dashboard_header_search_placeholder": "Search projects...",
+  "dashboard_header_subscription": "Subscription",
+  "nav_sign_out": "Sign Out",
+  "dashboard_header_user_placeholder": "User"
 }
