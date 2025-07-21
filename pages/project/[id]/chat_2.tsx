@@ -686,26 +686,29 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.params as { id: string };
-  const { req } = context;
+  const { id } = context.params!;
 
-  // Initialize Supabase client with auth context
+  // Create Supabase client
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-  // Fetch project details
+  // Fetch the project from Supabase
   const { data: project, error: projectError } = await supabase
     .from('projects')
     .select('*')
     .eq('id', id)
     .single();
 
+  // Handle errors or missing project
   if (projectError || !project) {
-    return { notFound: true };
+    console.error('Error fetching project:', projectError);
+    return {
+      notFound: true
+    };
   }
 
-  // Fetch personas for the project
+  // Fetch personas for this project
   const { data: personas, error: personasError } = await supabase
     .from('personas')
     .select('*')
@@ -713,7 +716,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (personasError) {
     console.error('Error fetching personas:', personasError);
-    // Decide if you want to return an error page or just an empty array of personas
+  }
+
+  // Fetch initial chat messages - limit to most recent 50
+  const { data: initialMessages, error: messagesError } = await supabase
+    .from('chat_messages')
+    .select('*')
+    .eq('project_id', id)
+    .order('created_at', { ascending: true })
+    .limit(50); // Changed from 10 to 50
+
+  if (messagesError) {
+    console.error('Error fetching chat messages:', messagesError);
   }
 
   const locale = context.locale ?? 'en';
@@ -722,9 +736,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       project,
-      projectId: id,
-      initialPersonas: personas || [],
+      projectId: id as string,
       ...translations,
-    },
+      initialPersonas: personas || [],
+      initialMessages: initialMessages || []
+    }
   };
 };

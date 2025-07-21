@@ -24,72 +24,65 @@ export interface NavItem {
 export const mainNavItems: NavItem[] = [
   {
     icon: Home,
-    label: 'Overview',
+    label: 'nav_overview',
     href: '/project/:id',
     requiresPlan: 'free',
     isImplemented: true,
-    description: 'Project overview and analytics'
+    description: 'nav_overview_desc'
   },
   {
     icon: MessageCircle,
-    label: 'Personas Chat',
+    label: 'nav_personas_chat',
     href: '/project/:id/chat',
     requiresPlan: 'free',
     isImplemented: true,
-    description: 'Chat with AI personas'
+    description: 'nav_personas_chat_desc'
   },
   {
     icon: Presentation,
-    label: 'Pitch Deck',
+    label: 'nav_pitch_deck',
     href: '/project/:id/deck',
     requiresPlan: 'premium',
     isImplemented: false,
-    description: 'AI-powered pitch deck builder'
+    description: 'nav_pitch_deck_desc'
   },
   {
     icon: FileText,
-    label: 'Documents',
-    href: '/project/:id/documents',
+    label: 'nav_reports',
+    href: '/project/:id/reports',
     requiresPlan: 'premium',
     isImplemented: false,
-    description: 'Store and analyze business documents'
-  },
-  {
-    icon: Lightbulb,
-    label: 'Insights',
-    href: '/project/:id/insights',
-    requiresPlan: 'premium',
-    isImplemented: false,
-    description: 'AI-generated business insights'
+    description: 'nav_reports_desc'
   },
   {
     icon: BarChart2,
-    label: 'Analytics',
-    href: '/project/:id/analytics',
+    label: 'nav_market_pulse',
+    href: '/project/:id/pulse',
     requiresPlan: 'premium',
     isImplemented: false,
-    description: 'Project performance analytics'
+    description: 'nav_market_pulse_desc'
   },
   {
     icon: Video,
-    label: 'Virtual VC',
+    label: 'nav_virtual_vc',
     href: '/project/:id/virtual-vc',
     requiresPlan: 'enterprise',
     isImplemented: false,
-    description: 'Practice pitching with AI VCs'
+    description: 'nav_virtual_vc_desc'
   },
   {
     icon: Users,
-    label: 'Team Collaboration',
-    href: '/project/:id/team',
-    requiresPlan: 'enterprise',
+    label: 'nav_team_collab',
+    href: '/project/:id/settings',
+    requiresPlan: 'free',
     isImplemented: false,
-    description: 'Collaborate with your team'
+    description: 'nav_team_collab_desc'
   }
 ];
 
-export const backNavItem = {
+export const backNavItem: NavItem = {
   icon: ArrowLeft,
-  label: '← Back to Dashboard',
-  href: '/dashboard'
+  label: 'nav_back_to_projects',
+  href: '/dashboard',
+  description: 'Return to project selection'
 };

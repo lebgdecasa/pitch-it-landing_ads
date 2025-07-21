@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { mainNavItems, backNavItem } from './navigation';
 import { useAuthContext } from '@/supa_database/components/AuthProvider';
 import { Lock, ChevronLeft, ChevronRight, LifeBuoy } from 'lucide-react';
+import { useTranslation } from 'next-i18next';
 
 interface IconProps {
   className?: string;
@@ -19,6 +20,7 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
   const { profile } = useAuthContext();
   const router = useRouter();
+  const { t } = useTranslation('common');
   const [collapsed, setCollapsed] = useState(false);
   const [showUpgradeTooltip, setShowUpgradeTooltip] = useState<string | null>(null);
 
@@ -62,11 +64,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
     e.preventDefault();
     if (!item.isImplemented) {
       // Feature not implemented yet
-      setShowUpgradeTooltip(`${item.label} is coming soon! Join our premium plan to get early access.`);
+      setShowUpgradeTooltip(t('tooltip_coming_soon', { feature: t(item.label) }));
     } else if (!canAccessFeature(item.requiresPlan)) {
       // Feature requires upgrade
-      const planName = item.requiresPlan === 'enterprise' ? 'Enterprise' : 'Premium';
-      setShowUpgradeTooltip(`${item.label} requires ${planName} plan. Upgrade to unlock this feature!`);
+      const planName = item.requiresPlan === 'enterprise' ? t('plan_enterprise') : t('plan_premium');
+      setShowUpgradeTooltip(t('tooltip_upgrade_required', { feature: t(item.label), planName }));
     }
 
     // Hide tooltip after 3 seconds
@@ -76,10 +78,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
   // Get plan display name
   const getPlanDisplayName = (plan: string) => {
     switch (plan) {
-      case 'free': return 'Free';
-      case 'premium': return 'Premium';
-      case 'enterprise': return 'Enterprise';
-      default: return 'Free';
+      case 'free': return t('plan_free');
+      case 'premium': return t('plan_premium');
+      case 'enterprise': return t('plan_enterprise');
+      default: return t('plan_free');
     }
   };
 
@@ -100,8 +102,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
           <button
             onClick={toggleSidebar}
             className="p-1.5 rounded-md hover:bg-gray-100 text-gray-600 transition-colors"
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? t('sidebar_expand') : t('sidebar_collapse')}
+            title={collapsed ? t('sidebar_expand') : t('sidebar_collapse')}
           >
             {collapsed ? (
               <ChevronRight className="h-5 w-5" />
@@ -114,7 +116,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
         {/* Plan information */}
         {!collapsed && (
           <div className="bg-blue-50 mx-4 p-3 rounded-md mb-6">
-            <p className="text-xs font-medium text-blue-800 mb-1">Current Plan</p>
+            <p className="text-xs font-medium text-blue-800 mb-1">{t('sidebar_current_plan')}</p>
             <div className="flex justify-between items-center">
               <span className="font-medium text-sm">
                 {getPlanDisplayName(userPlan)}
@@ -124,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
                   href="/subscription"
                   className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                 >
-                  Upgrade
+                  {t('sidebar_upgrade')}
                 </Link>
               )}
             </div>
@@ -159,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
                     ? 'text-gray-400 hover:bg-gray-50'
                     : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                 }`}
-                title={collapsed ? item.label : item.description}
+                title={collapsed ? t(item.label) : t(item.description || item.label)}
                 onClick={isLocked ? (e) => handleLockedFeatureClick(e, item) : undefined}
               >
                 <div className="relative flex items-center">
@@ -176,7 +178,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
                 </div>
                 {!collapsed && (
                   <div className="flex items-center justify-between w-full">
-                    <span className={isLocked ? 'text-gray-400' : ''}>{item.label}</span>
+                    <span className={isLocked ? 'text-gray-400' : ''}>{t(item.label)}</span>
                     {isLocked && !collapsed && (
                       <Lock className="h-3 w-3 text-gray-400 ml-2" />
                     )}
@@ -204,10 +206,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
           <Link
             href={backNavItem.href}
             className={`flex items-center ${collapsed ? 'justify-center' : ''} px-2 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors`}
-            title={backNavItem.label}
+            title={t(backNavItem.label)}
           >
             <backNavItem.icon className={`h-5 w-5 ${collapsed ? '' : 'mr-3'} text-gray-500`} />
-            {!collapsed && backNavItem.label}
+            {!collapsed && t(backNavItem.label)}
           </Link>
         </div>
 
@@ -216,10 +218,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
           <a
             href="mailto:feedback@nextraction.ai?subject=Feedback%20for%20NexTraction"
             className={`flex items-center ${collapsed ? 'justify-center' : ''} px-2 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors`}
-            title="Provide Feedback"
+            title={t('sidebar_provide_feedback')}
           >
             <LifeBuoy className={`h-5 w-5 ${collapsed ? '' : 'mr-3'} text-gray-500`} />
-            {!collapsed && "Feedback"}
+            {!collapsed && t('sidebar_feedback')}
           </a>
         </div>
       </aside>
@@ -233,7 +235,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
             className="text-xs underline hover:no-underline mt-1 block"
             onClick={() => setShowUpgradeTooltip(null)}
           >
-            Upgrade Now →
+            {t('sidebar_upgrade_now')}
           </Link>
         </div>
       )}
