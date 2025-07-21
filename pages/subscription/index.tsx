@@ -119,8 +119,8 @@ export default function SubscriptionPage() {
 
   return (
     <><Head>
-      <title> Manage your Subscription </title>
-      <meta name="description" content="Manage and track your business ideas and projects." />
+      <title>{t('subscription_page_head_title')}</title>
+      <meta name="description" content={t('subscription_page_head_description')} />
     </Head><div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8 relative">
         <div className="absolute top-4 left-4">
           <Button className="w-full mt-auto bg-blue-600 hover:bg-blue-700 text-white">

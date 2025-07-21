@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { useChatMessages } from '../../../supa_database/hooks/useChatMessages';
+import { useTranslation } from 'next-i18next';
 
 interface Persona {
   id: string;
@@ -19,6 +20,7 @@ interface GroupChatProps {
 }
 
 export const GroupChat: React.FC<GroupChatProps> = ({ projectId, projectName, personas }) => {
+  const { t } = useTranslation('common');
   const { messages, loading, sendMessage } = useChatMessages(projectId);
   const [newMessage, setNewMessage] = useState('');
   const [selectedPersona, setSelectedPersona] = useState<Persona | null>(null);
@@ -32,19 +34,19 @@ export const GroupChat: React.FC<GroupChatProps> = ({ projectId, projectName, pe
     if (!newMessage.trim()) return;
 
     // Send message through the hook
-    await sendMessage(newMessage, selectedPersona?.id || null, 'user', 'You');
+    await sendMessage(newMessage, selectedPersona?.id || null, 'user', t('You'));
     setNewMessage('');
     setSelectedPersona(null);
   };
 
   if (loading) {
-    return <div className="p-4">Loading chat...</div>;
+    return <div className="p-4">{t('Loading chat...')}</div>;
   }
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="p-4 border-b">
-        <h3 className="font-semibold text-lg">Group Chat</h3>
+        <h3 className="font-semibold text-lg">{t('Group Chat')}</h3>
       </div>
 
       {/* Persona selection */}
@@ -81,7 +83,7 @@ export const GroupChat: React.FC<GroupChatProps> = ({ projectId, projectName, pe
                 <p className="text-sm">{message.content}</p>
               </div>
               <div className="mt-1 text-xs text-gray-500">
-                <span>{isUser ? 'You' : persona?.name || 'AI'}</span>
+                <span>{isUser ? t('You') : persona?.name || t('AI')}</span>
               </div>
             </div>
           );
@@ -96,14 +98,10 @@ export const GroupChat: React.FC<GroupChatProps> = ({ projectId, projectName, pe
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-          placeholder={selectedPersona ? `Ask ${selectedPersona.name}...` : "Type a message..."}
+          placeholder={selectedPersona ? t('Ask {{name}}...', { name: selectedPersona.name }) : t('Type a message...')}
           className="flex-1 p-2 border border-gray-300 rounded-md"
         />
-        <Button
-          onClick={handleSendMessage}
-          className="ml-2"
-          disabled={!newMessage.trim()}
-        >
+        <Button onClick={handleSendMessage} className="ml-2" disabled={!newMessage.trim()}>
           <Send className="h-4 w-4" />
         </Button>
       </div>

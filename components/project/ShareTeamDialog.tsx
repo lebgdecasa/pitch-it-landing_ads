@@ -4,15 +4,21 @@ import { Share2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useTranslation } from "next-i18next";
 
 interface TeamMember {
   name: string;
@@ -27,6 +33,8 @@ interface ShareTeamDialogProps {
   className?: string;
   variant?: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive";
   size?: "default" | "sm" | "lg" | "icon";
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export const ShareTeamDialog = ({
@@ -35,7 +43,10 @@ export const ShareTeamDialog = ({
   className,
   variant = "outline",
   size = "sm",
+  isOpen,
+  onClose,
 }: ShareTeamDialogProps) => {
+  const { t } = useTranslation("common");
   const [newMember, setNewMember] = useState<TeamMember>({
     name: "",
     role: "",
@@ -44,6 +55,7 @@ export const ShareTeamDialog = ({
   });
   const [members, setMembers] = useState<TeamMember[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isSending, setIsSending] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -61,15 +73,15 @@ export const ShareTeamDialog = ({
 
   const handleAddMember = () => {
     if (!newMember.name.trim()) {
-      setError("Name is required");
+      setError(t("share_team_dialog_name_required"));
       return;
     }
     if (!newMember.email.trim()) {
-      setError("Email is required");
+      setError(t("share_team_dialog_email_required"));
       return;
     }
     if (!validateEmail(newMember.email)) {
-      setError("Please enter a valid email address");
+      setError(t("share_team_dialog_invalid_email"));
       return;
     }
 
@@ -90,25 +102,22 @@ export const ShareTeamDialog = ({
   };
 
   const handleSaveAndShare = async () => {
+    setIsSending(true);
     // TODO: Implement API call to share project
     console.log(`Sharing project ${projectId} with:`, members);
     alert(`Project "${projectName}" has been shared with ${members.length} team members.`);
     setMembers([]);
+    setIsSending(false);
+    onClose();
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant={variant} size={size} className={className}>
-          <Share2 className="h-4 w-4 mr-1" />
-          Share with Team
-        </Button>
-      </DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Share Project with Team</DialogTitle>
+          <DialogTitle>{t("Share with your team")}</DialogTitle>
           <DialogDescription>
-            Invite team members to collaborate on &ldquo;{projectName}&rdquo;
+            {t("Enter the email of the person you want to share this project with.")}
           </DialogDescription>
         </DialogHeader>
 
@@ -119,7 +128,7 @@ export const ShareTeamDialog = ({
                 name="name"
                 value={newMember.name}
                 onChange={handleInputChange}
-                placeholder="Name"
+                placeholder={t("share_team_dialog_enter_name")}
               />
             </div>
             <div className="col-span-3">
@@ -127,7 +136,7 @@ export const ShareTeamDialog = ({
                 name="role"
                 value={newMember.role}
                 onChange={handleInputChange}
-                placeholder="Role"
+                placeholder={t("share_team_dialog_enter_role")}
               />
             </div>
             <div className="col-span-3">
@@ -136,7 +145,7 @@ export const ShareTeamDialog = ({
                 type="email"
                 value={newMember.email}
                 onChange={handleInputChange}
-                placeholder="Email"
+                placeholder={t("Enter email")}
               />
             </div>
             <div className="col-span-2">
@@ -145,11 +154,11 @@ export const ShareTeamDialog = ({
                 onValueChange={handleAccessChange}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select..." />
+                  <SelectValue placeholder={t("share_team_dialog_select")} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="viewer">Viewer</SelectItem>
-                  <SelectItem value="editor">Editor</SelectItem>
+                  <SelectItem value="viewer">{t("share_team_dialog_viewer")}</SelectItem>
+                  <SelectItem value="editor">{t("share_team_dialog_editor")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -164,13 +173,13 @@ export const ShareTeamDialog = ({
               size="sm"
               onClick={handleAddMember}
             >
-              Add Member
+              {t("share_team_dialog_add_member")}
             </Button>
           </div>
 
           {members.length > 0 && (
             <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">Team members to invite:</h4>
+              <h4 className="text-sm font-medium mb-2">{t("share_team_dialog_members_to_invite")}</h4>
               <div className="border rounded-md divide-y">
                 {members.map((member, index) => (
                   <div key={index} className="flex items-center justify-between p-3">
@@ -193,7 +202,7 @@ export const ShareTeamDialog = ({
                       size="sm"
                       onClick={() => handleRemoveMember(index)}
                     >
-                      Remove
+                      {t("share_team_dialog_remove")}
                     </Button>
                   </div>
                 ))}
@@ -203,15 +212,15 @@ export const ShareTeamDialog = ({
         </div>
 
         <DialogFooter className="mt-6">
-          <Button variant="ghost" type="button">
-            Cancel
+          <Button variant="ghost" type="button" onClick={onClose}>
+            {t("Cancel")}
           </Button>
           <Button
             type="button"
             onClick={handleSaveAndShare}
-            disabled={members.length === 0}
+            disabled={members.length === 0 || isSending}
           >
-            Share Project
+            {isSending ? t("Sending...") : t("share_team_dialog_share_project")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -8,6 +8,9 @@ import dynamic from 'next/dynamic';
 import { useAuthContext } from '../../../supa_database/components/AuthProvider'; // Import useAuthContext
 import Head from 'next/head';
 import * as ga from '@/lib/ga';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import type { GetServerSideProps } from 'next';
 
 // Component imports
 // import ShareTeamDialog from '../../../components/project/ShareTeamDialog'; // Lazy loaded
@@ -41,18 +44,21 @@ const PitchDetail = ({ label, value, icon: Icon, color }: {
   value: string;
   icon?: React.ElementType;
   color?: string
-}) => (
+}) => {
+  const { t } = useTranslation('common');
+  return (
   <div className="mb-4">
     <div className="flex items-center mb-1">
       {Icon && <Icon className={`h-4 w-4 mr-2 ${color || "text-gray-500"}`} />}
       <h4 className="text-sm font-medium text-gray-500">{label}</h4>
     </div>
-    <p className="text-gray-800 ml-6">{value || "Not defined yet"}</p>
+    <p className="text-gray-800 ml-6">{value || t('not_defined_yet')}</p>
   </div>
-);
+)};
 
 export default function ProjectPage() {
   const router = useRouter();
+  const { t } = useTranslation('common');
   const { id: projectIdFromRouter } = router.query;
   const { user, loading: authLoading, profile } = useAuthContext();
 
@@ -106,12 +112,12 @@ export default function ProjectPage() {
   }, [project?.analysis]);
 
   if (authLoading || (!profile && !user && authLoading !== false)) { // Adjusted loading check
-    return <div>Loading user information...</div>;
+    return <div>{t('loading_user_info')}</div>;
   }
 
   if (profile && (profile.subscription_tier === 'premium' || profile.subscription_tier === 'enterprise')) {
     // This condition is primarily handled by useEffect, but this can be a fallback.
-    return <div>Redirecting to the appropriate version for your plan...</div>;
+    return <div>{t('redirecting_for_plan')}</div>;
   }
 
   if (project && project.locked) {
@@ -119,12 +125,12 @@ export default function ProjectPage() {
           <ProjectLayout>
             <div className="p-4 md:p-6 max-w-7xl mx-auto text-center">
               <Lock className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h1 className="text-2xl font-bold">Project is Locked</h1>
+              <h1 className="text-2xl font-bold">{t('project_locked_title')}</h1>
               <p className="text-gray-600 mt-2">
-                This project is still being processed. It will be unlocked once the initial analysis is complete.
+                {t('project_locked_description')}
               </p>
               <Button asChild className="mt-4">
-                  <Link href="/dashboard">Back to Dashboard</Link>
+                  <Link href="/dashboard">{t('back_to_dashboard')}</Link>
               </Button>
             </div>
           </ProjectLayout>
@@ -132,10 +138,10 @@ export default function ProjectPage() {
       }
 
   if (projectLoading || personasLoading) {
-    let statusMessage = "Loading...";
-    if (authLoading) statusMessage = "Authenticating user...";
-    else if (projectLoading) statusMessage = "Loading project details...";
-    else if (personasLoading) statusMessage = "Loading personas...";
+    let statusMessage = t('loading');
+    if (authLoading) statusMessage = t('authenticating_user');
+    else if (projectLoading) statusMessage = t('loading_project_details');
+    else if (personasLoading) statusMessage = t('loading_personas');
     return <div className="p-4">{statusMessage}</div>;
   }
 
@@ -143,9 +149,9 @@ export default function ProjectPage() {
   if (!user) {
     return (
       <div className="p-4 text-center">
-        <p>Authentication required. Please log in to view this project.</p>
+        <p>{t('auth_required')}</p>
         <Button asChild className="mt-4">
-          <Link href="/">Back to Homepage</Link>
+          <Link href="/">{t('back_to_homepage')}</Link>
         </Button>
       </div>
     );
@@ -157,9 +163,9 @@ export default function ProjectPage() {
     if (projectError === 'Project not found or access denied.') {
       return (
         <div className="p-4 text-center">
-          <p>Project not found or access is denied. Please check the ID or your permissions. Logged UserID: {user?.id}</p>
+          <p>{t('project_not_found_or_denied', { userId: user?.id })}</p>
           <Button asChild className="mt-4">
-            <Link href="/">Back to Homepage</Link>
+            <Link href="/">{t('back_to_homepage')}</Link>
           </Button>
         </div>
       );
@@ -167,9 +173,9 @@ export default function ProjectPage() {
     // Display other project errors
     return (
       <div className="p-4 text-center">
-        <p>Error loading project data: {projectError}</p>
+        <p>{t('error_loading_project', { error: projectError })}</p>
         <Button asChild className="mt-4">
-          <Link href="/">Back to Homepage</Link>
+          <Link href="/">{t('back_to_homepage')}</Link>
         </Button>
       </div>
     );
@@ -179,9 +185,9 @@ export default function ProjectPage() {
   if (personasError) {
     return (
       <div className="p-4 text-center">
-        <p>Error loading associated personas: {personasError}</p>
+        <p>{t('error_loading_personas', { error: personasError })}</p>
         <Button asChild className="mt-4">
-          <Link href="/">Back to Homepage</Link>
+          <Link href="/">{t('back_to_homepage')}</Link>
         </Button>
       </div>
     );
@@ -191,21 +197,21 @@ export default function ProjectPage() {
   if (!project) {
     return (
       <div className="p-4 text-center">
-        <p>Project data is not available. Logged UserID: {user?.id}</p>
+        <p>{t('project_data_not_available', { userId: user?.id })}</p>
         <Button asChild className="mt-4">
-          <Link href="/">Back to Homepage</Link>
+          <Link href="/">{t('back_to_homepage')}</Link>
         </Button>
       </div>
     );
   }
 
   const stageInfo: StageInfo = {
-    'Idea': { color: 'bg-blue-100 text-blue-800', label: 'IDEA', description: 'Define your business idea' },
-    'Prototype': { color: 'bg-purple-100 text-purple-800', label: 'PROTOTYPE', description: 'Build your prototype' },
-    'MVP': { color: 'bg-green-100 text-green-800', label: 'MVP', description: 'Launch your MVP' },
-    'Series A': { color: 'bg-amber-100 text-amber-800', label: 'SERIES A', description: 'Series A funding' },
-    'Series B': { color: 'bg-indigo-100 text-indigo-800', label: 'SERIES B', description: 'Series B funding' },
-    'Series C': { color: 'bg-teal-100 text-teal-800', label: 'SERIES C', description: 'Series C funding' }
+    'Idea': { color: 'bg-blue-100 text-blue-800', label: t('project_stage_idea_label'), description: t('project_stage_idea_desc') },
+    'Prototype': { color: 'bg-purple-100 text-purple-800', label: t('project_stage_prototype_label'), description: t('project_stage_prototype_desc') },
+    'MVP': { color: 'bg-green-100 text-green-800', label: t('project_stage_mvp_label'), description: t('project_stage_mvp_desc') },
+    'Series A': { color: 'bg-amber-100 text-amber-800', label: t('project_stage_series_a_label'), description: t('project_stage_series_a_desc') },
+    'Series B': { color: 'bg-indigo-100 text-indigo-800', label: t('project_stage_series_b_label'), description: t('project_stage_series_b_desc') },
+    'Series C': { color: 'bg-teal-100 text-teal-800', label: t('project_stage_series_c_label'), description: t('project_stage_series_c_desc') }
   };
 
   const currentStage = stageInfo[project.stage] || stageInfo['Idea'];
@@ -229,8 +235,8 @@ export default function ProjectPage() {
 
   return (
     <><Head>
-      <title> {project.name} | NexTraction</title>
-      <meta name="description" content="Manage and track your business ideas and projects." />
+      <title> {t('project_page_title', { projectName: project.name })}</title>
+      <meta name="description" content={t('project_page_description')} />
     </Head><ProjectLayout>
         <div className="p-4 md:p-6 max-w-7xl mx-auto">
           {/* Header */}
@@ -257,31 +263,31 @@ export default function ProjectPage() {
               {transformedMetrics && (() => {
                 const metricGroups = [
                   {
-                    title: 'Market Potential',
+                    title: t('market_potential_title'),
                     metrics: {
-                      'Total Addressable Market (TAM)': transformedMetrics.tam,
-                      'Potential Earnings': transformedMetrics.potentialEarnings,
-                      'Market Growth Rate': transformedMetrics.marketGrowthRate,
-                      'Projected Market Share': transformedMetrics.projectedMarketShare,
+                      [t('tam_label')]: transformedMetrics.tam,
+                      [t('potential_earnings_label')]: transformedMetrics.potentialEarnings,
+                      [t('market_growth_rate_label')]: transformedMetrics.marketGrowthRate,
+                      [t('projected_market_share_label')]: transformedMetrics.projectedMarketShare,
                     },
                   },
                   {
-                    title: 'Profitability',
+                    title: t('profitability_title'),
                     metrics: {
-                      'Customer Acquisition Cost (CAC)': transformedMetrics.cac,
-                      'Customer Lifetime Value (CLTV)': transformedMetrics.cltv,
-                      'CAC to CLTV Ratio': transformedMetrics.cacCltvRatio,
-                      'Average Gross Margin': transformedMetrics.averageGrossMargin,
-                      'CAC Payback Period': transformedMetrics.cacPayback,
+                      [t('cac_label')]: transformedMetrics.cac,
+                      [t('cltv_label')]: transformedMetrics.cltv,
+                      [t('cac_cltv_ratio_label')]: transformedMetrics.cacCltvRatio,
+                      [t('avg_gross_margin_label')]: transformedMetrics.averageGrossMargin,
+                      [t('cac_payback_period_label')]: transformedMetrics.cacPayback,
                     },
                   },
                   {
-                    title: 'Time to Market',
+                    title: t('time_to_market_title'),
                     metrics: {
-                      'Sales Cycle': transformedMetrics.salesCycle,
-                      'Time to MVP': transformedMetrics.timeToMvp,
-                      'Seed to Launch Time': transformedMetrics.seedToLaunch,
-                      'Time to Revenue': transformedMetrics.timeToRevenue,
+                      [t('sales_cycle_label')]: transformedMetrics.salesCycle,
+                      [t('time_to_mvp_label')]: transformedMetrics.timeToMvp,
+                      [t('seed_to_launch_time_label')]: transformedMetrics.seedToLaunch,
+                      [t('time_to_revenue_label')]: transformedMetrics.timeToRevenue,
                     },
                   },
                 ];
@@ -289,7 +295,7 @@ export default function ProjectPage() {
                 const sectionsToShow = metricGroups
                   .map(group => ({
                     ...group,
-                    metrics: Object.entries(group.metrics).filter(([_, value]) => value != null && value !== ''),
+                    metrics: Object.entries(group.metrics).filter(([_, value]) => value != null && value.toString() !== ''),
                   }))
                   .filter(group => group.metrics.length > 0);
 
@@ -300,7 +306,7 @@ export default function ProjectPage() {
                 return (
                   <div className="mb-6">
                     <div className="bg-white rounded-lg shadow-sm border p-6">
-                      <h2 className="text-xl font-semibold mb-4">Metrics</h2>
+                      <h2 className="text-xl font-semibold mb-4">{t('metrics_title')}</h2>
                       {sectionsToShow.map((section, index) => (
                         <div key={section.title} className={index < sectionsToShow.length - 1 ? 'mb-6' : ''}>
                           <h3 className="text-lg font-semibold text-gray-800 mb-3">{section.title}</h3>
@@ -321,42 +327,42 @@ export default function ProjectPage() {
 
               {/* Project Overview */}
               <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-                <h2 className="text-xl font-semibold mb-4">Project Overview</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('project_overview')}</h2>
                 <p className="text-gray-600 mb-6">{project.description}</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                   <PitchDetail
-                    label="Problem"
+                    label={t('problem_label')}
                     value={project.overview?.Problem || ""}
                     icon={AlertTriangle}
                     color="text-red-300" />
                   <PitchDetail
-                    label="Solution"
+                    label={t('solution_label')}
                     value={project.overview?.Solution || ""}
                     icon={Lightbulb}
                     color="text-blue-300" />
                   <PitchDetail
-                    label="Target Market"
+                    label={t('target_market_label')}
                     value={project.overview?.Target_Market || ""}
                     icon={Users}
                     color="text-green-300" />
                   <PitchDetail
-                    label="Business Model"
+                    label={t('business_model_label')}
                     value={project.overview?.Business_Model || ""}
                     icon={Briefcase}
                     color="text-yellow-300" />
                   <PitchDetail
-                    label="Competition"
+                    label={t('competition_label')}
                     value={project.overview?.Competition || ""}
                     icon={Swords}
                     color="text-purple-300" />
                   <PitchDetail
-                    label="Unique Selling Point"
+                    label={t('usp_label')}
                     value={project.overview?.Unique_selling_point || ""}
                     icon={Sparkles}
                     color="text-pink-300" />
                   <PitchDetail
-                    label="Marketing Strategy"
+                    label={t('marketing_strategy_label')}
                     value={project.overview?.Marketing_Strategy || ""}
                     icon={Megaphone}
                     color="text-indigo-300" />
@@ -374,7 +380,7 @@ export default function ProjectPage() {
 
               {/* Personas Section */}
               <div className="mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Target Personas</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('target_personas')}</h2>
                 {!showGroupChat && personas && personas.length > 0 && (
                   <>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
@@ -406,7 +412,7 @@ export default function ProjectPage() {
                       className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
                     >
                       <Users className="h-5 w-5 mr-2" />
-                      Chat with Personas
+                      {t('chat_with_personas')}
                     </Button>
                   </>
                 )}
@@ -419,7 +425,7 @@ export default function ProjectPage() {
             {/* Right column */}
             <div className="space-y-6">
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <h2 className="text-xl font-semibold mb-4">Actions</h2>
+                <h2 className="text-xl font-semibold mb-4">{t('actions_title')}</h2>
                 <ActionButtons projectId={project.id} />
               </div>
             </div>
@@ -450,3 +456,9 @@ export default function ProjectPage() {
       </ProjectLayout></>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => ({
+  props: {
+    ...(await serverSideTranslations(locale ?? 'en', ['common'])),
+  },
+});

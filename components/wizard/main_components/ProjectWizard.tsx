@@ -10,6 +10,7 @@ import { createProject } from '@/supa_database/utils/projects';
 import axios from 'axios';
 import { ProjectStage } from '@/types';
 import Modal from '@/components/ui/Modal'; // Import Modal
+import { useTranslation } from 'next-i18next';
 
 interface ProjectData {
   projectName: string;
@@ -20,6 +21,7 @@ interface ProjectData {
 }
 
 export const ProjectWizard: React.FC = () => {
+  const { t } = useTranslation('common');
   const [currentStep, setCurrentStep] = useState(1);
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,7 +58,7 @@ export const ProjectWizard: React.FC = () => {
       setIsModalOpen(true); // Open the modal instead of redirecting
     } catch (error) {
       console.error('Submission error:', error);
-      setSubmitError('An unexpected error occurred. Please try again.');
+      setSubmitError(t('error_unexpected_submission'));
       setIsSubmitting(false);
     }
   };
@@ -101,29 +103,21 @@ export const ProjectWizard: React.FC = () => {
     return <AnalysisProgress />;
   }
 
-
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-4xl mx-auto p-4 sm:p-6 md:p-8 bg-white rounded-lg shadow-xl">
       <WizardStepper currentStep={currentStep} />
-      <div className="mt-8">
-        {renderStep()}
-      </div>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          router.push('/dashboard');
-        }}
-        titleId="analysis-started-title"
-      >
+      <div className="mt-8">{renderStep()}</div>
+      <Modal isOpen={isModalOpen} onClose={() => router.push('/dashboard')} titleId="submission-success-modal-title">
         <div className="text-center">
-          <h2 id="analysis-started-title" className="text-2xl font-bold mb-4">Project Analysis Started</h2>
-          <p>You will receive an email once the analysis is complete. (Please check your spams folder if you didn't receive anything within an hour.)</p>
+          <h2 id="submission-success-modal-title" className="text-lg font-semibold">{t('modal_submission_success_title')}</h2>
+          <p className="mt-2 text-sm text-gray-600">
+            {t('modal_submission_success_message')}
+          </p>
           <button
             onClick={() => router.push('/dashboard')}
-            className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            Back to Dashboard
+            {t('modal_submission_success_button')}
           </button>
         </div>
       </Modal>

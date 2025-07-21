@@ -11,6 +11,8 @@ import { useChatMessages } from '@/supa_database/hooks/useChatMessages'; // Add 
 import { PersonaModal } from '@/components/client-components/persona/PersonaModal'; // Import PersonaModal
 import Head from 'next/head';
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 
 interface Persona {
@@ -48,6 +50,7 @@ interface ChatPageProps {
 
 export default function ChatPage({ project, projectId: initialProjectId, initialPersonas }: ChatPageProps) {
   const router = useRouter();
+  const { t } = useTranslation('common');
   const { id: queryProjectId } = router.query;
   const projectId = queryProjectId || initialProjectId;
 
@@ -78,7 +81,7 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showMentions, setShowMentions] = useState(false);
-  const [currentUser] = useState('You'); // You can replace this with actual user context
+  const [currentUser] = useState(t('you')); // You can replace this with actual user context
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const messagesTopRef = useRef<HTMLDivElement>(null);
@@ -99,12 +102,12 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
       <ProjectLayout>
         <div className="p-4 md:p-6 max-w-7xl mx-auto text-center">
           <Lock className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold">Project is Locked</h1>
+          <h1 className="text-2xl font-bold">{t('project_locked_title')}</h1>
           <p className="text-gray-600 mt-2">
-            This project is still being processed. It will be unlocked once the initial analysis is complete.
+            {t('project_locked_description')}
           </p>
           <Button asChild className="mt-4">
-              <Link href={`/project/${project.id}`}>Back to Project</Link>
+              <Link href={`/project/${project.id}`}>{t('back_to_project')}</Link>
           </Button>
         </div>
       </ProjectLayout>
@@ -112,11 +115,11 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   }
 
   if (authLoading || !profile) {
-    return <div>Loading user information...</div>;
+    return <div>{t('loading_user_info')}</div>;
   }
 
   if (profile.subscription_tier === 'premium' || profile.subscription_tier === 'enterprise') {
-    return <div>Redirecting to the appropriate version for your plan...</div>;
+    return <div>{t('redirecting_for_plan')}</div>;
   }
 
   // Colors for persona avatars
@@ -265,10 +268,10 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
       });
 
       const data = await response.json();
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || "I'm thinking...";
+      return data.candidates?.[0]?.content?.parts?.[0]?.text || t('thinking');
     } catch (error) {
       console.error('Error generating response:', error);
-      return "Sorry, I'm having trouble responding right now.";
+      return t('error_responding');
     }
   };
 
@@ -451,8 +454,8 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
   return (
     <><Head>
-      <title> Chat | {project.name}</title>
-      <meta name="description" content="Manage and track your business ideas and projects." />
+      <title>{t('chat_page_title', { projectName: project.name })}</title>
+      <meta name="description" content={t('chat_page_description')} />
     </Head><ProjectLayout>
         <div className="flex h-screen bg-gray-100">
           {/* Sidebar with Personas */}
@@ -462,12 +465,12 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
 
                 <div className="flex-1">
                   <h1 className="text-lg font-semibold text-gray-900 truncate">{project.name}</h1>
-                  <p className="text-sm text-gray-500">Project Chat</p>
+                  <p className="text-sm text-gray-500">{t('project_chat')}</p>
                 </div>
               </div>
               <div className="flex items-center text-sm text-gray-600">
                 <Users className="mr-2 h-4 w-4" />
-                Team Members ({personas.length})
+                {t('team_members', { count: personas.length })}
               </div>
             </div>
 
@@ -489,7 +492,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
               {personas.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
                   <Bot className="mx-auto h-12 w-12 mb-3 text-gray-300" />
-                  <p className="text-sm">No team members found for this project.</p>
+                  <p className="text-sm">{t('no_team_members_found')}</p>
                 </div>
               )}
             </div>
@@ -498,93 +501,83 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
           {/* Chat Area */}
           <div className="flex-1 flex flex-col">
             {/* Chat Header */}
-            <div className="bg-white border-b border-gray-200 p-4">
-              <h2 className="text-xl font-semibold text-gray-900">Team Collaboration</h2>
-              <p className="text-sm text-gray-500">
-                {personas.length > 0 ? 'Chat with your AI team members' : 'Add team members to start collaborating'}
-              </p>
+            <div className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">{t('team_collaboration')}</h2>
+                <p className="text-sm text-gray-500">
+                  {personas.length > 0 ? t('chat_with_ai_team') : t('add_team_members_to_chat')}
+                </p>
+              </div>
+              <Button asChild variant="outline">
+                <Link href={`/project/${project.id}/index_2`}>
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  {t('back_to_project')}
+                </Link>
+              </Button>
             </div>
+
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {/* Reference to the top of messages for intersection observer */}
               <div ref={messagesTopRef} />
-
-              {/* Load More Button */}
               {hasMore && (
-                <div className="flex justify-center my-2">
-                  <button
-                    onClick={handleLoadMore}
-                    disabled={messagesLoading}
-                    className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-md transition-colors flex items-center"
-                  >
-                    {messagesLoading ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-gray-400 border-t-gray-600 rounded-full animate-spin mr-2"></div>
-                        Loading...
-                      </>
-                    ) : (
-                      'Load More Messages'
-                    )}
-                  </button>
+                <div className="text-center">
+                  <Button onClick={handleLoadMore} variant="outline" size="sm">
+                    {messagesLoading ? t('loading_more') : t('load_more_messages')}
+                  </Button>
                 </div>
               )}
-
-              {messagesLoading && page === 1 ? (
-                <div className="flex justify-center items-center h-full">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                </div>
-              ) : messages.length === 0 ? (
+              {messages.length === 0 && !messagesLoading && (
                 <div className="text-center py-12 text-gray-500">
                   <div className="mb-4">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
                       <Send className="h-8 w-8 text-blue-600" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Start the conversation</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">{t('start_conversation_title')}</h3>
                   <p className="max-w-md mx-auto text-sm">
-                    Send a message to begin collaborating with your AI team members.
-                    {personas.length > 0 && " Use @name to mention specific team members."}
+                    {t('start_conversation_description')}
+                    {personas.length > 0 && ` ${t('mention_prompt')}`}
                   </p>
                 </div>
-              ) : (
-                messages.map((message) => {
-                  const persona = message.persona_id ? personas.find(p => p.id === message.persona_id) : null;
-                  const isUser = message.sender_type === 'user';
-
-                  return (
-                    <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`flex max-w-xs lg:max-w-md xl:max-w-lg ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
-                        {!isUser && (
-                          <div className={`w-8 h-8 rounded-full ${persona?.avatar_color || 'bg-gray-400'} flex items-center justify-center text-white text-xs font-medium`}>
-                            {message.sender.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-
-                        <div className={`px-4 py-2 rounded-lg ${isUser
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-white border border-gray-200 text-gray-900'}`}>
-                          {!isUser && (
-                            <div className="text-xs font-medium text-gray-600 mb-1">{message.sender}</div>
-                          )}
-                          <div className="text-sm whitespace-pre-wrap">
-                            {message.sender_type === 'user' ? renderMessageWithMentions(message.content) : message.content}
-                          </div>
-                          <div className={`text-xs mt-1 ${isUser ? 'text-blue-100' : 'text-gray-500'}`}>
-                            {formatTime(message.timestamp)}
-                          </div>
-                        </div>
-
-                        {isUser && (
-                          <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-medium">
-                            {currentUser.charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })
               )}
+
+              {messages.map((message) => {
+                const persona = message.persona_id ? personas.find(p => p.id === message.persona_id) : null;
+                const isUser = message.sender_type === 'user';
+
+                return (
+                  <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`flex max-w-xs lg:max-w-md xl:max-w-lg ${isUser ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
+                      {!isUser && (
+                        <div className={`w-8 h-8 rounded-full ${persona?.avatar_color || 'bg-gray-400'} flex items-center justify-center text-white text-xs font-medium`}>
+                          {message.sender.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+
+                      <div className={`px-4 py-2 rounded-lg ${isUser
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white border border-gray-200 text-gray-900'}`}>
+                        {!isUser && (
+                          <div className="text-xs font-medium text-gray-600 mb-1">{message.sender}</div>
+                        )}
+                        <div className="text-sm whitespace-pre-wrap">
+                          {message.sender_type === 'user' ? renderMessageWithMentions(message.content) : message.content}
+                        </div>
+                        <div className={`text-xs mt-1 ${isUser ? 'text-blue-100' : 'text-gray-500'}`}>
+                          {formatTime(message.timestamp)}
+                        </div>
+                      </div>
+
+                      {isUser && (
+                        <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-white text-xs font-medium">
+                          {currentUser.charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
 
               {isLoading && (
                 <div className="flex justify-start">
@@ -594,7 +587,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                     </div>
-                    <span className="text-sm text-gray-500">Team members are typing...</span>
+                    <span className="text-sm text-gray-500">{t('team_typing')}</span>
                   </div>
                 </div>
               )}
@@ -627,7 +620,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                   <button
                     onClick={() => setShowMentions(!showMentions)}
                     className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                    title="Mention team member"
+                    title={t('mention_team_member_title')}
                   >
                     <AtSign className="h-5 w-5" />
                   </button>
@@ -638,7 +631,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                       value={inputMessage}
                       onChange={(e) => setInputMessage(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Type a message... (Use @name to mention team members)"
+                      placeholder={t('chat_placeholder')}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       rows={1}
                       style={{ minHeight: '42px', maxHeight: '120px' }}
@@ -659,7 +652,7 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                 </div>
 
                 <div className="mt-2 text-xs text-gray-500">
-                  Press Enter to send, Shift+Enter for new line
+                  {t('chat_send_instruction')}
                 </div>
               </div>
             )}
@@ -676,15 +669,15 @@ Respond as ${persona.name} in character. Keep responses conversational, under 20
                 role: 'user', // Provide a default valid role for ChatPersona.role tag
                 // avatarUrl can be omitted; PersonaModal handles placeholder if not present
               }}
-              jobTitle={selectedPersonaForModal.role} // Use the actual role string for jobTitle
+              jobTitle={selectedPersonaForModal.role}
               needsDetails={selectedPersonaForModal.description}
               background={selectedPersonaForModal.demographics
                 ? Object.entries(selectedPersonaForModal.demographics)
                   .map(([key, value]) => `${key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')}: ${String(value)}`)
                   .join('; ')
                 : undefined}
-              goals={selectedPersonaForModal.goals}
-              challenges={selectedPersonaForModal.pain_points} // Map pain_points to challenges
+              goals={selectedPersonaForModal.goals || []}
+              challenges={selectedPersonaForModal.pain_points || []}
             />
           )}
         </div>
@@ -737,10 +730,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     console.error('Error fetching chat messages:', messagesError);
   }
 
+  const locale = context.locale ?? 'en';
+  const translations = await serverSideTranslations(locale, ['common']);
+
   return {
     props: {
       project,
       projectId: id as string,
+      ...translations,
       initialPersonas: personas || [],
       initialMessages: initialMessages || []
     }
