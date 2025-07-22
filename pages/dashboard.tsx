@@ -1,3 +1,5 @@
+// pages/dashboard.tsx
+
 "use client";
 
 import React, { useEffect, useState, MouseEvent } from 'react';
@@ -17,6 +19,11 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetStaticProps } from 'next';
 
 const ConfirmationDialog = dynamic(() => import('@/components/modals/ConfirmationDialog'), { ssr: false });
+
+interface DashboardPageProps {
+  isDummy?: boolean;
+  dummyProjects?: Project[];
+}
 
 // Project card component for dashboard
 const ProjectCard = ({
@@ -60,6 +67,8 @@ const ProjectCard = ({
 
   const isLocked = locked || false; // Default to false if not provided
 
+  const cardClassName = `block cursor-pointer h-full group ${isLocked ? 'project-card-locked' : ''}`;
+
   return (
     <Link href={isLocked ? "#" : `/project/${id}/index_2`} passHref legacyBehavior>
       <a className="block cursor-pointer h-full group"> {/* Removed relative */}
@@ -89,7 +98,7 @@ const ProjectCard = ({
   );
 };
 
-export default function Dashboard() {
+export default function Dashboard({ isDummy = false, dummyProjects = [] }: DashboardPageProps) {
   const { user } = useAuthContext();
   const { t } = useTranslation('common');
   // Use the useProjects hook
@@ -99,8 +108,10 @@ export default function Dashboard() {
   const [projectToDelete, setProjectToDelete] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
-    ga.trackDashboardView();
-  }, []);
+    if (!isDummy) {
+      ga.trackDashboardView();
+    }
+  }, [isDummy]);
 
   useEffect(() => {
     if (fetchedProjects) {
@@ -141,12 +152,13 @@ export default function Dashboard() {
     }
   }, [fetchedProjects]);
 
-  useEffect(() => {
-    if (user?.id) {
-      refetch();
-    }
-  }, [user?.id, refetch]);
+  const projectsToDisplay = isDummy ? dummyProjects : projects;
 
+  if (!isDummy) {
+    useEffect(() => {
+      if (user?.id) refetch();
+    }, [user?.id, refetch]);
+  }
   const handleDeleteRequest = (projectId: string, projectName: string) => {
     setProjectToDelete({ id: projectId, name: projectName });
     setShowDeleteConfirm(true);
@@ -170,7 +182,7 @@ export default function Dashboard() {
           <h2 className="text-2xl font-bold mb-4">{t('please_log_in')}</h2>
           <p className="mb-6 text-center">{t('log_in_prompt')}</p>
           <Button asChild>
-            <Link href="/auth">{t('log_in')}</Link> {/* Changed from /login to /auth based on file structure */}
+            <Link href="/auth">{t('log_in') || 'Log In'}</Link> {/* Changed from /login to /auth based on file structure */}
           </Button>
         </div>
       </DashboardLayout>
@@ -234,7 +246,7 @@ export default function Dashboard() {
               <Button asChild size="lg" className="rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors">
                 <Link href="/wizard" className="flex items-center" onClick={() => ga.trackButtonClick('new_project', 'dashboard')}>
                   <PlusCircle className="mr-2 h-5 w-5" />
-                  {t('new_project')}
+                  {t('new_project') || 'New Project'}
                 </Link>
               </Button>
             )}
@@ -248,7 +260,7 @@ export default function Dashboard() {
                 {/* Assuming /project/creation/wizard is the correct path for the wizard */}
                 <Link href="/wizard" className="flex items-center">
                   <PlusCircle className="mr-2 h-5 w-5" />
-                  {t('create_project')}
+                  {t('create_project') || 'Create Project'}
                 </Link>
               </Button>
             </div>

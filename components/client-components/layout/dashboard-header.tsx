@@ -131,7 +131,7 @@ export const DashboardHeader = () => {
               </div>
             ) : (
               <Button asChild size="sm">
-                <Link href="/login">{t('nav_sign_in')}</Link>
+                <Link href="/login">{t('nav_sign_in') || 'Sign In'}</Link>
               </Button>
             )}
           </div>

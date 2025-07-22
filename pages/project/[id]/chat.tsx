@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
-import { useAuthContext } from '@/supa_database/components/AuthProvider'; // Corrected import path
+import { useAuthContext } from '@/supa_database/components/AuthProvider';
 import { createClient } from '@supabase/supabase-js';
 import * as ga from '@/lib/ga';
 import { GetServerSideProps } from 'next';
-import { Send, AtSign, Users, Bot, ArrowLeft } from 'lucide-react';
+import { Send, AtSign, Users, Bot } from 'lucide-react';
 import Link from 'next/link';
 import ProjectLayout from '@/components/layout/ProjectLayout';
-import { PersonaModal } from '@/components/client-components/persona/PersonaModal'; // Import PersonaModal
-import Head from 'next/dist/shared/lib/head';
+import { PersonaModal } from '@/components/client-components/persona/PersonaModal';
+import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
@@ -40,24 +40,34 @@ interface ChatMessage {
 }
 
 interface ChatPageProps {
-  project: any;
-  projectId: string;
-  initialPersonas: Persona[];
+  project?: any;
+  projectId?: string;
+  initialPersonas?: Persona[];
+  initialMessages?: ChatMessage[];
+  isDummy?: boolean;
+  dummyProject?: any;
+  dummyPersonas?: Persona[];
+  dummyMessages?: ChatMessage[];
 }
 
-export default function ChatPage({ project, projectId: initialProjectId, initialPersonas }: ChatPageProps) {
+export default function ChatPage({
+  project: realProject,
+  projectId: realProjectId,
+  initialPersonas = [],
+  initialMessages = [],
+  isDummy = false,
+  dummyProject,
+  dummyPersonas = [],
+  dummyMessages = []
+}: ChatPageProps) {
   const router = useRouter();
   const { t } = useTranslation('common');
   // Use projectId from router.query if available, otherwise fallback to initialProjectId from props
   // This is to ensure router.query.id is available for redirection logic
   const { id: queryProjectId } = router.query;
-  const projectId = queryProjectId || initialProjectId;
-
   const { profile, loading: authLoading } = useAuthContext();
-
-  useEffect(() => {
-    ga.trackChatPageView();
-  }, []);
+  const project = isDummy ? dummyProject : realProject;
+  const projectId = isDummy ? dummyProject?.id : (queryProjectId || realProjectId);
 
   useEffect(() => {
     if (!authLoading && profile && projectId) {
@@ -67,8 +77,8 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
     }
   }, [authLoading, profile, router, projectId]);
 
-  const [personas, setPersonas] = useState<Persona[]>(initialPersonas);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [personas, setPersonas] = useState<Persona[]>(isDummy ? dummyPersonas : initialPersonas);
+  const [messages, setMessages] = useState<ChatMessage[]>(isDummy ? dummyMessages : initialMessages);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showMentions, setShowMentions] = useState(false);
@@ -80,9 +90,19 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   const [isPersonaModalOpen, setIsPersonaModalOpen] = useState(false);
   const [selectedPersonaForModal, setSelectedPersonaForModal] = useState<Persona | null>(null);
 
+  useEffect(() => {
+    // Onboarding: Disable analytics and redirection in dummy mode
+    if (!isDummy) {
+      ga.trackChatPageView();
+      if (!authLoading && profile && projectId && profile.subscription_tier === 'free') {
+        router.push(`/project/${projectId}/chat_2`);
+      }
+    }
+  }, [isDummy, authLoading, profile, router, projectId]);
+
   // Function to open persona details modal
   const handlePersonaClick = (persona: Persona) => {
-    ga.trackChatInteraction(`viewed_persona_${persona.name}`);
+    if (!isDummy) ga.trackChatInteraction(`viewed_persona_${persona.name}`);
     setSelectedPersonaForModal(persona);
     setIsPersonaModalOpen(true);
   };
@@ -102,13 +122,9 @@ export default function ChatPage({ project, projectId: initialProjectId, initial
   ];
 
   useEffect(() => {
-    // Assign avatar colors to personas
-    const personasWithColors = personas.map((persona, index) => ({
-      ...persona,
-      avatar_color: avatarColors[index % avatarColors.length]
-    }));
+    const personasWithColors = personas.map((p, index) => ({ ...p, avatar_color: avatarColors[index % avatarColors.length] }));
     setPersonas(personasWithColors);
-  }, []);
+  }, [isDummy ? dummyPersonas : initialPersonas]);
 
   useEffect(() => {
     scrollToBottom();

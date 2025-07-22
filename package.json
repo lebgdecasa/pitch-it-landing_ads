@@ -39,7 +39,9 @@
     "react-calendly": "^4.4.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.45.4",
+    "react-shepherd": "^6.1.8",
     "react-toastify": "^11.0.5",
+    "shepherd.js": "^14.5.0",
     "tailwind-merge": "^3.3.1",
     "three": "^0.176.0",
     "web-vitals": "^5.0.1"

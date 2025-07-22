@@ -1,3 +1,5 @@
+// components/wizard/main_components/ProjectWizard.tsx
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuthContext } from '@/supa_database/components/AuthProvider'; // Import the auth context
@@ -20,7 +22,11 @@ interface ProjectData {
   hasFiles?: boolean;
 }
 
-export const ProjectWizard: React.FC = () => {
+interface ProjectWizardProps {
+  isDummy?: boolean;
+}
+
+export const ProjectWizard: React.FC<ProjectWizardProps> = ({ isDummy = false }) => {
   const { t } = useTranslation('common');
   const [currentStep, setCurrentStep] = useState(1);
   const [showAnalysis, setShowAnalysis] = useState(false);
@@ -39,6 +45,13 @@ export const ProjectWizard: React.FC = () => {
   });
 
   const handleSubmit = async () => {
+    if (isDummy) {
+      setIsSubmitting(true);
+      // In dummy mode, we don't call the API or show the modal.
+      // The Shepherd.js tour will handle moving to the next view.
+      console.log("Onboarding: Submission simulated. No API call made.");
+      return;
+    }
     setIsSubmitting(true);
     setSubmitError(null);
 

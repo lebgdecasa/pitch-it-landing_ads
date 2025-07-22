@@ -81,7 +81,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       email: email as string,
       password: password as string,
       options: {
-        emailRedirectTo: 'https://nextraction.io/dashboard'
+        emailRedirectTo: 'https://nextraction.io/onboarding'
       }
     });
 

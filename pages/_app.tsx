@@ -12,6 +12,7 @@ import CalendlyModal from '@/components/modals/CalendlyModal';
 import WaitlistModal from '@/components/modals/WaitlistModal';
 import '@/styles/globals.css';
 import { appWithTranslation } from 'next-i18next';
+import 'shepherd.js/dist/css/shepherd.css';
 
 import { AuthProvider, useAuthContext } from '@/supa_database/components/AuthProvider'; // Added useAuthContext
 // AuthModal import might be removed if /auth page is the sole auth mechanism now
