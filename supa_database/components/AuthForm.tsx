@@ -100,8 +100,16 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode = 'signin' }) => {
           throw new Error(responseData.error || `HTTP error! status: ${response.status}`)
         }
         ga.trackLogin('email');
-        await supabase.auth.getSession()
-        router.push('/dashboard').then(() => window.location.reload())
+        const session = await supabase.auth.getSession()
+        
+        // Check onboarding status and redirect accordingly
+        if (session.data.session?.user) {
+          const { getRedirectPathAfterAuth } = await import('@/utils/onboardingRedirect');
+          const redirectPath = await getRedirectPathAfterAuth(session.data.session.user.id);
+          router.push(redirectPath).then(() => window.location.reload());
+        } else {
+          router.push('/onboarding').then(() => window.location.reload());
+        }
         return
       }
     } catch (err: any) {

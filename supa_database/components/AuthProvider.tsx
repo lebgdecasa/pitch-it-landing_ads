@@ -1,6 +1,7 @@
 // supa_database/components/AuthProvider.tsx
 import React, { createContext, useContext, ReactNode } from 'react'
 import { useAuth, AuthState } from '../auth'
+import { OnboardingProvider } from '@/components/onboarding/OnboardingProvider';
 
 const AuthContext = createContext<AuthState>({
   user: null,
@@ -18,7 +19,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return (
     <AuthContext.Provider value={auth}>
-      {children}
+      <OnboardingProvider>
+        {children}
+      </OnboardingProvider>
     </AuthContext.Provider>
   )
 }

@@ -149,6 +149,15 @@ declare global {
     });
   };
 
+  // Onboarding Events
+  export const trackOnboardingStep = (stepName: string, action: string) => {
+    event({
+      action: `onboarding_${action}`,
+      category: 'onboarding',
+      label: stepName,
+    });
+  };
+
   // Generic Click Event
   export const trackButtonClick = (buttonName: string, page: string) => {
     event({
