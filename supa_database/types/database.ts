@@ -22,6 +22,10 @@ export interface Database {
           created_at: string
           updated_at: string
           last_login: string | null
+          has_completed_onboarding: boolean
+          onboarding_started_at: string | null
+          onboarding_completed_at: string | null
+          onboarding_skip_reason: string | null
         }
         Insert: {
           id: string
@@ -34,6 +38,10 @@ export interface Database {
           created_at?: string
           updated_at?: string
           last_login?: string | null
+          has_completed_onboarding?: boolean
+          onboarding_started_at?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_skip_reason?: string | null
         }
         Update: {
           id?: string
@@ -46,6 +54,11 @@ export interface Database {
           created_at?: string
           updated_at?: string
           last_login?: string | null
+          has_completed_onboarding?: boolean
+          onboarding_started_at?: string | null
+          onboarding_completed_at?: string | null
+          onboarding_skip_reason?: string | null
+
         }
       }
       projects: {
@@ -220,6 +233,70 @@ export interface Database {
           created_by?: string | null
         }
       }
+      onboarding_analytics: {
+        Row: {
+          id: string
+          user_id: string
+          step_name: string
+          action: 'viewed' | 'completed' | 'skipped' | 'navigated_back'
+          metadata: Json
+          session_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          step_name: string
+          action: 'viewed' | 'completed' | 'skipped' | 'navigated_back'
+          metadata?: Json
+          session_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          step_name?: string
+          action?: 'viewed' | 'completed' | 'skipped' | 'navigated_back'
+          metadata?: Json
+          session_id?: string | null
+          created_at?: string
+        }
+      }
+      onboarding_sessions: {
+        Row: {
+          id: string
+          user_id: string
+          started_at: string
+          completed_at: string | null
+          completion_status: 'completed' | 'skipped' | 'abandoned' | null
+          total_time_seconds: number | null
+          steps_completed: number
+          total_steps: number | null
+          device_info: Json
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          started_at?: string
+          completed_at?: string | null
+          completion_status?: 'completed' | 'skipped' | 'abandoned' | null
+          total_time_seconds?: number | null
+          steps_completed?: number
+          total_steps?: number | null
+          device_info?: Json
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          started_at?: string
+          completed_at?: string | null
+          completion_status?: 'completed' | 'skipped' | 'abandoned' | null
+          total_time_seconds?: number | null
+          steps_completed?: number
+          total_steps?: number | null
+          device_info?: Json
+        }
+}
     }
     Views: {
       [_ in never]: never
@@ -241,6 +318,10 @@ export interface UserProfile {
   university?: string
   subscription_tier: 'free' | 'premium' | 'enterprise'
   credits_remaining: number
+  has_completed_onboarding: boolean
+  onboarding_started_at?: string
+  onboarding_completed_at?: string
+  onboarding_skip_reason?: string
 }
 
 interface MetricValue {

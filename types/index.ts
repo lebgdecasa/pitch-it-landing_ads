@@ -7,6 +7,7 @@ export interface User {
   createdAt: string;
   projectsCount: number;
   imageUrl?: string; // Added for user profile image
+  
 }
 
 // Pitch Types

@@ -12,6 +12,7 @@ import CalendlyModal from '@/components/modals/CalendlyModal';
 import WaitlistModal from '@/components/modals/WaitlistModal';
 import '@/styles/globals.css';
 import { appWithTranslation } from 'next-i18next';
+import { getRedirectPathAfterAuth } from '@/utils/onboardingRedirect';
 
 import { AuthProvider, useAuthContext } from '@/supa_database/components/AuthProvider'; // Added useAuthContext
 // AuthModal import might be removed if /auth page is the sole auth mechanism now
@@ -26,6 +27,7 @@ const PROTECTED_ROUTES = [
   '/dashboard',
   '/project',  // This will match /project/[id] routes
   '/subscription',
+  '/onboarding', // Onboarding is also protected - user must be authenticated
 ];
 
 const AUTH_PAGE_ROUTE = '/auth'; // The main authentication page
@@ -55,8 +57,10 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ children }) => {
       // If not authenticated and trying to access a protected route, redirect to auth page
       router.push(AUTH_PAGE_ROUTE);
     } else if (user && isAuthPageRoute) {
-      // If authenticated and trying to access the auth page, redirect to dashboard
-      router.push('/dashboard');
+      // If authenticated and trying to access the auth page, check onboarding status
+      getRedirectPathAfterAuth(user.id).then(redirectPath => {
+        router.push(redirectPath);
+      });
     }
   }, [user, loading, pathname, router, isProtectedRoute, isAuthPageRoute]);
 

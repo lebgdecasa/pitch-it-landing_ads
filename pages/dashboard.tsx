@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, MouseEvent } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import * as ga from '@/lib/ga';
 import { PlusCircle, Loader2, Trash2 } from 'lucide-react';
 import { useAuthContext } from '@/supa_database/components/AuthProvider';
@@ -15,6 +16,7 @@ import Head from 'next/head';
 import { useTranslation } from 'next-i18next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import type { GetStaticProps } from 'next';
+import { useOnboarding } from '@/components/onboarding/OnboardingProvider';
 
 const ConfirmationDialog = dynamic(() => import('@/components/modals/ConfirmationDialog'), { ssr: false });
 
@@ -90,13 +92,22 @@ const ProjectCard = ({
 };
 
 export default function Dashboard() {
+  const { startOnboarding, hasCompletedOnboarding } = useOnboarding();
   const { user } = useAuthContext();
   const { t } = useTranslation('common');
+  const router = useRouter();
   // Use the useProjects hook
   const { projects: fetchedProjects, loading, error, refetch, deleteProject } = useProjects(user?.id); // Added deleteProject
   const [projects, setProjects] = useState<Project[]>([]);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [projectToDelete, setProjectToDelete] = useState<{ id: string; name: string } | null>(null);
+
+  // Redirect to onboarding if user hasn't completed it
+  useEffect(() => {
+    if (user && hasCompletedOnboarding === false) {
+      router.push('/onboarding');
+    }
+  }, [user, hasCompletedOnboarding, router]);
 
   useEffect(() => {
     ga.trackDashboardView();
@@ -163,6 +174,18 @@ export default function Dashboard() {
     }
   };
 
+  // Show loading while checking onboarding status
+  if (user && hasCompletedOnboarding === undefined) {
+    return (
+      <DashboardLayout>
+        <div className="flex flex-col items-center justify-center min-h-[50vh] p-4">
+          <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+          <p className="mt-4 text-lg text-gray-700">{t('checking_onboarding_status') || 'Checking status...'}</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   if (!user) {
     return (
       <DashboardLayout>
@@ -172,6 +195,12 @@ export default function Dashboard() {
           <Button asChild>
             <Link href="/auth">{t('log_in')}</Link> {/* Changed from /login to /auth based on file structure */}
           </Button>
+          <Button
+          onClick={startOnboarding}
+          className="fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg"
+        >
+          ?
+        </Button>
         </div>
       </DashboardLayout>
     );
