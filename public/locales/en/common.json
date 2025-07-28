@@ -764,6 +764,7 @@
   "dashboard_header_user_placeholder": "User",
   "onboarding_welcome_title": "Welcome to NexTraction!",
   "onboarding_welcome_subtitle": "Let's take a quick tour to show you how to bring your project to life with AI-powered personas and analyses.",
+  "skip_onboarding": "Skip Onboarding and explore on my own!",
   "onboarding_welcome_feature1_title": "Create Projects",
   "onboarding_welcome_feature1_desc": "Set up your project in minutes with our guided wizard",
   "onboarding_welcome_feature2_title": "Get AI and Algorithmic Analysis",

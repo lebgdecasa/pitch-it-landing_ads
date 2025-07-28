@@ -31,6 +31,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     const checkOnboardingStatus = async () => {
       if (!user) return;
 
+      // Don't re-check if we already know the user has completed onboarding
+      if (hasCompletedOnboarding === true) return;
+
       const { data, error } = await supabase
         .from('users')
         .select('has_completed_onboarding')
@@ -47,9 +50,9 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     };
 
     checkOnboardingStatus();
-  }, [user, router.pathname]);
+  }, [user, router.pathname, hasCompletedOnboarding]);
 
-  const markOnboardingComplete = async () => {
+  const markOnboardingComplete = async (shouldRedirect = false) => {
     if (!user) return;
 
     await supabase
@@ -59,6 +62,10 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     setHasCompletedOnboarding(true);
     setIsActive(false);
+
+    if (shouldRedirect) {
+      router.push('/dashboard');
+    }
   };
 
   const value: OnboardingState = {
@@ -82,8 +89,24 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setCurrentStep(prev => prev - 1);
       }
     },
-    skipOnboarding: () => {
-      markOnboardingComplete();
+    skipOnboarding: async () => {
+      if (user) {
+        // Wait for the database update to complete before doing anything else
+        await supabase
+          .from('users')
+          .update({
+            has_completed_onboarding: true,
+            onboarding_skip_reason: 'user_skipped_at_overlay',
+          })
+          .eq('id', user.id);
+      }
+
+      // Now, update the local state
+      setHasCompletedOnboarding(true);
+      setIsActive(false);
+
+      // And finally, redirect to the dashboard
+      router.push('/dashboard');
     },
     resetOnboarding: () => {
       setCurrentStep(0);

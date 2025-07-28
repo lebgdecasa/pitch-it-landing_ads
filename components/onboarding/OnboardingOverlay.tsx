@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
 import { useOnboarding } from './OnboardingProvider';
+import { useTranslation } from 'next-i18next';
 
 interface OnboardingOverlayProps {
   children: React.ReactNode;
@@ -9,10 +9,12 @@ interface OnboardingOverlayProps {
 }
 
 export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({
+
   children,
   allowSkip = true
 }) => {
   const { skipOnboarding, isActive } = useOnboarding();
+  const { t } = useTranslation('common');
 
   return (
     <AnimatePresence>
@@ -26,9 +28,9 @@ export const OnboardingOverlay: React.FC<OnboardingOverlayProps> = ({
           {allowSkip && (
             <button
               onClick={skipOnboarding}
-              className="absolute top-4 right-4 p-2 text-white hover:bg-white/10 rounded-full"
+              className="absolute top-4 right-4 z-[10000] px-4 py-2 text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors duration-200 text-sm font-medium cursor-pointer"
             >
-              <X size={24} />
+              {t('skip_onboarding')}
             </button>
           )}
           {children}
