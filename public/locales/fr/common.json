@@ -777,13 +777,12 @@
   "onboarding_welcome_feature3_desc": "Interagissez avec des personas d'acheteurs cibles générés par IA, créés spécifiquement pour votre projet",
   "onboarding_welcome_cta": "Commencer",
   "onboarding_welcome_tour_duration": "Cette visite prend environ 3 minutes",
-
   "onboarding_dashboard_tour_title": "Créer Votre Premier Projet",
   "onboarding_dashboard_tour_desc": "Cliquez sur ce bouton pour commencer à créer votre projet. Nous vous guiderons à chaque étape !",
   "onboarding_dashboard_mock_title": "Mes Projets",
   "onboarding_dashboard_mock_no_projects": "Aucun projet pour le moment",
   "onboarding_dashboard_mock_create_button": "Créer un Nouveau Projet",
-
+  "restart_onboarding": "Onboarding",
   "onboarding_wizard_step1_title": "Étape 1 : Informations de Base",
   "onboarding_wizard_project_name_label": "Nom du Projet",
   "onboarding_wizard_project_name_placeholder": "Mon Projet Génial",

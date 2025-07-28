@@ -773,13 +773,12 @@
   "onboarding_welcome_feature3_desc": "Interact with AI-generated target buyer personas created specifically for your project",
   "onboarding_welcome_cta": "Get Started",
   "onboarding_welcome_tour_duration": "This tour takes about 3 minutes",
-
   "onboarding_dashboard_tour_title": "Create Your First Project",
   "onboarding_dashboard_tour_desc": "Click this button to start creating your project. We'll guide you through each step!",
   "onboarding_dashboard_mock_title": "My Projects",
   "onboarding_dashboard_mock_no_projects": "No projects yet",
   "onboarding_dashboard_mock_create_button": "Create New Project",
-
+  "restart_onboarding": "Onboarding",
   "onboarding_wizard_step1_title": "Step 1: Basic Information",
   "onboarding_wizard_project_name_label": "Project Name",
   "onboarding_wizard_project_name_placeholder": "My Awesome Project",
@@ -895,13 +894,11 @@
   "onboarding_chat_demo_tip": "Tip: Use @ to mention specific personas",
   "onboarding_chat_demo_got_it": "Got it!",
   "onboarding_chat_demo_loading": "Loading...",
-
   "onboarding_complete_title": "You're All Set!",
   "onboarding_complete_subtitle": "Now that you know how to use NexTraction like a pro, it's time to create your own project!",
   "onboarding_complete_cta": "Create My First Project",
   "onboarding_complete_review": "Review Tour Again",
   "onboarding_complete_help_text": "You can always access this tour from the help menu",
-
   "onboarding_tooltip_previous": "Previous",
   "onboarding_tooltip_next": "Next",
   "onboarding_previous": "Previous",
