@@ -25,7 +25,7 @@ export const WelcomeStep: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 md:p-12 relative"
+        className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full p-6 md:p-8 relative"
       >
         {/* Skip button */}
         <button
@@ -36,7 +36,7 @@ export const WelcomeStep: React.FC = () => {
         </button>
 
         {/* Icon */}
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-4">
             <div className="bg-blue-100 p-4 rounded-full">
             <img
               src="/images/nextraction_logo.png"
@@ -51,12 +51,12 @@ export const WelcomeStep: React.FC = () => {
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             {t('onboarding_welcome_title')}
           </h1>
-          <p className="text-lg text-gray-600 mb-8 max-w-lg mx-auto">
+          <p className="text-lg text-gray-600 mb-6 max-w-lg mx-auto">
             {t('onboarding_welcome_subtitle')}
           </p>
 
           {/* Features list */}
-          <div className="grid md:grid-cols-3 gap-4 mb-8 text-left">
+          <div className="grid md:grid-cols-3 gap-4 mb-6 text-left">
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 mb-1">{t('onboarding_welcome_feature1_title')}</h3>
               <p className="text-sm text-gray-600">
@@ -91,7 +91,7 @@ export const WelcomeStep: React.FC = () => {
         </div>
 
         {/* Tour duration */}
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-gray-500 mt-4">
           {t('onboarding_welcome_tour_duration')}
         </p>
       </motion.div>
