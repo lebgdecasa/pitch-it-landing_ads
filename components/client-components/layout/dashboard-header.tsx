@@ -9,6 +9,8 @@ import { useAuthContext } from '@/supa_database/components/AuthProvider';
 import { trackButtonClick, trackLanguageChange } from '@/utils/analytics';
 import { useTranslation } from 'next-i18next';
 import { LanguageContext } from '@/context/LanguageContext';
+import { useOnboarding } from '@/components/onboarding/OnboardingProvider';
+
 
 export const DashboardHeader = () => {
   const { user } = useAuthContext();
@@ -16,6 +18,8 @@ export const DashboardHeader = () => {
   const router = useRouter();
   const { t } = useTranslation('common');
   const { language, setLanguage } = useContext(LanguageContext);
+  const { restartOnboarding } = useOnboarding();
+
 
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);
@@ -50,6 +54,11 @@ export const DashboardHeader = () => {
       // Optionally, show an error message to the user
       alert('Failed to sign out: ' + err.message);
     }
+  };
+
+  const handleRestartOnboarding = () => {
+    setIsProfileOpen(false);
+    restartOnboarding();
   };
 
   return (
@@ -96,10 +105,6 @@ export const DashboardHeader = () => {
                 FR
               </button>
             </div>
-            <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100">
-              <Bell className="h-5 w-5" />
-            </button>
-
             {user ? (
               <div className="relative">
                 <button
@@ -133,7 +138,16 @@ export const DashboardHeader = () => {
               <Button asChild size="sm">
                 <Link href="/login">{t('nav_sign_in')}</Link>
               </Button>
+
             )}
+            <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={handleRestartOnboarding}
+                      className=" bg-blue-700 text-white hover:bg-blue-800 transition-colors"
+                    >
+                      {t('restart_onboarding')}
+                    </Button>
           </div>
         </div>
       </div>

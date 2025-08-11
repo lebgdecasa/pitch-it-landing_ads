@@ -13,12 +13,13 @@ interface OnboardingState {
   previousStep: () => void;
   skipOnboarding: () => void;
   resetOnboarding: () => void;
+  restartOnboarding: () => void;
 }
 
 const OnboardingContext = createContext<OnboardingState | null>(null);
 
 export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useAuthContext();
+  const { user, profile, fetchUserProfile } = useAuthContext();
   const router = useRouter();
   const [isActive, setIsActive] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -26,39 +27,61 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const TOTAL_STEPS = 6; // Adjust based on your flow
 
-  // Check if user has completed onboarding
   useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('users')
-        .select('has_completed_onboarding')
-        .eq('id', user.id)
-        .single();
-
-      if (data) {
-        setHasCompletedOnboarding(data.has_completed_onboarding || false);
-        // Auto-start onboarding only if user is on the onboarding page
-        if (!data.has_completed_onboarding && router.pathname === '/onboarding') {
-          setIsActive(true);
-        }
+    // Sync with the profile from AuthContext
+    if (profile !== undefined) {
+      setHasCompletedOnboarding(profile?.has_completed_onboarding);
+      if (profile?.has_completed_onboarding === false && router.pathname === '/onboarding') {
+        setIsActive(true);
       }
-    };
+    }
+  }, [profile, router.pathname]);
 
-    checkOnboardingStatus();
-  }, [user, router.pathname]);
 
-  const markOnboardingComplete = async () => {
+  const markOnboardingComplete = async (shouldRedirect = false) => {
     if (!user) return;
+
+    // Set state immediately for a responsive UI
+    setIsActive(false);
+    setHasCompletedOnboarding(true);
 
     await supabase
       .from('users')
       .update({ has_completed_onboarding: true })
       .eq('id', user.id);
 
-    setHasCompletedOnboarding(true);
-    setIsActive(false);
+    // Ensure the profile is updated before redirecting
+    await fetchUserProfile();
+
+    if (shouldRedirect) {
+      router.push('/dashboard');
+    }
+  };
+
+  const restartOnboarding = async () => {
+    if (!user) return;
+
+    try {
+      // Set onboarding to false in the database
+      const { error } = await supabase
+        .from('users')
+        .update({ has_completed_onboarding: false })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Refetch the user profile to update the auth context
+      await fetchUserProfile();
+
+      // Reset local state and redirect
+      setHasCompletedOnboarding(false);
+      setCurrentStep(0);
+      setIsActive(true);
+      router.push('/onboarding?force=true');
+    } catch (error) {
+      console.error('Error restarting onboarding:', error);
+      // Optionally, show an error to the user
+    }
   };
 
   const value: OnboardingState = {
@@ -74,7 +97,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       if (currentStep < TOTAL_STEPS - 1) {
         setCurrentStep(prev => prev + 1);
       } else {
-        markOnboardingComplete();
+        markOnboardingComplete(true); // Redirect on final step
       }
     },
     previousStep: () => {
@@ -82,13 +105,33 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setCurrentStep(prev => prev - 1);
       }
     },
-    skipOnboarding: () => {
-      markOnboardingComplete();
+    skipOnboarding: async () => {
+      if (user) {
+        // Set state immediately for a responsive UI
+        setIsActive(false);
+        setHasCompletedOnboarding(true);
+
+        // Wait for the database update to complete before doing anything else
+        await supabase
+          .from('users')
+          .update({
+            has_completed_onboarding: true,
+            onboarding_skip_reason: 'user_skipped_at_overlay',
+          })
+          .eq('id', user.id);
+
+        // Ensure the profile is updated before redirecting
+        await fetchUserProfile();
+      }
+
+      // And finally, redirect to the dashboard
+      router.push('/dashboard');
     },
     resetOnboarding: () => {
       setCurrentStep(0);
       setIsActive(true);
-    }
+    },
+    restartOnboarding,
   };
 
   return (

@@ -9,6 +9,7 @@ export interface AuthState {
   profile: UserProfile | null;
   loading: boolean;
   checkUser: () => Promise<void>; // Added checkUser
+  fetchUserProfile: () => Promise<void>;
 }
 
 // This AuthContext is locally defined and likely not the one consumed by AuthProvider.tsx.
@@ -18,13 +19,32 @@ const AuthContext = createContext<AuthState>({
   profile: null,
   loading: true,
   checkUser: async () => {}, // Default async function for checkUser
+  fetchUserProfile: async () => {},
 });
 
-export const useAuth = () => {
+export const useAuth = (): AuthState => {
   // Individual state hooks
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+
+  const fetchUserProfile = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        if (error) throw error;
+        setProfile(data);
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        setProfile(null);
+      }
+    }
+  }, []);
 
   const checkUser = useCallback(async () => {
     setLoading(true); // Set loading true at the beginning of the check
@@ -64,7 +84,7 @@ export const useAuth = () => {
   }, [checkUser]); // checkUser is stable due to useCallback
 
   // Return the individual states and the checkUser function
-  return { user, profile, loading, checkUser };
+  return { user, profile, loading, checkUser, fetchUserProfile };
 };
 
 

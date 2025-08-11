@@ -6,8 +6,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { mainNavItems, backNavItem } from './navigation';
 import { useAuthContext } from '@/supa_database/components/AuthProvider';
-import { Lock, ChevronLeft, ChevronRight, LifeBuoy } from 'lucide-react';
+import { Lock, ChevronLeft, ChevronRight, LifeBuoy, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'next-i18next';
+import { useOnboarding } from '../onboarding/OnboardingProvider';
 
 interface IconProps {
   className?: string;
@@ -23,6 +24,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
   const { t } = useTranslation('common');
   const [collapsed, setCollapsed] = useState(false);
   const [showUpgradeTooltip, setShowUpgradeTooltip] = useState<string | null>(null);
+  const { restartOnboarding } = useOnboarding();
 
   // Load user preference from localStorage on component mount
   useEffect(() => {
@@ -221,8 +223,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ projectId }) => {
             title={t('sidebar_provide_feedback')}
           >
             <LifeBuoy className={`h-5 w-5 ${collapsed ? '' : 'mr-3'} text-gray-500`} />
-            {!collapsed && t('sidebar_feedback')}
           </a>
+        </div>
+        <div className={`${collapsed ? 'px-2' : 'px-4'} py-2 border-t border-gray-200`}>
+          <button
+            onClick={restartOnboarding}
+            className={`flex items-center ${collapsed ? 'justify-center' : ''} w-full px-2 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors`}
+            title={t('restart_onboarding')}
+          >
+            <RefreshCw className={`h-5 w-5 ${collapsed ? '' : 'mr-3'} text-gray-500`} />
+            {!collapsed && <span>{t('restart_onboarding')}</span>}
+          </button>
         </div>
       </aside>
 

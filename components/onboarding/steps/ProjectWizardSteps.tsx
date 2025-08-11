@@ -2,14 +2,44 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOnboarding } from '../OnboardingProvider';
 import { OnboardingTooltip } from '../OnboardingTooltip';
-import { CheckCircle, FileText, Upload } from 'lucide-react';
+import { CheckCircle, FileText, Upload, HelpCircle } from 'lucide-react';
 import { useTranslation } from 'next-i18next';
+
+// Mocked PITCH_DIMENSIONS for demonstration purposes
+const PITCH_DIMENSIONS = (t: any) => [
+  { id: 'problem', name: t('onboarding_wizard_problem') },
+  { id: 'solution', name: t('onboarding_wizard_solution') },
+  { id: 'target_market', name: t('onboarding_wizard_target_market') },
+  { id: 'business_model', name: t('onboarding_wizard_business_model') },
+  { id: 'competition', name: t('onboarding_wizard_competition') },
+  { id: 'usp', name: t('onboarding_wizard_usp') },
+  { id: 'team', name: 'Team' },
+  { id: 'financials', name: 'Financials' },
+  { id: 'traction', name: 'Traction' },
+  { id: 'go_to_market', name: 'Go-to-Market Strategy' },
+  { id: 'vision', name: 'Vision' },
+];
+
 
 export const ProjectWizardSteps: React.FC = () => {
   const { t } = useTranslation('common');
   const { nextStep, previousStep } = useOnboarding();
   const [subStep, setSubStep] = useState(0);
   const [tooltipStep, setTooltipStep] = useState(0);
+  const [coveredDimensions, setCoveredDimensions] = useState({
+    problem: true,
+    solution: true,
+    target_market: false,
+    business_model: false,
+    competition: false,
+    usp: false,
+    team: false,
+    financials: false,
+    traction: false,
+    go_to_market: false,
+    vision: false,
+  });
+
 
   // Refs for highlighting elements
   const nameFieldRef = useRef<HTMLInputElement>(null);
@@ -19,9 +49,10 @@ export const ProjectWizardSteps: React.FC = () => {
   const dimensionBoxRef = useRef<HTMLDivElement>(null);
   const progressPanelRef = useRef<HTMLDivElement>(null);
   const stageOptionRef = useRef<HTMLDivElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
-    if (subStep === 1 && tooltipStep < 3) {
+    if (subStep === 1 && tooltipStep < 4) {
       setTooltipStep(tooltipStep + 1);
     } else if (subStep < 3) {
       setSubStep(subStep + 1);
@@ -40,6 +71,12 @@ export const ProjectWizardSteps: React.FC = () => {
     } else {
       previousStep();
     }
+  };
+
+  const calculateProgress = () => {
+    const coveredCount = Object.values(coveredDimensions).filter(Boolean).length;
+    const totalDimensions = PITCH_DIMENSIONS(t).length;
+    return (coveredCount / totalDimensions) * 100;
   };
 
   const renderSubStep = () => {
@@ -86,7 +123,7 @@ export const ProjectWizardSteps: React.FC = () => {
             <OnboardingTooltip
               title={t('onboarding_wizard_basic_info_tooltip_title')}
               description={t('onboarding_wizard_basic_info_tooltip_desc')}
-              targetRef={nameFieldRef}
+              targetRef={[nameFieldRef, industryFieldRef]}
               position="right"
               showPrevious={true}
               onNext={handleNext}
@@ -129,7 +166,16 @@ export const ProjectWizardSteps: React.FC = () => {
                   >
                     {t('onboarding_wizard_show_assistant')}
                   </button>
+                  <div className="pt-4" ref={progressBarRef}>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                      <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: `${calculateProgress()}%` }}></div>
+                    </div>
+                    <p className="text-xs text-gray-500 text-center">
+                      {t('dimensions_covered', { count: Object.values(coveredDimensions).filter(Boolean).length, total: PITCH_DIMENSIONS(t).length })}
+                    </p>
+                  </div>
                 </div>
+
 
                 <div
                   ref={progressPanelRef}
@@ -155,6 +201,7 @@ export const ProjectWizardSteps: React.FC = () => {
                         </div>
                       ))}
                   </div>
+
                   <p className="text-xs text-gray-600 mt-3">
                     {t('onboarding_wizard_coverage_complete')}
                   </p>
@@ -181,7 +228,7 @@ export const ProjectWizardSteps: React.FC = () => {
                 title={t('onboarding_wizard_description_area_tooltip_title')}
                 description={t('onboarding_wizard_description_area_tooltip_desc')}
                 targetRef={descriptionFieldRef}
-                position="right center"
+                position="bottom center"
                 showPrevious={true}
                 onNext={handleNext}
                 onPrevious={handlePrevious}
@@ -207,7 +254,20 @@ export const ProjectWizardSteps: React.FC = () => {
                 title={t('onboarding_wizard_progress_tooltip_title')}
                 description={t('onboarding_wizard_progress_tooltip_desc')}
                 targetRef={progressPanelRef}
-                position="left"
+                position="far-left top"
+                showPrevious={true}
+                onNext={handleNext}
+                onPrevious={handlePrevious}
+              />
+            )}
+
+            {/* Tooltip 5: Progress Bar */}
+            {tooltipStep === 4 && (
+              <OnboardingTooltip
+                title={t('onboarding_wizard_coverage_tooltip_title')}
+                description={t('onboarding_wizard_coverage_tooltip_desc')}
+                targetRef={progressBarRef}
+                position="far-top right"
                 showPrevious={true}
                 onNext={handleNext}
                 onPrevious={handlePrevious}

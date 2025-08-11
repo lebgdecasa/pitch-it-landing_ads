@@ -7,15 +7,16 @@ const AuthContext = createContext<AuthState>({
   user: null,
   profile: null,
   loading: true,
-  checkUser: async () => {} // Added default checkUser function
-})
+  checkUser: async () => {}, // Added default checkUser function
+  fetchUserProfile: async () => {},
+});
 
 interface AuthProviderProps {
   children: ReactNode
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const auth = useAuth()
+  const auth = useAuth();
 
   return (
     <AuthContext.Provider value={auth}>

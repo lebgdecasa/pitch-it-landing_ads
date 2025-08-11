@@ -767,22 +767,22 @@
   "nav_sign_out": "Se déconnecter",
   "dashboard_header_user_placeholder": "Utilisateur",
   "onboarding_welcome_title": "Bienvenue sur NexTraction!",
-  "onboarding_welcome_subtitle": "Faisons un rapide tour pour vous montrer comment donner vie à votre projet avec des personas et des analyses alimentées par l'IA.",
+  "onboarding_welcome_subtitle": "Faisons un rapide tour pour vous montrer comment donner vie à votre projet avec des personas et des analyses alimentées par l'IA et un algorithme de recherche et analyse.",
+  "skip_onboarding": "Passer l'onboarding et explorer par moi-même !",
   "onboarding_welcome_feature1_title": "Créer des Projets",
   "onboarding_welcome_feature1_desc": "Configurez votre projet en quelques minutes avec notre assistant guidé",
   "onboarding_welcome_feature2_title": "Obtenez des Analyses IA et Algorithmiques",
-  "onboarding_welcome_feature2_desc": "Recevez des analyses de marché et de la concurrence complètes",
+  "onboarding_welcome_feature2_desc": "Nous analysons des forums spécialisés et des subreddits pertinents (Netnographie) pour découvrir les besoins des acheteurs et les gains attendus ; c'est ainsi que nous créons vos personas. Nous utilisons également des algorithmes de recherche approfondie et de pollinisation croisée pour identifier les tendances clés et les insights du marché.",
   "onboarding_welcome_feature3_title": "Discuter avec des Personas",
   "onboarding_welcome_feature3_desc": "Interagissez avec des personas d'acheteurs cibles générés par IA, créés spécifiquement pour votre projet",
   "onboarding_welcome_cta": "Commencer",
   "onboarding_welcome_tour_duration": "Cette visite prend environ 3 minutes",
-
   "onboarding_dashboard_tour_title": "Créer Votre Premier Projet",
   "onboarding_dashboard_tour_desc": "Cliquez sur ce bouton pour commencer à créer votre projet. Nous vous guiderons à chaque étape !",
   "onboarding_dashboard_mock_title": "Mes Projets",
   "onboarding_dashboard_mock_no_projects": "Aucun projet pour le moment",
   "onboarding_dashboard_mock_create_button": "Créer un Nouveau Projet",
-
+  "restart_onboarding": "Onboarding",
   "onboarding_wizard_step1_title": "Étape 1 : Informations de Base",
   "onboarding_wizard_project_name_label": "Nom du Projet",
   "onboarding_wizard_project_name_placeholder": "Mon Projet Génial",
@@ -813,9 +813,12 @@
   "onboarding_wizard_progress_tooltip_title": "Suivi de la Progression",
   "onboarding_wizard_progress_tooltip_desc": "Surveillez votre progression. Notre IA s'assure que vous couvrez toutes les dimensions commerciales essentielles.",
   "onboarding_wizard_dimensions_tooltip_title": "Guide des Dimensions",
-  "onboarding_wizard_dimensions_tooltip_desc": "Suivez ces invites pour construire une description de projet complète. Chaque dimension renforce votre analyse.",
+  "onboarding_wizard_dimensions_tooltip_desc": "Cette zone se met à jour dynamiquement pendant que vous tapez. Lorsque vous avez couvert une dimension avec succès, la zone affichera une nouvelle dimension, avec une question et un exemple !",
   "onboarding_wizard_description_area_tooltip_title": "Zone de Description du Projet",
   "onboarding_wizard_description_area_tooltip_desc": "Rédigez la description de votre projet ici. Pendant que vous tapez, notre IA analyse votre texte et identifie les dimensions que vous avez couvertes.",
+
+  "onboarding_wizard_coverage_tooltip_title": "Couverture des dimensions",
+  "onboarding_wizard_coverage_tooltip_desc": "Pour garantir une analyse approfondie et générer des personas précis, vous devez couvrir au moins 6 des 11 dimensions clés dans votre description. Vous ne pourrez pas continuer tant que cette exigence n'est pas satisfaite.",
 
   "onboarding_wizard_step3_title": "Étape 3 : Phase du Projet",
   "onboarding_wizard_stage_label": "Phase Actuelle",
@@ -827,6 +830,8 @@
   "onboarding_wizard_stage_mvp_desc": "Produit minimum viable prêt",
   "onboarding_wizard_stage_tooltip_title": "Choisissez Votre Phase",
   "onboarding_wizard_stage_tooltip_desc": "Sélectionnez votre phase de développement actuelle. Cela aide à adapter notre analyse et nos recommandations.",
+
+
 
   "onboarding_wizard_step4_title": "Projet Créé !",
   "onboarding_wizard_success_desc": "Votre projet a été créé et notre IA est en train d'analyser votre marché. Vous recevrez bientôt des informations détaillées et des personas.",
