@@ -16,7 +16,7 @@ export function usePersonas(projectId: string | undefined) {
 
     async function fetchPersonas() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('personas')
           .select('*')
           .eq('project_id', projectId)

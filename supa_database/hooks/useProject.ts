@@ -37,7 +37,7 @@ export const useProjects = (userId?: string) => {
 
   const createProject = async (projectData: Omit<Project, 'id' | 'created_at' | 'updated_at'>) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('projects')
         .insert(projectData)
         .select()
@@ -55,7 +55,7 @@ export const useProjects = (userId?: string) => {
 
   const updateProject = async (id: string, updates: Partial<Project>) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('projects')
         .update(updates)
         .eq('id', id)

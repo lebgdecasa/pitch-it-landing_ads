@@ -54,7 +54,7 @@ export default async function handler(
     const supabaseAdmin = createServerSupabaseClient();
 
     // Update user's subscription_tier in Supabase using the authenticatedUserId
-    const { data, error: dbError } = await supabaseAdmin
+    const { data, error: dbError } = await (supabaseAdmin as any)
       .from('users')
       .update({ subscription_tier: newPlan })
       .eq('id', authenticatedUserId) // Use ID from session

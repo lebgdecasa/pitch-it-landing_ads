@@ -6,7 +6,7 @@ export const createProjectAnalysis = async (
   analysisData: Omit<ProjectAnalysis, 'id' | 'created_at' | 'updated_at'>
 ) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('project_analysis')
       .insert(analysisData)
       .select()
@@ -50,7 +50,7 @@ export const updateProjectAnalysis = async (
   updates: Partial<ProjectAnalysis>
 ) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('project_analysis')
       .update(updates)
       .eq('id', id)

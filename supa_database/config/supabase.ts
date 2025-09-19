@@ -1,6 +1,6 @@
-import { createBrowserClient } from '@supabase/ssr'; // SupabaseClientOptions is not directly used from here for createBrowserClient
+import { createBrowserClient } from '@supabase/ssr';
 import { Database } from '../types/database';
-import { SupabaseClient, createClient, SupabaseClientOptions } from '@supabase/supabase-js'; // Import SupabaseClientOptions here
+import { SupabaseClient, createClient, SupabaseClientOptions } from '@supabase/supabase-js';
 import { type CookieOptions, createServerClient as createSsrServerClient } from '@supabase/ssr'; // Combined imports
 import { type NextApiRequest, type NextApiResponse } from 'next';
 
@@ -16,24 +16,20 @@ declare global {
 let supabaseSingleton: SupabaseClient<Database>;
 
 // Client options for the browser client
-// For createBrowserClient, the options type is inferred or part of its own signature,
-// not directly SupabaseClientOptions from '@supabase/supabase-js' in the same way.
-// However, the structure is similar.
-const browserClientOptions = { // Options for createBrowserClient
+const browserClientOptions: SupabaseClientOptions<'public'> = {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
   },
-  // cookies: { /* If using custom cookie handling with ssr client */ }
 };
 
 if (process.env.NODE_ENV === 'production') {
-  supabaseSingleton = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey, browserClientOptions);
+  supabaseSingleton = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey) as SupabaseClient<Database>;
 } else {
   if (!global.__globalSupabaseClientInstance) {
     console.log('Creating new Supabase browser client instance (development) via config/supabase.ts');
-    global.__globalSupabaseClientInstance = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey, browserClientOptions);
+    global.__globalSupabaseClientInstance = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey) as SupabaseClient<Database>;
   }
   supabaseSingleton = global.__globalSupabaseClientInstance;
 }

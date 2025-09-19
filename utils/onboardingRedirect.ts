@@ -7,7 +7,7 @@ import { supabase } from '@/supa_database/config/supabase';
  */
 export async function getRedirectPathAfterAuth(userId: string): Promise<string> {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('users')
       .select('has_completed_onboarding')
       .eq('id', userId)

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useAuthContext } from '@/supa_database/components/AuthProvider';
-import { supabase } from '@/supa_database/config/supabase';
+import { useAuthContext } from '../../supa_database/components/AuthProvider';
+import { supabase } from '../../supa_database/config/supabase';
 
 interface OnboardingState {
   isActive: boolean;
@@ -45,7 +45,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     setIsActive(false);
     setHasCompletedOnboarding(true);
 
-    await supabase
+    await (supabase as any)
       .from('users')
       .update({ has_completed_onboarding: true })
       .eq('id', user.id);
@@ -63,7 +63,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     try {
       // Set onboarding to false in the database
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('users')
         .update({ has_completed_onboarding: false })
         .eq('id', user.id);
@@ -112,7 +112,7 @@ export const OnboardingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setHasCompletedOnboarding(true);
 
         // Wait for the database update to complete before doing anything else
-        await supabase
+        await (supabase as any)
           .from('users')
           .update({
             has_completed_onboarding: true,

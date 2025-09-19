@@ -111,7 +111,7 @@ export const updateUserProfile = async (
   updates: Partial<UserProfile>
 ): Promise<UserProfile | null> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('users')
       .update(updates)
       .eq('id', userId)
@@ -168,7 +168,7 @@ export const deductCredits = async (
   amount: number = 1
 ): Promise<boolean> => {
   try {
-    const { data: profile } = await supabase
+    const { data: profile } = await (supabase as any)
       .from('users')
       .select('credits_remaining, subscription_tier')
       .eq('id', userId)
@@ -183,7 +183,7 @@ export const deductCredits = async (
     if (profile.credits_remaining < amount) return false
 
     // Deduct credits
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('users')
       .update({ credits_remaining: profile.credits_remaining - amount })
       .eq('id', userId)
