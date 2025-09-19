@@ -105,7 +105,7 @@ const nextConfig = {
       beforeFiles: [
         {
           source: '/proxy/:path*',
-          destination: `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/:path*`,
+          destination: `http://${process.env.BACKEND_HOST}/:path*`,
         },
       ],
     };
